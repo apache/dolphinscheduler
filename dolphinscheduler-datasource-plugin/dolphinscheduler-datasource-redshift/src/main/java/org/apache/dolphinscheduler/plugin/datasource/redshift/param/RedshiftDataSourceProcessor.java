@@ -59,8 +59,7 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
         redshiftDatasourceParamDTO.setMode(connectionParams.getMode());
         redshiftDatasourceParamDTO.setDbUser(connectionParams.getDbUser());
         if (connectionParams.getMode().equals(RedshiftAuthMode.PASSWORD)) {
-            redshiftDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-            redshiftDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+            redshiftDatasourceParamDTO.setHostAndPortByAddress(connectionParams.getAddress());
         } else {
             if (hostPortArray[0].contains(Constants.COLON)) {
                 String portString = hostPortArray[0].split(Constants.COLON)[1];

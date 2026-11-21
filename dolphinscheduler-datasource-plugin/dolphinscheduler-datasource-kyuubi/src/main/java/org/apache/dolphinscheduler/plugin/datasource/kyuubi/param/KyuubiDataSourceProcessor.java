@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.kyuubi.param;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
@@ -74,15 +73,7 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
             return kyuubiDataSourceParamDTO;
         }
 
-        String[] tmpArray = kyuubiConnectionParam.getAddress().split(Constants.DOUBLE_SLASH);
-        StringBuilder hosts = new StringBuilder();
-        String[] hostPortArray = tmpArray[tmpArray.length - 1].split(Constants.COMMA);
-        for (String hostPort : hostPortArray) {
-            hosts.append(hostPort.split(Constants.COLON)[0]).append(Constants.COMMA);
-        }
-        hosts.deleteCharAt(hosts.length() - 1);
-        kyuubiDataSourceParamDTO.setHost(hosts.toString());
-        kyuubiDataSourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        kyuubiDataSourceParamDTO.setHostAndPortByAddress(kyuubiConnectionParam.getAddress());
 
         return kyuubiDataSourceParamDTO;
     }

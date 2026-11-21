@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.azuresql.param;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
@@ -68,15 +67,11 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
         AzureSQLConnectionParam connectionParams = (AzureSQLConnectionParam) createConnectionParams(connectionJson);
-        String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-
         AzureSQLDataSourceParamDTO azureSQLDatasourceParamDTO = new AzureSQLDataSourceParamDTO();
         azureSQLDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         azureSQLDatasourceParamDTO.setUserName(connectionParams.getUser());
         azureSQLDatasourceParamDTO.setOther(connectionParams.getOther());
-        azureSQLDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        azureSQLDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        azureSQLDatasourceParamDTO.setHostAndPortByAddress(connectionParams.getAddress());
         azureSQLDatasourceParamDTO.setMode(connectionParams.getMode());
         switch (azureSQLDatasourceParamDTO.getMode()) {
             case AD_MSI:

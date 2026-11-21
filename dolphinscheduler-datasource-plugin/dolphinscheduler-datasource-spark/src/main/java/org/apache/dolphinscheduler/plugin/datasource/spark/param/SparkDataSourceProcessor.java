@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.spark.param;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
@@ -36,7 +35,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -64,15 +62,7 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
         sparkDatasourceParamDTO.setLoginUserKeytabUsername(connectionParams.getLoginUserKeytabUsername());
         sparkDatasourceParamDTO.setPrincipal(connectionParams.getPrincipal());
 
-        StringBuilder hosts = new StringBuilder();
-        String[] tmpArray = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = tmpArray[tmpArray.length - 1].split(Constants.COMMA);
-        Arrays.stream(hostPortArray)
-                .forEach(hostPort -> hosts.append(hostPort.split(Constants.COLON)[0]).append(Constants.COMMA));
-        hosts.deleteCharAt(hosts.length() - 1);
-
-        sparkDatasourceParamDTO.setHost(hosts.toString());
-        sparkDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        sparkDatasourceParamDTO.setHostAndPortByAddress(connectionParams.getAddress());
 
         return sparkDatasourceParamDTO;
     }

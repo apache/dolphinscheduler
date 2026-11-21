@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.snowflake.param;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
@@ -51,16 +50,8 @@ public class SnowflakeDatasourceProcessor extends AbstractDataSourceProcessor {
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
         SnowflakeConnectionParam snowFlakeConnectionParam =
                 (SnowflakeConnectionParam) createConnectionParams(connectionJson);
-        String[] tmpArray = snowFlakeConnectionParam.getAddress().split(Constants.DOUBLE_SLASH);
-        StringBuilder hosts = new StringBuilder();
-        String[] hostPortArray = tmpArray[tmpArray.length - 1].split(Constants.COMMA);
-        for (String hostPort : hostPortArray) {
-            hosts.append(hostPort.split(Constants.COLON)[0]).append(Constants.COMMA);
-        }
-        hosts.deleteCharAt(hosts.length() - 1);
         SnowflakeDatasourceParamDTO snowflakeDatasourceParamDTO = new SnowflakeDatasourceParamDTO();
-        snowflakeDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        snowflakeDatasourceParamDTO.setHost(hosts.toString());
+        snowflakeDatasourceParamDTO.setHostAndPortByAddress(snowFlakeConnectionParam.getAddress());
         snowflakeDatasourceParamDTO.setDatabase(snowFlakeConnectionParam.getDatabase());
         snowflakeDatasourceParamDTO.setUserName(snowFlakeConnectionParam.getUser());
         snowflakeDatasourceParamDTO.setOther(snowFlakeConnectionParam.getOther());

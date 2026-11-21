@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.presto.param;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
@@ -51,12 +50,8 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
         PrestoConnectionParam connectionParams = (PrestoConnectionParam) createConnectionParams(connectionJson);
 
-        String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-
         PrestoDataSourceParamDTO prestoDatasourceParamDTO = new PrestoDataSourceParamDTO();
-        prestoDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        prestoDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        prestoDatasourceParamDTO.setHostAndPortByAddress(connectionParams.getAddress());
         prestoDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         prestoDatasourceParamDTO.setUserName(connectionParams.getUser());
         prestoDatasourceParamDTO.setOther(connectionParams.getOther());

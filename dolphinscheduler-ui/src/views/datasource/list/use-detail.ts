@@ -58,10 +58,13 @@ export function useDetail(getFieldsValue: Function) {
   const queryById = async (id: number) => {
     if (status.loading) return {}
     status.loading = true
-    const dataSourceRes = await queryDataSource(id)
-    status.loading = false
-    PREV_NAME = dataSourceRes.name
-    return dataSourceRes
+    try {
+      const dataSourceRes = await queryDataSource(id)
+      PREV_NAME = dataSourceRes.name
+      return dataSourceRes
+    } finally {
+      status.loading = false
+    }
   }
 
   const testConnect = async () => {

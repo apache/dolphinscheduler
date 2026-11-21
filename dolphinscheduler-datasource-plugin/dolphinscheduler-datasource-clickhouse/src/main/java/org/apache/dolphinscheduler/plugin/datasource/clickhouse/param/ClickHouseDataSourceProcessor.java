@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.clickhouse.param;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
@@ -56,10 +55,7 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
         clickHouseDatasourceParamDTO.setUserName(connectionParams.getUser());
         clickHouseDatasourceParamDTO.setOther(connectionParams.getOther());
 
-        String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-        clickHouseDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        clickHouseDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        clickHouseDatasourceParamDTO.setHostAndPortByAddress(connectionParams.getAddress());
 
         return clickHouseDatasourceParamDTO;
     }

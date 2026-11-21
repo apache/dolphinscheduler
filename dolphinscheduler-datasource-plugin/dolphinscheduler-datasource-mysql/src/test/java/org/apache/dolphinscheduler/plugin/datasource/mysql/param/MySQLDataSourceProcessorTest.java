@@ -85,6 +85,15 @@ public class MySQLDataSourceProcessorTest {
     }
 
     @Test
+    public void testCreateDatasourceParamDTOWithMultiHost() {
+        String connectionJson = "{\"address\":\"jdbc:mysql://h1,h2:3306\",\"database\":\"default\",\"user\":\"root\"}";
+        MySQLDataSourceParamDTO dto =
+                (MySQLDataSourceParamDTO) mysqlDatasourceProcessor.createDatasourceParamDTO(connectionJson);
+        Assertions.assertEquals("h1,h2", dto.getHost());
+        Assertions.assertEquals(3306, dto.getPort());
+    }
+
+    @Test
     public void testGetDbType() {
         Assertions.assertEquals(DbType.MYSQL, mysqlDatasourceProcessor.getDbType());
     }

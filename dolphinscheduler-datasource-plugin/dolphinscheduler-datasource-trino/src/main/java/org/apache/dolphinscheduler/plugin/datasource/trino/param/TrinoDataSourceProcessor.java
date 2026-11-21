@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.trino.param;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
@@ -52,13 +51,8 @@ public class TrinoDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
         TrinoConnectionParam connectionParams = (TrinoConnectionParam) createConnectionParams(connectionJson);
 
-        String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-
         TrinoDataSourceParamDTO TrinoDatasourceParamDTO = new TrinoDataSourceParamDTO();
-        String[] split = hostPortArray[0].split(Constants.COLON);
-        TrinoDatasourceParamDTO.setHost(split[0]);
-        TrinoDatasourceParamDTO.setPort(Integer.valueOf(split[1]));
+        TrinoDatasourceParamDTO.setHostAndPortByAddress(connectionParams.getAddress());
         TrinoDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         TrinoDatasourceParamDTO.setUserName(connectionParams.getUser());
         TrinoDatasourceParamDTO.setOther(connectionParams.getOther());

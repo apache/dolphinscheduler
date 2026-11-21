@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.databend.param;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
@@ -55,10 +54,7 @@ public class DatabendDataSourceProcessor extends AbstractDataSourceProcessor {
         databendDatasourceParamDTO.setUserName(connectionParams.getUser());
         databendDatasourceParamDTO.setOther(connectionParams.getOther());
 
-        String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-        databendDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        databendDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        databendDatasourceParamDTO.setHostAndPortByAddress(connectionParams.getAddress());
 
         return databendDatasourceParamDTO;
     }

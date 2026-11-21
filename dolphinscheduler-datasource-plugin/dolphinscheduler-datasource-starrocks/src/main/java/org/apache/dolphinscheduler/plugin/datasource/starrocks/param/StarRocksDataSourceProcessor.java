@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.starrocks.param;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
@@ -71,11 +70,7 @@ public class StarRocksDataSourceProcessor extends AbstractDataSourceProcessor {
         starRocksDataSourceParamDTO.setDatabase(connectionParams.getDatabase());
         starRocksDataSourceParamDTO.setOther(connectionParams.getOther());
 
-        String address = connectionParams.getAddress();
-        String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-        starRocksDataSourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        starRocksDataSourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        starRocksDataSourceParamDTO.setHostAndPortByAddress(connectionParams.getAddress());
 
         return starRocksDataSourceParamDTO;
     }

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.oceanbase.param;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
@@ -70,11 +69,7 @@ public class OceanBaseDataSourceProcessor extends AbstractDataSourceProcessor {
         dataSourceParamDTO.setDatabase(connectionParams.getDatabase());
         dataSourceParamDTO.setOther(connectionParams.getOther());
 
-        String address = connectionParams.getAddress();
-        String[] hostSeparator = address.split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = hostSeparator[hostSeparator.length - 1].split(Constants.COMMA);
-        dataSourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        dataSourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        dataSourceParamDTO.setHostAndPortByAddress(connectionParams.getAddress());
         return dataSourceParamDTO;
     }
 

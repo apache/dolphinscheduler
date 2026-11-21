@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.db2.param;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
@@ -57,10 +56,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
         db2DatasourceParamDTO.setOther(connectionParams.getOther());
         db2DatasourceParamDTO.setUserName(connectionParams.getUser());
 
-        String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-        db2DatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
-        db2DatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        db2DatasourceParamDTO.setHostAndPortByAddress(connectionParams.getAddress());
 
         return db2DatasourceParamDTO;
     }

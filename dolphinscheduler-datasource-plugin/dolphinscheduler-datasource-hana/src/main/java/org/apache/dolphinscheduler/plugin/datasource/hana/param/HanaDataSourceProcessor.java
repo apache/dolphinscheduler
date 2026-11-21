@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hana.param;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
@@ -52,11 +51,7 @@ public class HanaDataSourceProcessor extends AbstractDataSourceProcessor {
         HanaDataSourceParamDTO mysqlDatasourceParamDTO = new HanaDataSourceParamDTO();
         mysqlDatasourceParamDTO.setUserName(connectionParams.getUser());
         mysqlDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        String address = connectionParams.getAddress();
-        String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-        mysqlDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        mysqlDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        mysqlDatasourceParamDTO.setHostAndPortByAddress(connectionParams.getAddress());
 
         return mysqlDatasourceParamDTO;
     }
