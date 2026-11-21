@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   useCustomParams,
@@ -29,7 +29,13 @@ import {
   useResources,
   useYarnQueue
 } from '.'
-import type { IJsonItem } from '../types'
+import {
+  getResourceDirAfter,
+  spliceUselessResources,
+  validateResourceExist
+} from './use-resources'
+import type { ResourceOption } from './use-resources'
+import type { IJsonItem, IJsonItemParams } from '../types'
 
 export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
@@ -49,9 +55,20 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
     model.programType === 'SQL' && model.sqlExecutionType === 'FILE'
   )
 
+  const pyFilesSpan = computed(() => (model.programType === 'PYTHON' ? 24 : 0))
+
   const resourcesLimit = computed(() =>
     model.programType === 'SQL' && model.sqlExecutionType === 'FILE' ? 1 : -1
   )
+
+  const resourcesField = useResources(
+    24,
+    resourcesRequired,
+    resourcesLimit
+  ) as IJsonItemParams
+
+  const resourcesOptions = resourcesField.options as Ref<ResourceOption[]>
+  const resourcesLoading = resourcesField.props.loading as Ref<boolean>
 
   const sqlExecutionTypeSpan = computed(() =>
     model.programType === 'SQL' ? 12 : 0
@@ -87,6 +104,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         'on-update:value': () => {
           model.mainJar = null
           model.mainClass = ''
+          model.pyFiles = []
         }
       }
     },
@@ -186,7 +204,136 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         placeholder: t('project.node.option_parameters_tips')
       }
     },
-    useResources(24, resourcesRequired, resourcesLimit),
+    {
+      type: 'tree-select',
+      field: 'pyFiles',
+      span: pyFilesSpan,
+      name: t('project.node.py_files'),
+      options: resourcesField.options,
+      props: {
+        multiple: true,
+        checkable: true,
+        cascade: true,
+        showPath: true,
+        filterable: true,
+        clearFilterAfterSelect: false,
+        checkStrategy: 'child',
+        placeholder: t('project.node.py_files_tips'),
+        keyField: 'fullName',
+        labelField: 'name'
+      },
+      validate: {
+        trigger: ['blur'],
+        validator(validate: any, value: string[]) {
+          if (value) {
+            const errorName = spliceUselessResources(
+              value,
+              resourcesOptions.value,
+              resourcesLoading.value
+            )
+            if (errorName) {
+              return new Error(
+                t('project.node.useless_resources_tips') + errorName
+              )
+            }
+          }
+        }
+      }
+    },
+    {
+      type: 'tree-select',
+      field: 'archives',
+      span: 24,
+      name: t('project.node.archives'),
+      options: resourcesField.options,
+      props: {
+        multiple: true,
+        checkable: true,
+        cascade: true,
+        showPath: true,
+        filterable: true,
+        clearFilterAfterSelect: false,
+        checkStrategy: 'child',
+        placeholder: t('project.node.archives_tips'),
+        keyField: 'fullName',
+        labelField: 'name'
+      },
+      validate: {
+        trigger: ['blur'],
+        validator(validate: any, value: string[]) {
+          if (value) {
+            const errorName = spliceUselessResources(
+              value,
+              resourcesOptions.value,
+              resourcesLoading.value
+            )
+            if (errorName) {
+              return new Error(
+                t('project.node.useless_resources_tips') + errorName
+              )
+            }
+          }
+        }
+      }
+    },
+    {
+      type: 'input',
+      field: 'principal',
+      span: 24,
+      name: t('project.node.principal'),
+      props: {
+        placeholder: t('project.node.principal_tips')
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        validator(validate: any, value: string) {
+          if (value && !model.keytab) {
+            return new Error(t('project.node.principal_keytab_pair_tips'))
+          }
+        }
+      }
+    },
+    {
+      type: 'tree-select',
+      field: 'keytab',
+      span: 24,
+      name: t('project.node.keytab'),
+      options: resourcesField.options,
+      props: {
+        checkable: true,
+        cascade: true,
+        showPath: true,
+        filterable: true,
+        checkStrategy: 'child',
+        placeholder: t('project.node.keytab_tips'),
+        keyField: 'fullName',
+        labelField: 'name'
+      },
+      validate: {
+        trigger: ['blur'],
+        validator(validate: any, value: string) {
+          if (value) {
+            // the resource tree may still be loading; defer the stale check until it is ready
+            if (
+              !resourcesLoading.value &&
+              !validateResourceExist(value, [], resourcesOptions.value)
+            ) {
+              model.keytab = null
+              return new Error(
+                t('project.node.useless_resources_tips') +
+                  ': ' +
+                  getResourceDirAfter(value, []) +
+                  ';'
+              )
+            }
+            if (!model.principal) {
+              return new Error(t('project.node.principal_keytab_pair_tips'))
+            }
+          }
+        }
+      }
+    },
+    resourcesField,
     ...useCustomParams({
       model,
       field: 'localParams',

@@ -264,6 +264,10 @@ interface IRuleParameters {
 interface ITaskParams {
   resourceList?: ISourceItem[]
   mainJar?: ISourceItem
+  pyFiles?: ISourceItem[]
+  archives?: ISourceItem[]
+  principal?: string
+  keytab?: ISourceItem
   localParams?: ILocalParam[]
   runType?: string
   jvmArgs?: string
@@ -487,6 +491,9 @@ interface INodeData
       ITaskParams,
       | 'resourceList'
       | 'mainJar'
+      | 'pyFiles'
+      | 'archives'
+      | 'keytab'
       | 'targetParams'
       | 'sourceParams'
       | 'dependence'
@@ -523,6 +530,9 @@ interface INodeData
   postTaskOptions?: []
   resourceList?: string[]
   mainJar?: string
+  pyFiles?: string[]
+  archives?: string[]
+  keytab?: string | null
   timeoutSetting?: boolean
   isCustomTask?: boolean
   method?: string

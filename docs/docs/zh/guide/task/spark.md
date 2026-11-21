@@ -33,6 +33,10 @@ Spark  任务类型用于执行 Spark 应用。对于 Spark 节点，worker 支�
 - Yarn 队列：用于设置 Yarn 队列，默认使用 default 队列。
 - 主程序参数：设置 Spark 程序的输入参数，支持自定义参数变量的替换。
 - 选项参数：设置Spark命令的选项参数，例如`--jars`、`--files`、`--archives`、`--conf`。
+- PyFiles：从资源中心选择 `.py`/`.zip`/`.egg` 文件分发到 Executor（加入 PYTHONPATH）。仅 PYTHON 程序类型可用。
+- Archives：从资源中心选择 `.tar`/`.zip`/`.tgz` 压缩包分发到 Executor。
+- Principal：Kerberos 认证主体，用于安全 Hadoop 集群，例如 `user@REALM`。须与 Keytab 成对配置。
+- Keytab：Kerberos keytab 文件（来自资源中心）。须与 Principal 成对配置。
 - 资源：如果其他参数中引用了资源文件，需要在资源中选择指定。
 - 自定义参数：是 Spark 局部的用户自定义参数，会替换脚本中以 ${变量} 的内容。
 

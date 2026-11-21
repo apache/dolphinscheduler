@@ -38,6 +38,26 @@ public class SparkConstants {
      */
     public static final String SPARK_YARN_QUEUE = "--queue";
 
+    /**
+     * --py-files PY_FILES
+     */
+    public static final String PY_FILES = "--py-files";
+
+    /**
+     * --archives ARCHIVES
+     */
+    public static final String ARCHIVES = "--archives";
+
+    /**
+     * --principal PRINCIPAL
+     */
+    public static final String PRINCIPAL = "--principal";
+
+    /**
+     * --keytab KEYTAB
+     */
+    public static final String KEYTAB = "--keytab";
+
     public static final String DEPLOY_MODE = "--deploy-mode";
 
     public static final String DEPLOY_MODE_LOCAL = "local";
