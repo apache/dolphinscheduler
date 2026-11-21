@@ -80,22 +80,24 @@ public class WorkflowScheduleTrigger
                 EnvironmentUtils.getEnvironmentCodeOrDefault(scheduleTriggerRequest.getEnvironmentCode()));
         workflowInstance.setTimeout(workflowDefinition.getTimeout());
         workflowInstance.setDryRun(scheduleTriggerRequest.getDryRun().getCode());
+        final ScheduleWorkflowCommandParam scheduleWorkflowCommandParam = ScheduleWorkflowCommandParam.builder()
+                .timeZone(scheduleTriggerRequest.getTimezoneId())
+                .build();
+        workflowInstance.setCommandParam(JSONUtils.toJsonString(scheduleWorkflowCommandParam));
+        workflowInstance.setGlobalParams(
+                mergeCommandParamsWithWorkflowParams(scheduleWorkflowCommandParam, workflowDefinition));
         return ImmutablePair.of(workflowDefinition, workflowInstance);
     }
 
     @Override
     protected Command constructTriggerCommand(final WorkflowScheduleTriggerRequest scheduleTriggerRequest,
                                               final WorkflowInstance workflowInstance) {
-        final ScheduleWorkflowCommandParam scheduleWorkflowCommandParam = ScheduleWorkflowCommandParam.builder()
-                .timeZone(scheduleTriggerRequest.getTimezoneId())
-                .build();
         return Command.builder()
                 .commandType(CommandType.SCHEDULER)
                 .workflowDefinitionCode(scheduleTriggerRequest.getWorkflowCode())
                 .workflowDefinitionVersion(scheduleTriggerRequest.getWorkflowVersion())
                 .workflowInstanceId(workflowInstance.getId())
                 .workflowInstancePriority(workflowInstance.getWorkflowInstancePriority())
-                .commandParam(JSONUtils.toJsonString(scheduleWorkflowCommandParam))
                 .build();
     }
 

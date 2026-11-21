@@ -46,11 +46,18 @@
 
 ## 3.4.3
 
+* 工作流启动参数（`commandParam` 和合并后的 `globalParams`）改为在创建实例时持久化，启动命令不再携带这些参数。升级前请停止新增触发，并等待旧版 Master 消费待启动命令（包括 `SERIAL_WAIT` 实例）。所有 Master 需统一升级，本次变更不支持新旧版 Master 混合执行。尚未执行的实例因暂停而已经丢失的参数无法自动恢复。([#18801](https://github.com/apache/dolphinscheduler/issues/18801))
+
 * 为 `t_ds_schedules` 表新增 `missed_fire_policy` 字段。现有定时默认使用 `FIRE_ALL_MISSED`，以保持原有 Quartz `IgnoreMisfires` 行为。([#18464](https://github.com/apache/dolphinscheduler/pull/18464))
+
 * 移除已废弃的 Dynamic Task 查询接口。([#18556](https://github.com/apache/dolphinscheduler/issues/18556))
+
 * 移除已废弃的任务及其上游关系更新接口 `PUT /projects/{projectCode}/task-definition/{code}/with-upstream`。([#18568](https://github.com/apache/dolphinscheduler/issues/18568))
+
 * 移除已废弃的集群查询接口 `GET /cluster/query-by-code`。
+
 * 工作流实例列表接口（`GET /projects/{projectCode}/workflow-instances`、`GET /projects/{projectCode}/workflow-instances/top-n`、`GET /projects/{projectCode}/workflow-instances/trigger`）的响应体不再返回以下属性：
+
   * **移除的大字段**：`commandParam`、`globalParams`、`historyCmd`、`varPool`、`stateHistory`
   * **移除的非数据库字段**：`stateDescList`、`workflowDefinition`、`dagData`、`queue`、`locations`、`dependenceScheduleTimes`
   * **移除的派生属性**：`cmdTypeIfComplement`、`complementData`（补数执行相关，如需获取请使用详情接口）
