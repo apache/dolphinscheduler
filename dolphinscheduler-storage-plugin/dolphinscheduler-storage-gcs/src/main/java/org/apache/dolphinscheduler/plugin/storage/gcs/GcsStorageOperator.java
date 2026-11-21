@@ -81,6 +81,13 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
         checkBucketNameExists(bucketName);
     }
 
+    // VisibleForTesting
+    GcsStorageOperator(String resourceUploadPath, String bucketName, Storage gcsStorage) {
+        super(resourceUploadPath);
+        this.bucketName = bucketName;
+        this.gcsStorage = gcsStorage;
+    }
+
     @Override
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
@@ -89,7 +96,7 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
                     resourceBaseAbsolutePath);
             return resourceBaseAbsolutePath.substring(1);
         }
-        return getStorageBaseDirectory();
+        return resourceBaseAbsolutePath;
     }
 
     @SneakyThrows
@@ -121,17 +128,42 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
 
     @Override
     public boolean exists(String fullName) {
-        fullName = transformAbsolutePathToGcsKey(fullName);
-        Blob blob = gcsStorage.get(BlobId.of(bucketName, fullName));
+        return checkBlobExists(transformAbsolutePathToGcsKey(fullName));
+    }
+
+    private boolean checkBlobExists(String gcsKey) {
+        Blob blob = gcsStorage.get(BlobId.of(bucketName, gcsKey));
         return blob != null && blob.exists();
     }
 
     @SneakyThrows
     @Override
     public void delete(String filePath, boolean recursive) {
-        filePath = transformAbsolutePathToGcsKey(filePath);
-        if (exists(filePath)) {
-            gcsStorage.delete(BlobId.of(bucketName, filePath));
+        String gcsKey = transformAbsolutePathToGcsKey(filePath);
+        ResourceMetadata resourceMetaData = getResourceMetaData(filePath);
+        if (!resourceMetaData.isDirectory()) {
+            if (checkBlobExists(gcsKey)) {
+                gcsStorage.delete(BlobId.of(bucketName, gcsKey));
+            }
+            return;
+        }
+
+        if (recursive) {
+            Page<Blob> blobs = gcsStorage.list(bucketName, Storage.BlobListOption.prefix(gcsKey));
+            List<BlobId> batch = new ArrayList<>();
+            for (Blob blob : blobs.iterateAll()) {
+                batch.add(blob.getBlobId());
+                if (batch.size() >= 100) {
+                    gcsStorage.delete(batch);
+                    batch = new ArrayList<>();
+                }
+            }
+            if (!batch.isEmpty()) {
+                gcsStorage.delete(batch);
+            }
+        }
+        if (checkBlobExists(gcsKey)) {
+            gcsStorage.delete(BlobId.of(bucketName, gcsKey));
         }
     }
 
@@ -183,8 +215,8 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
 
         Blob blob = gcsStorage.get(BlobId.of(bucketName, filePath));
         try (
-                BufferedReader bufferedReader =
-                        new BufferedReader(new InputStreamReader(new ByteArrayInputStream(blob.getContent())))) {
+                BufferedReader bufferedReader = new BufferedReader(
+                        new InputStreamReader(new ByteArrayInputStream(blob.getContent())))) {
             Stream<String> stream = bufferedReader.lines().skip(skipLineNums).limit(limit);
             return stream.collect(Collectors.toList());
         }
