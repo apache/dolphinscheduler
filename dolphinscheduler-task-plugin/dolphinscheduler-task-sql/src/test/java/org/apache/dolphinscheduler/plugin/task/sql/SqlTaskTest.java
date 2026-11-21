@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.enums.AlertType;
@@ -45,6 +47,8 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.HashMap;
@@ -982,10 +986,125 @@ class SqlTaskTest {
         }
     }
 
+    private void assertInvalidQueryMaxRows(String value) {
+        try (MockedStatic<PropertyUtils> propertyUtils = Mockito.mockStatic(PropertyUtils.class)) {
+            propertyUtils.when(() -> PropertyUtils.getString("sql.task.query.max.rows"))
+                    .thenReturn(value);
+            IllegalArgumentException exception =
+                    Assertions.assertThrows(IllegalArgumentException.class, () -> createSqlTaskWithQueryLimit(0));
+            Assertions.assertEquals(
+                    "Property sql.task.query.max.rows must be a positive integer, but got: " + value,
+                    exception.getMessage());
+        }
+    }
+
     private int readStaticIntConstant(String name) throws Exception {
         Field field = SqlTask.class.getDeclaredField(name);
         field.setAccessible(true);
         return field.getInt(null);
+    }
+
+    private SqlTask createSqlTaskWithQueryLimit(int limit) {
+        SqlParameters sqlParameters = new SqlParameters();
+        sqlParameters.setType("HIVE");
+        sqlParameters.setDatasource(1);
+        sqlParameters.setSql("select 1");
+        sqlParameters.setLimit(limit);
+
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams(JSONUtils.toJsonString(sqlParameters));
+        ctx.setTaskName("test_sql_task");
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+        return new SqlTask(ctx);
+    }
+
+    private PreparedStatement prepareStatementAndBind(SqlTask task, Connection connection) throws Exception {
+        PreparedStatement stmt = mock(PreparedStatement.class);
+        when(connection.prepareStatement(anyString())).thenReturn(stmt);
+
+        Method method = SqlTask.class.getDeclaredMethod("prepareStatementAndBind", Connection.class, SqlBinds.class);
+        method.setAccessible(true);
+        return (PreparedStatement) method.invoke(task, connection, new SqlBinds("select 1", null));
+    }
+
+    @Test
+    void testPrepareStatementAndBindUsesTaskLimitWhenSet() throws Exception {
+        SqlTask task = createSqlTaskWithQueryLimit(5);
+        PreparedStatement stmt = prepareStatementAndBind(task, mock(Connection.class));
+
+        verify(stmt).setMaxRows(5);
+        Mockito.verifyNoMoreInteractions(stmt);
+    }
+
+    @Test
+    void testPrepareStatementAndBindFallsBackToDefaultQueryLimit() throws Exception {
+        SqlTask task = createSqlTaskWithQueryLimit(0);
+        PreparedStatement stmt = prepareStatementAndBind(task, mock(Connection.class));
+
+        verify(stmt).setMaxRows(readStaticIntConstant("QUERY_LIMIT"));
+        Mockito.verifyNoMoreInteractions(stmt);
+    }
+
+    @Test
+    void testPrepareStatementAndBindFallsBackToConfiguredQueryMaxRows() throws Exception {
+        try (MockedStatic<PropertyUtils> propertyUtils = Mockito.mockStatic(PropertyUtils.class)) {
+            // queryMaxRows is read once at task construction, so the task must be created
+            // inside the mocked scope.
+            propertyUtils.when(() -> PropertyUtils.getString("sql.task.query.max.rows"))
+                    .thenReturn("7");
+            SqlTask task = createSqlTaskWithQueryLimit(0);
+            PreparedStatement stmt = prepareStatementAndBind(task, mock(Connection.class));
+
+            verify(stmt).setMaxRows(7);
+            Mockito.verifyNoMoreInteractions(stmt);
+        }
+    }
+
+    @Test
+    void testQueryMaxRowsFallsBackToDefaultWhenNotConfigured() throws Exception {
+        try (MockedStatic<PropertyUtils> propertyUtils = Mockito.mockStatic(PropertyUtils.class)) {
+            propertyUtils.when(() -> PropertyUtils.getString("sql.task.query.max.rows"))
+                    .thenReturn(null);
+            SqlTask task = createSqlTaskWithQueryLimit(0);
+            PreparedStatement stmt = prepareStatementAndBind(task, mock(Connection.class));
+
+            verify(stmt).setMaxRows(readStaticIntConstant("QUERY_LIMIT"));
+            Mockito.verifyNoMoreInteractions(stmt);
+        }
+    }
+
+    @Test
+    void testQueryMaxRowsRejectsMalformedValue() {
+        assertInvalidQueryMaxRows("1000x");
+    }
+
+    @Test
+    void testQueryMaxRowsRejectsEmptyValue() {
+        assertInvalidQueryMaxRows("");
+    }
+
+    @Test
+    void testQueryMaxRowsRejectsZero() {
+        assertInvalidQueryMaxRows("0");
+    }
+
+    @Test
+    void testQueryMaxRowsRejectsNegativeValue() {
+        assertInvalidQueryMaxRows("-5");
+    }
+
+    @Test
+    void testQueryMaxRowsRejectsMalformedValuePreservingCause() {
+        try (MockedStatic<PropertyUtils> propertyUtils = Mockito.mockStatic(PropertyUtils.class)) {
+            propertyUtils.when(() -> PropertyUtils.getString("sql.task.query.max.rows"))
+                    .thenReturn("1000x");
+            IllegalArgumentException exception =
+                    Assertions.assertThrows(IllegalArgumentException.class, () -> createSqlTaskWithQueryLimit(0));
+            Assertions.assertEquals(
+                    "Property sql.task.query.max.rows must be a positive integer, but got: 1000x",
+                    exception.getMessage());
+            Assertions.assertInstanceOf(NumberFormatException.class, exception.getCause());
+        }
     }
 
     @Test

@@ -91,7 +91,8 @@ public class SqlTask extends AbstractTask {
             "create or replace temporary function {0} as ''{1}''";
 
     /**
-     * default query sql limit
+     * default max rows fetched when the task-level "limit" parameter is not set, overridable
+     * via the sql.task.query.max.rows property in common.properties, which must be a positive integer
      */
     private static final int QUERY_LIMIT = 10000;
 
@@ -123,12 +124,40 @@ public class SqlTask extends AbstractTask {
     private final int alertMaxContentBytes =
             PropertyUtils.getInt(Constants.SQL_TASK_ALERT_MAX_CONTENT_BYTES, DEFAULT_ALERT_MAX_CONTENT_BYTES);
 
+    private final int queryMaxRows = readQueryMaxRows();
+
     private final SQLTaskExecutionContext sqlTaskExecutionContext;
 
     private final DbType dbType;
 
     private Connection sessionConnection;
     private Statement sessionStatement;
+
+    private static int readQueryMaxRows() {
+        String value = PropertyUtils.getString(Constants.SQL_TASK_QUERY_MAX_ROWS);
+        if (value == null) {
+            return QUERY_LIMIT;
+        }
+        int rows;
+        try {
+            rows = Integer.parseInt(value.trim());
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "Property %s must be a positive integer, but got: %s",
+                            Constants.SQL_TASK_QUERY_MAX_ROWS,
+                            value),
+                    exception);
+        }
+        if (rows <= 0) {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "Property %s must be a positive integer, but got: %s",
+                            Constants.SQL_TASK_QUERY_MAX_ROWS,
+                            value));
+        }
+        return rows;
+    }
 
     public SqlTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
@@ -519,7 +548,7 @@ public class SqlTask extends AbstractTask {
             if (timeoutFlag) {
                 stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
             }
-            stmt.setMaxRows(sqlParameters.getLimit() <= 0 ? QUERY_LIMIT : sqlParameters.getLimit());
+            stmt.setMaxRows(sqlParameters.getLimit() <= 0 ? queryMaxRows : sqlParameters.getLimit());
             Map<Integer, Property> params = sqlBinds.getParamsMap();
             if (params != null) {
                 for (Map.Entry<Integer, Property> entry : params.entrySet()) {
