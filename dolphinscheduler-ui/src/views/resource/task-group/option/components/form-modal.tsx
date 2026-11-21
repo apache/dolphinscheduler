@@ -158,7 +158,6 @@ const FormModal = defineComponent({
             path='description'
           >
             <NInput
-              allowInput={this.trim}
               v-model={[this.formData.description, 'value']}
               type='textarea'
               placeholder={t('resource.task_group_option.please_enter_desc')}
