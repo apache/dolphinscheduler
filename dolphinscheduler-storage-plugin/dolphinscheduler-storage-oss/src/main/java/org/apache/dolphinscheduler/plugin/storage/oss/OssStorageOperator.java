@@ -51,6 +51,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSException;
+import com.aliyun.oss.model.DeleteObjectsRequest;
 import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.ListObjectsV2Request;
 import com.aliyun.oss.model.ListObjectsV2Result;
@@ -174,8 +175,35 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
 
     @Override
     public void delete(String filePath, boolean recursive) {
-        filePath = transformAbsolutePathToOssKey(filePath);
-        ossClient.deleteObject(bucketName, filePath);
+        // The prefix keeps the trailing separator so deleting "dir1" does not match "dir10"
+        if (recursive && getResourceMetaData(filePath).isDirectory()) {
+            deleteObjectsByPrefix(transformAbsolutePathToOssKey(filePath));
+            return;
+        }
+        ossClient.deleteObject(bucketName, transformAbsolutePathToOssKey(filePath));
+    }
+
+    private void deleteObjectsByPrefix(String prefix) {
+        String continuationToken = null;
+        boolean truncated;
+        do {
+            ListObjectsV2Request listObjectsV2Request = new ListObjectsV2Request()
+                    .withBucketName(bucketName)
+                    .withPrefix(prefix)
+                    .withMaxKeys(MAX_KEYS);
+            if (continuationToken != null) {
+                listObjectsV2Request.setContinuationToken(continuationToken);
+            }
+            ListObjectsV2Result listObjectsV2Result = ossClient.listObjectsV2(listObjectsV2Request);
+            List<String> keys = listObjectsV2Result.getObjectSummaries().stream()
+                    .map(OSSObjectSummary::getKey)
+                    .collect(Collectors.toList());
+            if (!keys.isEmpty()) {
+                ossClient.deleteObjects(new DeleteObjectsRequest(bucketName).withKeys(keys).withQuiet(true));
+            }
+            truncated = listObjectsV2Result.isTruncated();
+            continuationToken = listObjectsV2Result.getNextContinuationToken();
+        } while (truncated && continuationToken != null);
     }
 
     @Override
