@@ -42,6 +42,7 @@ import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -119,7 +120,9 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
 
     @Override
     public boolean exists(String fullName) {
-        return isObjectExists(fullName);
+        // A directory is the marker blob "<path>/" in a flat namespace and the blob "<path>" in a hierarchical one
+        String absKey = transformAbsolutePathToAbsKey(fullName);
+        return isObjectExists(absKey) || (!absKey.equals(fullName) && isObjectExists(fullName));
     }
 
     protected boolean isObjectExists(String objectName) {
@@ -129,7 +132,25 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
     @SneakyThrows
     @Override
     public void delete(String filePath, boolean recursive) {
-        blobContainerClient.getBlobClient(filePath).deleteIfExists();
+        String absKey = transformAbsolutePathToAbsKey(filePath);
+        if (recursive && getResourceMetaData(filePath).isDirectory()) {
+            // The prefix listing contains the directory marker blob as well
+            ListBlobsOptions options = new ListBlobsOptions().setPrefix(absKey);
+            List<String> blobNames = new ArrayList<>();
+            for (BlobItem blobItem : blobContainerClient.listBlobs(options, null)) {
+                blobNames.add(blobItem.getName());
+            }
+            // With a hierarchical namespace a directory can only be deleted when it is empty, and a name always sorts
+            // before the names below it, so delete in reverse order to remove the children first
+            blobNames.sort(Comparator.reverseOrder());
+            for (String blobName : blobNames) {
+                blobContainerClient.getBlobClient(blobName).deleteIfExists();
+            }
+            // The directory itself is a blob without the trailing separator in a hierarchical namespace
+            blobContainerClient.getBlobClient(transformAbsKeyToAbsolutePath(absKey)).deleteIfExists();
+            return;
+        }
+        blobContainerClient.getBlobClient(absKey).deleteIfExists();
     }
 
     @Override
