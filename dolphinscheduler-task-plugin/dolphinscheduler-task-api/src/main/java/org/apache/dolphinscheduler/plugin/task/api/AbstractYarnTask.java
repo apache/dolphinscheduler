@@ -90,7 +90,7 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
         try {
             shellCommandExecutor.cancelApplication();
         } catch (Exception e) {
-            throw new TaskException("cancel application error", e);
+            throw new TaskException("cancel application error: " + e.getMessage(), e);
         }
     }
 
@@ -103,6 +103,18 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
     public List<String> getApplicationIds() throws TaskException {
         return LogUtils.getAppIds(taskRequest.getLogPath(), taskRequest.getAppInfoPath(),
                 PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
+    }
+
+    /**
+     * Wait until the output of the task process has been written to the task log, at most the given
+     * time. A task which stops the process outside of the normal run, for example to cancel a remote
+     * job, uses it to make sure that the tail of the output is available in the task log.
+     *
+     * @param timeoutMillis the maximum time to wait
+     * @return true if the output was collected, false if the wait timed out
+     */
+    protected boolean awaitTaskOutputCollected(long timeoutMillis) {
+        return shellCommandExecutor.awaitOutputCollected(timeoutMillis);
     }
 
     /**

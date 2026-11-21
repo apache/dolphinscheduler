@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.task.executor.eventbus;
 
+import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.listener.ITaskExecutorLifecycleEventListener;
 
 /**
@@ -33,6 +34,20 @@ public interface ITaskExecutorEventBusCoordinator extends AutoCloseable {
      * Register the task executor event listener
      */
     void registerTaskExecutorLifecycleEventListener(final ITaskExecutorLifecycleEventListener taskExecutorLifecycleEventListener);
+
+    /**
+     * Fire the kill event of the task executor and wait until the listeners have killed it.
+     *
+     * <p>The queued events are fired by a worker thread, which cannot report the result of the kill to
+     * the caller: the kill is fired on the calling thread instead, and an exception of a listener is
+     * thrown to the caller, so that a caller which has to stop a task knows that the task is not
+     * stopped. The event is not queued, the state of the task executor is reported by the listeners as
+     * it is for a queued event.
+     *
+     * @param taskExecutor the task executor to kill
+     * @throws RuntimeException when the task could not be killed
+     */
+    void fireTaskExecutorKillEvent(final ITaskExecutor taskExecutor);
 
     /**
      * Shutdown the coordinator

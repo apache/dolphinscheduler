@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.worker.executor.PhysicalTaskExecutor;
 import org.apache.dolphinscheduler.server.worker.executor.PhysicalTaskExecutorRepository;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
+import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
 
 import java.util.Optional;
 
@@ -63,11 +64,16 @@ public class StreamingTaskInstanceOperatorImpl implements IStreamingTaskInstance
                 log.warn("The taskInstance: {} is not StreamTask", taskInstanceId);
                 return TaskInstanceTriggerSavepointResponse.fail("The taskInstance is not StreamTask");
             }
-            try {
-                ((StreamTask) task).savePoint();
-            } catch (Exception e) {
-                log.error("StreamTask: {} call savePoint error", taskInstanceId, e);
-                return TaskInstanceTriggerSavepointResponse.fail("StreamTask call savePoint error: " + e.getMessage());
+            // the savepoint runs on the RPC thread, so the task log MDC has to be set here: otherwise
+            // the failure which the task writes to its log only reaches the worker log
+            try (TaskExecutorMDCUtils.MDCAutoClosable ignored = TaskExecutorMDCUtils.logWithMDC(taskExecutor)) {
+                try {
+                    ((StreamTask) task).savePoint();
+                } catch (Exception e) {
+                    log.error("StreamTask: {} call savePoint error", taskInstanceId, e);
+                    return TaskInstanceTriggerSavepointResponse.fail(
+                            "StreamTask call savePoint error: " + e.getMessage());
+                }
             }
             return TaskInstanceTriggerSavepointResponse.success();
         } finally {

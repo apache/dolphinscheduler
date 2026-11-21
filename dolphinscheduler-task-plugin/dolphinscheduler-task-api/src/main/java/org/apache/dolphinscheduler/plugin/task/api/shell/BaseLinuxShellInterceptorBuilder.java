@@ -61,7 +61,9 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
         Path shellAbsolutePath = shellAbsolutePath();
         FileUtils.createFileWith755(shellAbsolutePath);
         Files.write(shellAbsolutePath, finalScript.getBytes(), StandardOpenOption.APPEND);
-        log.info("Final Script Content:\n====================\n{}\n====================", finalScript);
+        // the content is not logged: it carries the task environment and the task parameters, which
+        // can include credentials. The file itself is available for the diagnostics.
+        log.info("The final script content is written to the shell file: {}", shellAbsolutePath.getFileName());
 
     }
 
