@@ -75,25 +75,18 @@ public class MigrateLineageService {
         List<WorkflowTaskLineage> workflowTaskLineageList = new ArrayList<>();
 
         for (TaskDefinition taskDefinition : taskDefinitionList) {
-            parseDependentTaskParams(taskDefinition, workflowTaskLineageList);
-
-            for (WorkflowTaskLineage workflowTaskLineage : workflowTaskLineageList) {
-                workflowTaskRelationList.stream()
-                        .filter(processTaskRelation -> processTaskRelation.getPreTaskCode() == taskDefinition.getCode()
-                                || processTaskRelation.getPostTaskCode() == taskDefinition.getCode())
-                        .findFirst()
-                        .ifPresent(processTaskRelation -> {
-                            workflowTaskLineage
-                                    .setWorkflowDefinitionCode(processTaskRelation.getWorkflowDefinitionCode());
-                            workflowTaskLineage
-                                    .setWorkflowDefinitionVersion(processTaskRelation.getWorkflowDefinitionVersion());
-                        });
-            }
+            workflowTaskRelationList.stream()
+                    .filter(relation -> relation.getPreTaskCode() == taskDefinition.getCode()
+                            || relation.getPostTaskCode() == taskDefinition.getCode())
+                    .findFirst()
+                    .ifPresent(relation -> appendTaskLineages(taskDefinition, relation, workflowTaskLineageList));
         }
         return workflowTaskLineageList;
     }
 
-    private void parseDependentTaskParams(TaskDefinition taskDefinition, List<WorkflowTaskLineage> taskLineageList) {
+    private void appendTaskLineages(TaskDefinition taskDefinition,
+                                    WorkflowTaskRelation workflowTaskRelation,
+                                    List<WorkflowTaskLineage> taskLineageList) {
         DependentParameters dependentParameters =
                 JSONUtils.parseObject(taskDefinition.getTaskParams(), DependentParameters.class);
         if (dependentParameters != null) {
@@ -104,6 +97,11 @@ public class MigrateLineageService {
                     List<DependentItem> dependItemList = taskModel.getDependItemList();
                     for (DependentItem dependentItem : dependItemList) {
                         WorkflowTaskLineage workflowTaskLineage = new WorkflowTaskLineage();
+                        workflowTaskLineage.setWorkflowDefinitionCode(workflowTaskRelation.getWorkflowDefinitionCode());
+                        workflowTaskLineage
+                                .setWorkflowDefinitionVersion(workflowTaskRelation.getWorkflowDefinitionVersion());
+                        workflowTaskLineage.setTaskDefinitionCode(taskDefinition.getCode());
+                        workflowTaskLineage.setTaskDefinitionVersion(taskDefinition.getVersion());
                         workflowTaskLineage.setDeptProjectCode(dependentItem.getProjectCode());
                         workflowTaskLineage.setDeptWorkflowDefinitionCode(dependentItem.getDefinitionCode());
                         workflowTaskLineage.setDeptTaskDefinitionCode(dependentItem.getDepTaskCode());
