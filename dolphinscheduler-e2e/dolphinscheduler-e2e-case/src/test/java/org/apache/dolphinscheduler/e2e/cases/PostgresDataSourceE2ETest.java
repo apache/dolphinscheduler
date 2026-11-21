@@ -90,6 +90,30 @@ public class PostgresDataSourceE2ETest {
 
     @Test
     @Order(20)
+    void testEditDataSourceWithoutChangingPassword() {
+        final DataSourcePage page = new DataSourcePage(browser);
+
+        // The edit form echoes the masked password back: the connection test succeeds only if the
+        // backend tests the connectivity against the password already stored for the datasource.
+        page.editDataSource(dataSourceName)
+                .testConnection()
+                .submit();
+    }
+
+    @Test
+    @Order(30)
+    void testConnectionTestStillSucceedsAfterSavedEdit() {
+        final DataSourcePage page = new DataSourcePage(browser);
+
+        // The datasource was updated in the previous test without a password change: the stored
+        // password must still be the working one, so the connection test succeeds again.
+        page.editDataSource(dataSourceName)
+                .testConnection()
+                .cancel();
+    }
+
+    @Test
+    @Order(40)
     void testDeletePostgresDataSource() {
         final DataSourcePage page = new DataSourcePage(browser);
 
