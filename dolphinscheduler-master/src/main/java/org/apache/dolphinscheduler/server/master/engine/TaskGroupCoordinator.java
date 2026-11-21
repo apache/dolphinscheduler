@@ -57,6 +57,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.Uninterruptibles;
 
 @Slf4j
 @Component
@@ -77,7 +78,7 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    private boolean flag = false;
+    private volatile boolean flag = false;
 
     private Thread internalThread;
 
@@ -518,19 +519,12 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
 
     @Override
     public synchronized void close() {
-        if (!flag) {
-            log.warn("TaskGroupCoordinator is already closed");
-            return;
-        }
         flag = false;
-        try {
-            if (internalThread != null) {
-                internalThread.interrupt();
-            }
-        } catch (Exception ex) {
-            log.error("Close internalThread failed", ex);
+        if (internalThread != null) {
+            internalThread.interrupt();
+            Uninterruptibles.joinUninterruptibly(internalThread);
+            internalThread = null;
         }
-        internalThread = null;
         log.info("TaskGroupCoordinator closed");
     }
 }

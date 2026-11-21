@@ -41,6 +41,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.util.concurrent.Uninterruptibles;
+
 /**
  * Used to coordinate the serial execution of workflows.
  * <p> Once a workflow instance is submitted with serial wait strategy, it will be added to the serial queue.
@@ -170,19 +172,12 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
 
     @Override
     public synchronized void close() {
-        if (!flag) {
-            log.warn("WorkflowSerialCoordinator is already closed");
-            return;
-        }
         flag = false;
-        try {
-            if (internalThread != null) {
-                internalThread.interrupt();
-            }
-        } catch (Exception ex) {
-            log.error("Close internalThread failed", ex);
+        if (internalThread != null) {
+            internalThread.interrupt();
+            Uninterruptibles.joinUninterruptibly(internalThread);
+            internalThread = null;
         }
-        internalThread = null;
         log.info("WorkflowSerialCoordinator closed");
     }
 }

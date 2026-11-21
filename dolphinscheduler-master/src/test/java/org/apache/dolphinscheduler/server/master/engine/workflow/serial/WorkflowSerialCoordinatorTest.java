@@ -18,10 +18,22 @@
 package org.apache.dolphinscheduler.server.master.engine.workflow.serial;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.dao.repository.SerialCommandDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
+
+import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -81,4 +93,59 @@ class WorkflowSerialCoordinatorTest {
 
         assertDoesNotThrow(() -> workflowSerialCoordinator.close());
     }
+    @Test
+    void closeMustWaitForOldWorkerBeforeRestart() throws Exception {
+        CountDownLatch inDao = new CountDownLatch(1);
+        CountDownLatch interrupted = new CountDownLatch(1);
+        CountDownLatch releaseDao = new CountDownLatch(1);
+        AtomicReference<Thread> oldWorker = new AtomicReference<>();
+        when(serialCommandDao.fetchSerialCommands(1000)).thenAnswer(invocation -> {
+            if (oldWorker.compareAndSet(null, Thread.currentThread())) {
+                Thread.interrupted();
+                inDao.countDown();
+                boolean wasInterrupted = false;
+                while (releaseDao.getCount() != 0) {
+                    try {
+                        releaseDao.await();
+                    } catch (InterruptedException ex) {
+                        wasInterrupted = true;
+                        interrupted.countDown();
+                    }
+                }
+                if (wasInterrupted) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            return Collections.emptyList();
+        });
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        Future<?> closing = null;
+        Future<?> restarting = null;
+        try {
+            workflowSerialCoordinator.start();
+            assertTrue(inDao.await(2, TimeUnit.SECONDS));
+            closing = executor.submit(workflowSerialCoordinator::close);
+            assertTrue(interrupted.await(2, TimeUnit.SECONDS));
+            Future<?> pendingClose = closing;
+            assertThrows(TimeoutException.class, () -> pendingClose.get(200, TimeUnit.MILLISECONDS));
+            restarting = executor.submit(workflowSerialCoordinator::start);
+            Future<?> pendingRestart = restarting;
+            assertThrows(TimeoutException.class, () -> pendingRestart.get(200, TimeUnit.MILLISECONDS));
+            releaseDao.countDown();
+            closing.get(2, TimeUnit.SECONDS);
+            restarting.get(2, TimeUnit.SECONDS);
+            assertFalse(oldWorker.get().isAlive());
+        } finally {
+            releaseDao.countDown();
+            if (closing != null) {
+                closing.get(2, TimeUnit.SECONDS);
+            }
+            if (restarting != null) {
+                restarting.get(2, TimeUnit.SECONDS);
+            }
+            workflowSerialCoordinator.close();
+            executor.shutdownNow();
+        }
+    }
+
 }
