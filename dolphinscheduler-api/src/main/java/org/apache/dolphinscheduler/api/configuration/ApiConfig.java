@@ -64,8 +64,8 @@ public class ApiConfig implements Validator {
     }
 
     private void validatePythonGateway(Errors errors) {
-        if (pythonGateway.isEnabled() && StringUtils.isEmpty(pythonGateway.getAuthToken())) {
-            errors.rejectValue("pythonGateway.auth-token", null, "should not be empty when enabled is true");
+        if (pythonGateway.isEnabled() && StringUtils.isBlank(pythonGateway.getAuthToken())) {
+            errors.rejectValue("pythonGateway.auth-token", null, "should not be blank when enabled is true");
         }
     }
 
@@ -109,7 +109,7 @@ public class ApiConfig implements Validator {
         private int pythonPort = 25334;
         private int connectTimeout = 0;
         private int readTimeout = 0;
-        private String authToken = "jwUDzpLsNKEFER4*a8gruBH_GsAurNxU7A@Xc";
+        private String authToken;
     }
 
 }

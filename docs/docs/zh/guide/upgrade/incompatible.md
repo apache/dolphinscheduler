@@ -58,6 +58,8 @@
 
 ## 3.5.0
 
+* Python Gateway 不再提供默认的 `api.python-gateway.auth-token`，启用时必须显式配置非空白 token。API、Master、Worker、Alert 和 Standalone 不再提供默认的 Actuator 账号密码；开启 `management.security.enabled` 前，必须为 `management.security.username` 和 `management.security.password` 配置非空白值。缺少必需凭据或凭据仅含空白字符时，服务启动失败；未启用的功能无需配置凭据。([#18812](https://github.com/apache/dolphinscheduler/issues/18812))
+
 * 内部 RPC 认证默认关闭。升级全部服务后，再协调所有服务在各自的 `common.properties` 中开启 `rpc.authentication.enabled=true` 并配置相同的 `rpc.authentication.secret`，认证开启与关闭的服务不能互通。凭据在进程内缓存，启用认证和轮换密钥需要重启服务。参见 [RPC 认证](../security/authentication-type.md#服务间-rpc-认证)。
 
 * Master、Worker 和 Alert Server 现在按 RPC 请求生成心跳快照，并发请求共享一秒刷新间隔的线程安全系统指标缓存。`BaseHeartBeatTask` 及 Master、Worker、Alert 的心跳任务子类已移除，自定义扩展如继承这些类，需要自行管理调度。Alert Server 取消定期写注册心跳，只在启动时注册稳定进程身份，并在重连时恢复注册。`alert.max-heartbeat-interval` 已移除，API 在收到查询请求时直接通过 RPC 获取 Alert 心跳。
