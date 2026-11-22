@@ -105,6 +105,10 @@ export const TASK_TYPES_MAP = {
     alias: 'MLFLOW',
     helperLinkDisable: true
   },
+  DATAVINES: {
+    alias: 'DATAVINES',
+    helperLinkDisable: true
+  },
   OPENMLDB: {
     alias: 'OPENMLDB',
     helperLinkDisable: true

@@ -178,6 +178,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/mlflow.html',
                             },
                             {
+                                title: 'Datavines',
+                                link: '/en-us/docs/dev/user_doc/guide/task/datavines.html',
+                            },
+                            {
                                 title: 'Openmldb',
                                 link: '/en-us/docs/dev/user_doc/guide/task/openmldb.html',
                             },
@@ -912,6 +916,10 @@ export default {
                             {
                                 title: 'MLflow',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/mlflow.html',
+                            },
+                            {
+                                title: 'Datavines',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/datavines.html',
                             },
                             {
                                 title: 'Openmldb',

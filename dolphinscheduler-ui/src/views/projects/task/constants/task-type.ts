@@ -37,6 +37,7 @@ export type TaskType =
   | 'K8S'
   | 'JUPYTER'
   | 'MLFLOW'
+  | 'DATAVINES'
   | 'OPENMLDB'
   | 'DVC'
   | 'JAVA'
@@ -133,6 +134,10 @@ export const TASK_TYPES_MAP = {
   },
   MLFLOW: {
     alias: 'MLFLOW',
+    helperLinkDisable: true
+  },
+  DATAVINES: {
+    alias: 'DATAVINES',
     helperLinkDisable: true
   },
   OPENMLDB: {

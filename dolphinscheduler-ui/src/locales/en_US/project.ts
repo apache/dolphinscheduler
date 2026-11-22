@@ -839,6 +839,21 @@ export default {
     mlflow_mlflowTrackingUri_tips: 'http://127.0.0.1:5000',
     mlflow_mlflowTrackingUri_error_tips:
       'MLflow Tracking Server URI can not be empty',
+    datavines_address: 'Datavines Address',
+    datavines_address_tips:
+      'Datavines service address, e.g. http://127.0.0.1:5600',
+    datavines_address_error_tips:
+      'Address must start with http:// or https://',
+    datavines_job_id: 'Job ID',
+    datavines_job_id_tips: 'Datavines job ID',
+    datavines_token: 'Token',
+    datavines_token_tips: 'Datavines OpenAPI token',
+    datavines_interval: 'Poll Interval (s)',
+    datavines_interval_tips: 'Status polling interval in seconds',
+    datavines_timeout: 'Timeout (s)',
+    datavines_timeout_tips: 'Maximum wait time in seconds',
+    datavines_retry_times: 'Retry Times',
+    datavines_retry_times_tips: 'Retry times for API failures',
     mlflow_jobType: 'Job Type',
     mlflow_automlTool: 'AutoML Tool',
     mlflow_taskType: 'MLflow Task Type',
