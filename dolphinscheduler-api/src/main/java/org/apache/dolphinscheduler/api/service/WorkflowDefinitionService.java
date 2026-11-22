@@ -107,14 +107,6 @@ public interface WorkflowDefinitionService {
                                                                long targetProjectCode);
 
     /**
-     * batch move workflow definition
-     */
-    void batchMoveWorkflowDefinition(User loginUser,
-                                     long projectCode,
-                                     String codes,
-                                     long targetProjectCode);
-
-    /**
      * update workflow definition, with whole workflow definition object including task definition, task relation and location.
      */
     WorkflowDefinition updateWorkflowDefinition(User loginUser,
