@@ -151,6 +151,11 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
             return;
         }
         blobContainerClient.getBlobClient(absKey).deleteIfExists();
+        if (getResourceMetaData(filePath).isDirectory()) {
+            // In a hierarchical namespace the directory is the blob without the trailing separator. Azure refuses to
+            // delete it while it still has children, and that error is passed on instead of being ignored
+            blobContainerClient.getBlobClient(transformAbsKeyToAbsolutePath(absKey)).deleteIfExists();
+        }
     }
 
     @Override

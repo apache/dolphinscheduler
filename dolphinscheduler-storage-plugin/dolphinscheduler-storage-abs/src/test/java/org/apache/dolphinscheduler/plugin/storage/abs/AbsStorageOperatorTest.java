@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.storage.abs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -58,6 +59,7 @@ import com.azure.storage.blob.models.BlobContainerItem;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobItemProperties;
 import com.azure.storage.blob.models.BlobProperties;
+import com.azure.storage.blob.models.BlobStorageException;
 import com.azure.storage.blob.models.ListBlobsOptions;
 
 class AbsStorageOperatorTest {
@@ -217,12 +219,25 @@ class AbsStorageOperatorTest {
     void deleteDirectoryNonRecursivelyOnlyRemovesItsMarker() {
         BlobContainerClient containerClient = mock(BlobContainerClient.class);
         BlobClient marker = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir1/");
+        mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir1");
         AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
 
         storageOperator.delete("dolphinscheduler/default/resources/dir1", false);
 
         verify(marker).deleteIfExists();
         verify(containerClient, never()).listBlobs(any(ListBlobsOptions.class), any());
+    }
+
+    @Test
+    void deleteEmptyHierarchicalDirectoryNonRecursivelyRemovesTheDirectoryObject() {
+        assertNonRecursiveDeleteRemovesTheDirectoryObject("dolphinscheduler/default/resources/dir1");
+        assertNonRecursiveDeleteRemovesTheDirectoryObject("dolphinscheduler/tenant_a/resources/dir1/sub");
+    }
+
+    @Test
+    void deleteNonEmptyHierarchicalDirectoryNonRecursivelyFails() {
+        assertNonRecursiveDeleteOfANonEmptyDirectoryFails("dolphinscheduler/default/resources/dir1");
+        assertNonRecursiveDeleteOfANonEmptyDirectoryFails("dolphinscheduler/tenant_a/resources/dir1/sub");
     }
 
     @Test
@@ -277,6 +292,34 @@ class AbsStorageOperatorTest {
         AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
 
         assertFalse(storageOperator.exists("dolphinscheduler/default/resources/dir2"));
+    }
+
+    private void assertNonRecursiveDeleteRemovesTheDirectoryObject(String directory) {
+        // With a hierarchical namespace there is no "<path>/" marker, the directory is the blob "<path>"
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        mockBlobClient(containerClient, directory + "/");
+        BlobClient directoryObject = mockBlobClient(containerClient, directory);
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        storageOperator.delete(directory, false);
+
+        verify(directoryObject).deleteIfExists();
+        verify(containerClient, never()).listBlobs(any(ListBlobsOptions.class), any());
+    }
+
+    private void assertNonRecursiveDeleteOfANonEmptyDirectoryFails(String directory) {
+        // Azure refuses to delete a directory that still has children with 409 Conflict
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        mockBlobClient(containerClient, directory + "/");
+        BlobClient directoryObject = mockBlobClient(containerClient, directory);
+        BlobStorageException conflict = mock(BlobStorageException.class);
+        when(conflict.getStatusCode()).thenReturn(409);
+        when(directoryObject.deleteIfExists()).thenThrow(conflict);
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        BlobStorageException thrown =
+                assertThrows(BlobStorageException.class, () -> storageOperator.delete(directory, false));
+        assertEquals(409, thrown.getStatusCode());
     }
 
     private void mockBlobExists(BlobContainerClient containerClient, String name, boolean exists) {
