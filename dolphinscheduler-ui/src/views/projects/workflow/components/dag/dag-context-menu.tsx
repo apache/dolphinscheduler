@@ -39,6 +39,10 @@ const props = {
     type: Boolean as PropType<boolean>,
     default: false
   },
+  copyDisplay: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  },
   taskInstance: {
     type: Object as PropType<IWorkflowTaskInstance>,
     require: true
@@ -195,26 +199,22 @@ export default defineComponent({
             </NButton>
           )}
           {this.menuDisplay && (
-            <>
-              <NButton
-                class={`${styles['menu-item']}`}
-                onClick={this.handleEdit}
-              >
-                {t('project.node.edit')}
-              </NButton>
-              <NButton
-                class={`${styles['menu-item']}`}
-                onClick={this.handleCopy}
-              >
-                {t('project.node.copy')}
-              </NButton>
-              <NButton
-                class={`${styles['menu-item']}`}
-                onClick={this.handleDelete}
-              >
-                {t('project.node.delete')}
-              </NButton>
-            </>
+            <NButton class={`${styles['menu-item']}`} onClick={this.handleEdit}>
+              {t('project.node.edit')}
+            </NButton>
+          )}
+          {this.copyDisplay && (
+            <NButton class={`${styles['menu-item']}`} onClick={this.handleCopy}>
+              {t('project.node.copy')}
+            </NButton>
+          )}
+          {this.menuDisplay && (
+            <NButton
+              class={`${styles['menu-item']}`}
+              onClick={this.handleDelete}
+            >
+              {t('project.node.delete')}
+            </NButton>
           )}
           {this.taskInstance && (
             <>
