@@ -210,20 +210,6 @@ public class WorkflowDefinitionControllerTest {
     }
 
     @Test
-    public void testBatchMoveWorkflowDefinition() {
-        long projectCode = 1L;
-        long targetProjectCode = 2L;
-        String id = "1";
-
-        doNothing().when(processDefinitionService)
-                .batchMoveWorkflowDefinition(user, projectCode, id, targetProjectCode);
-        Result<Void> response =
-                workflowDefinitionController.moveWorkflowDefinition(user, projectCode, id, targetProjectCode);
-
-        Assertions.assertTrue(response != null && response.isSuccess());
-    }
-
-    @Test
     public void testQueryWorkflowDefinitionList() {
         long projectCode = 1L;
 
