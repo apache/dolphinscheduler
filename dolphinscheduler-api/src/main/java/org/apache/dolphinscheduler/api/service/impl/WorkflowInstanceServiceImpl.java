@@ -42,6 +42,8 @@ import org.apache.dolphinscheduler.api.service.WorkflowInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
+import org.apache.dolphinscheduler.api.validator.TaskProjectValidator;
+import org.apache.dolphinscheduler.api.validator.WorkflowRelationValidator;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ContextType;
@@ -62,6 +64,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentDetails;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
@@ -74,6 +77,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
 import org.apache.dolphinscheduler.dao.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -164,6 +168,15 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
     @Autowired
     private TaskInstanceContextDao taskInstanceContextDao;
+
+    @Autowired
+    private TaskProjectValidator taskProjectValidator;
+
+    @Autowired
+    private WorkflowRelationValidator workflowRelationValidator;
+
+    @Autowired
+    private WorkflowTaskRelationDao workflowTaskRelationDao;
 
     @Autowired
     private TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
@@ -404,6 +417,28 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                     workflowInstance.getName(), workflowInstance.getState().toString(), "update");
         }
 
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao
+                .queryByCode(workflowInstance.getWorkflowDefinitionCode())
+                .orElseThrow(() -> new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
+                        workflowInstance.getWorkflowDefinitionCode()));
+        if (projectCode != workflowDefinition.getProjectCode()) {
+            throw new ServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH);
+        }
+        WorkflowDefinitionLog recordedDefinition = workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion());
+        if (recordedDefinition == null) {
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
+                    workflowInstance.getWorkflowDefinitionCode());
+        }
+        if (projectCode != recordedDefinition.getProjectCode()) {
+            throw new ServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH);
+        }
+        if (Boolean.TRUE.equals(syncDefine)) {
+            workflowRelationValidator.validate(new WorkflowRelationValidator.Context(projectCode,
+                    workflowDefinition.getCode(),
+                    workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflowDefinition.getCode())));
+        }
+
         String timezoneId;
         final ICommandParam commandParam = parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
         if (commandParam == null || StringUtils.isEmpty(commandParam.getTimeZone())) {
@@ -430,6 +465,11 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 throw new ServiceException(Status.WORKFLOW_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
             }
         }
+        taskProjectValidator.validate(new TaskProjectValidator.Context(projectCode, taskDefinitionLogs));
+        List<WorkflowTaskRelationLog> taskRelationList =
+                JSONUtils.toList(taskRelationJson, WorkflowTaskRelationLog.class);
+        workflowRelationValidator.validate(
+                new WorkflowRelationValidator.Context(projectCode, workflowDefinition.getCode(), taskRelationList));
         List<TaskDefinition> versionKeys = new ArrayList<>();
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
             if (taskDefinitionLog.getCode() > 0 && taskDefinitionLog.getVersion() > 0) {
@@ -459,10 +499,6 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                     workflowInstanceId);
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
         }
-        WorkflowDefinition workflowDefinition =
-                workflowDefinitionDao.queryByCode(workflowInstance.getWorkflowDefinitionCode()).orElse(null);
-        List<WorkflowTaskRelationLog> taskRelationList =
-                JSONUtils.toList(taskRelationJson, WorkflowTaskRelationLog.class);
         // check workflow json is valid (throws ServiceException on validation failures)
         workflowDefinitionService.checkWorkflowNodeList(taskRelationJson, taskDefinitionLogs);
 

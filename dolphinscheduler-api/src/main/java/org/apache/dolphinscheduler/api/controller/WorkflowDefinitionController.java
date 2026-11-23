@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.BATCH_COPY_WORKFLOW_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.BATCH_DELETE_WORKFLOW_DEFINE_BY_CODES_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.BATCH_MOVE_WORKFLOW_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_WORKFLOW_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_WORKFLOW_DEFINE_BY_CODE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_WORKFLOW_DEFINITION_VERSION_ERROR;
@@ -162,31 +161,6 @@ public class WorkflowDefinitionController extends BaseController {
         List<WorkflowDefinitionCopyVO> copyResponses = workflowDefinitionService
                 .batchCopyWorkflowDefinition(loginUser, projectCode, codes, targetProjectCode);
         return Result.success(copyResponses);
-    }
-
-    /**
-     * move workflow definition
-     *
-     * @param loginUser         login user
-     * @param projectCode       project code
-     * @param codes             workflow definition codes
-     * @param targetProjectCode target project code
-     * @return move result code
-     */
-    @Operation(summary = "batchMoveByCodes", description = "MOVE_WORKFLOW_DEFINITION_NOTES")
-    @Parameters({
-            @Parameter(name = "codes", description = "WORKFLOW_DEFINITION_CODE_LIST", required = true, schema = @Schema(implementation = String.class, example = "3,4")),
-            @Parameter(name = "targetProjectCode", description = "TARGET_PROJECT_CODE", required = true, schema = @Schema(implementation = long.class, example = "123"))
-    })
-    @PostMapping(value = "/batch-move")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(BATCH_MOVE_WORKFLOW_DEFINITION_ERROR)
-    public Result<Void> moveWorkflowDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                               @RequestParam(value = "codes", required = true) String codes,
-                                               @RequestParam(value = "targetProjectCode", required = true) long targetProjectCode) {
-        workflowDefinitionService.batchMoveWorkflowDefinition(loginUser, projectCode, codes, targetProjectCode);
-        return Result.success();
     }
 
     /**

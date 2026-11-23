@@ -397,25 +397,21 @@ public class ProcessServiceImpl implements ProcessService {
         if (batchInsert == 0) {
             return Constants.EXIT_CODE_FAILURE;
         } else {
-            int result = 0;
             for (WorkflowTaskRelation taskRelation : workflowTaskRelationListFromLog) {
                 int switchResult = switchTaskDefinitionVersion(taskRelation.getPostTaskCode(),
                         taskRelation.getPostTaskVersion());
-                if (switchResult != Constants.EXIT_CODE_FAILURE) {
-                    result++;
+                if (switchResult == Constants.EXIT_CODE_FAILURE) {
+                    return Constants.EXIT_CODE_FAILURE;
                 }
             }
-            return result;
+            return batchInsert;
         }
     }
 
     @Override
     public int switchTaskDefinitionVersion(long taskCode, int taskVersion) {
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
-        if (taskDefinition == null) {
-            return Constants.EXIT_CODE_FAILURE;
-        }
-        if (taskDefinition.getVersion() == taskVersion) {
+        if (taskDefinition != null && taskDefinition.getVersion() == taskVersion) {
             return Constants.EXIT_CODE_SUCCESS;
         }
         TaskDefinitionLog taskDefinitionUpdate =
@@ -424,8 +420,14 @@ public class ProcessServiceImpl implements ProcessService {
             return Constants.EXIT_CODE_FAILURE;
         }
         taskDefinitionUpdate.setUpdateTime(new Date());
+        if (taskDefinition == null) {
+            taskDefinitionUpdate.setId(null);
+            int inserted = taskDefinitionMapper.insert(taskDefinitionUpdate);
+            return inserted > 0 ? inserted : Constants.EXIT_CODE_FAILURE;
+        }
         taskDefinitionUpdate.setId(taskDefinition.getId());
-        return taskDefinitionMapper.updateById(taskDefinitionUpdate);
+        int updated = taskDefinitionMapper.updateById(taskDefinitionUpdate);
+        return updated > 0 ? updated : Constants.EXIT_CODE_FAILURE;
     }
 
     @Override
