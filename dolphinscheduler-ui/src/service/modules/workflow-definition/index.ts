@@ -73,17 +73,6 @@ export function batchDeleteByCodes(data: CodesReq, code: number): any {
   })
 }
 
-export function batchMoveByCodes(
-  data: TargetCodeReq & CodesReq,
-  code: CodeReq
-): any {
-  return axios({
-    url: `/projects/${code}/workflow-definition/batch-move`,
-    method: 'post',
-    data
-  })
-}
-
 export function getTaskListByDefinitionCodes(
   params: CodesReq,
   code: number
