@@ -206,6 +206,33 @@ class OssStorageOperatorTest {
     }
 
     @Test
+    void existsForRecursiveDeleteDoesNotListChildrenWhenFileObjectIsMissing() {
+        OSS ossClient = mockOssClient();
+        String filePath = DIRECTORY + "/a.sh";
+        when(ossClient.doesObjectExist(eq(BUCKET), eq(filePath))).thenReturn(false);
+        OssStorageOperator storageOperator = createStorageOperator(ossClient);
+
+        assertFalse(storageOperator.existsForRecursiveDelete(filePath));
+        verify(ossClient, never()).listObjectsV2(any(ListObjectsV2Request.class));
+    }
+
+    @Test
+    void existsForRecursiveDeleteNormalizesATrailingSlashBeforeListingChildren() {
+        OSS ossClient = mockOssClient();
+        when(ossClient.doesObjectExist(eq(BUCKET), eq(DIRECTORY + "/"))).thenReturn(false);
+        when(ossClient.listObjectsV2(any(ListObjectsV2Request.class)))
+                .thenReturn(listResult(false, null, DIRECTORY + "/b.sql"));
+        OssStorageOperator storageOperator = createStorageOperator(ossClient);
+
+        assertTrue(storageOperator.existsForRecursiveDelete(DIRECTORY + "/"));
+
+        ArgumentCaptor<ListObjectsV2Request> listCaptor = ArgumentCaptor.forClass(ListObjectsV2Request.class);
+        verify(ossClient).listObjectsV2(listCaptor.capture());
+        assertEquals(DIRECTORY + "/", listCaptor.getValue().getPrefix());
+        assertEquals(1, listCaptor.getValue().getMaxKeys());
+    }
+
+    @Test
     void recursiveDeleteRemovesLeftoverChildrenEvenWhenDirectoryMarkerIsMissing() {
         OSS ossClient = mockOssClient();
         when(ossClient.doesObjectExist(eq(BUCKET), eq(DIRECTORY + "/"))).thenReturn(false);
@@ -248,6 +275,40 @@ class OssStorageOperatorTest {
         assertTrue(exception.getMessage().contains(DIRECTORY + "/b.sql"));
         assertTrue(exception.getMessage().contains(DIRECTORY + "/sub/c.sql"));
         assertTrue(exception.getMessage().contains("OSS did not confirm deletion of objects"));
+    }
+
+    @Test
+    void deleteDirectoryRecursivelyFailsWhenOssReturnsANullDeleteResult() {
+        OSS ossClient = mockOssClient();
+        when(ossClient.listObjectsV2(any(ListObjectsV2Request.class))).thenReturn(listResult(false, null,
+                DIRECTORY + "/",
+                DIRECTORY + "/b.sql"));
+        when(ossClient.deleteObjects(any(DeleteObjectsRequest.class))).thenReturn(null);
+        OssStorageOperator storageOperator = createStorageOperator(ossClient);
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> storageOperator.delete(DIRECTORY, true));
+        assertTrue(exception.getMessage().contains("OSS did not confirm deletion of objects"));
+        assertTrue(exception.getMessage().contains(DIRECTORY + "/"));
+        assertTrue(exception.getMessage().contains(DIRECTORY + "/b.sql"));
+    }
+
+    @Test
+    void deleteDirectoryRecursivelyFailsWhenOssReturnsANullDeletedObjectsList() {
+        OSS ossClient = mockOssClient();
+        when(ossClient.listObjectsV2(any(ListObjectsV2Request.class))).thenReturn(listResult(false, null,
+                DIRECTORY + "/",
+                DIRECTORY + "/b.sql"));
+        DeleteObjectsResult deleteObjectsResult = mock(DeleteObjectsResult.class);
+        when(deleteObjectsResult.getDeletedObjects()).thenReturn(null);
+        when(ossClient.deleteObjects(any(DeleteObjectsRequest.class))).thenReturn(deleteObjectsResult);
+        OssStorageOperator storageOperator = createStorageOperator(ossClient);
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> storageOperator.delete(DIRECTORY, true));
+        assertTrue(exception.getMessage().contains("OSS did not confirm deletion of objects"));
+        assertTrue(exception.getMessage().contains(DIRECTORY + "/"));
+        assertTrue(exception.getMessage().contains(DIRECTORY + "/b.sql"));
     }
 
     private OSS mockOssClient() {

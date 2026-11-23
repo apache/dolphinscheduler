@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.validator.resource;
 
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowServiceException;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -76,14 +77,13 @@ class LeftoverOssDirectoryResourceCenterTest {
         resourcesService = new ResourcesServiceImpl();
         ReflectionTestUtils.setField(resourcesService, "deleteResourceDtoValidator", deleteResourceDtoValidator);
         ReflectionTestUtils.setField(resourcesService, "storageOperator", storageOperator);
-
-        // Same leftover OSS prefix: child objects remain, but the directory marker is missing.
-        when(storageOperator.exists(DIRECTORY)).thenReturn(false);
-        when(storageOperator.existsForRecursiveDelete(DIRECTORY)).thenReturn(true);
     }
 
     @Test
     void sameMarkerlessDirectory_recursiveDeleteSucceedsButRenameFailsValidation() {
+        // Same leftover OSS prefix: child objects remain, but the directory marker is missing.
+        when(storageOperator.exists(DIRECTORY)).thenReturn(false);
+        when(storageOperator.existsForRecursiveDelete(DIRECTORY)).thenReturn(true);
         RenameDirectoryDto renameDirectoryDto = RenameDirectoryDto.builder()
                 .loginUser(loginUser)
                 .originDirectoryAbsolutePath(DIRECTORY)
@@ -99,5 +99,18 @@ class LeftoverOssDirectoryResourceCenterTest {
                 .build();
         assertDoesNotThrow(() -> resourcesService.delete(deleteRequest));
         verify(storageOperator).delete(DIRECTORY, true);
+    }
+
+    @Test
+    void deleteFailsValidationWhenExistsForRecursiveDeleteReturnsFalse() {
+        when(storageOperator.existsForRecursiveDelete(DIRECTORY)).thenReturn(false);
+        DeleteResourceRequest deleteRequest = DeleteResourceRequest.builder()
+                .loginUser(loginUser)
+                .resourceAbsolutePath(DIRECTORY)
+                .build();
+        assertThrowServiceException(
+                "Internal Server Error: Thr resource is not exists: " + DIRECTORY,
+                () -> resourcesService.delete(deleteRequest));
+        verify(storageOperator, never()).delete(DIRECTORY, true);
     }
 }
