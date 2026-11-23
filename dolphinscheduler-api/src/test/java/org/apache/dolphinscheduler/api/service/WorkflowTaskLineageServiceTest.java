@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -290,6 +291,32 @@ public class WorkflowTaskLineageServiceTest {
         Optional<String> result =
                 workflowLineageService.taskDependentMsg(loginUser, projectCode, workflowDefinitionCode, taskCode);
         Assertions.assertFalse(result.isPresent());
+    }
+
+    @Test
+    public void testTaskDependentMsgKeepsSelfLineageForTaskDeletion() {
+        long workflowCode = 100L;
+        long taskCode = 200L;
+        User loginUser = getLoginUser();
+        WorkflowTaskLineage lineage = new WorkflowTaskLineage();
+        lineage.setWorkflowDefinitionCode(workflowCode);
+        lineage.setDeptWorkflowDefinitionCode(workflowCode);
+        lineage.setTaskDefinitionCode(taskCode);
+        lineage.setDeptTaskDefinitionCode(taskCode);
+        WorkflowDefinition workflow = new WorkflowDefinition();
+        workflow.setName("self-dependent-workflow");
+        TaskDefinition task = new TaskDefinition();
+        task.setName("self-dependent-task");
+        when(projectDao.queryByCode(1L)).thenReturn(getProject("test"));
+        when(workflowTaskLineageDao.queryWorkFlowLineageByDept(1L, workflowCode, taskCode))
+                .thenReturn(Collections.singletonList(lineage));
+        when(workflowDefinitionDao.queryByCode(workflowCode)).thenReturn(Optional.of(workflow));
+        when(taskDefinitionDao.queryByCode(taskCode)).thenReturn(task);
+
+        Optional<String> result = workflowLineageService.taskDependentMsg(loginUser, 1L, workflowCode, taskCode);
+
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertTrue(result.get().contains("self-dependent-task"));
     }
 
     @Test

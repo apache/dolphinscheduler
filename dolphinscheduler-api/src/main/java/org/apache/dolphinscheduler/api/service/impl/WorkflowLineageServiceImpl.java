@@ -206,6 +206,9 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
         List<String> taskDepStrList = new ArrayList<>();
 
         for (WorkflowTaskLineage workflowTaskLineage : dependentWorkflowList) {
+            if (taskCode == 0 && workflowTaskLineage.getWorkflowDefinitionCode() == workflowDefinitionCode) {
+                continue;
+            }
             WorkflowDefinition workflowDefinition =
                     workflowDefinitionDao.queryByCode(workflowTaskLineage.getDeptWorkflowDefinitionCode())
                             .orElse(null);
