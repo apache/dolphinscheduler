@@ -841,8 +841,7 @@ export default {
     log_display: '日志显示',
     rows_of_result: '行查询结果',
     query_max_rows: '最大查询行数',
-    query_max_rows_tips:
-      '可选；留空则使用全局默认配置 sql.task.query.max.rows',
+    query_max_rows_tips: '可选；留空则使用全局默认配置 sql.task.query.max.rows',
     title: '主题',
     title_tips: '请输入告警主题',
     alarm_group: '告警组',

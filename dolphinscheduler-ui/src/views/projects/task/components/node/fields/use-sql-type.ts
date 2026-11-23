@@ -101,6 +101,14 @@ export function useSqlType(model: { [field: string]: any }): IJsonItem[] {
         placeholder: t('project.node.query_max_rows_tips'),
         min: 1,
         max: 2147483647
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        validator(unuse, value) {
+          if (value && !Number.isInteger(value)) {
+            return new Error(t('project.node.integer_tips'))
+          }
+        }
       }
     },
     {

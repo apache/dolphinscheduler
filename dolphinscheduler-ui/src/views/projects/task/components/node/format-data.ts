@@ -571,6 +571,10 @@ export function formatModel(data: ITaskData) {
     params.mainJar = data.taskParams?.mainJar.resourceName
   }
 
+  if (data.taskParams?.limit !== undefined && data.taskParams.limit <= 0) {
+    params.limit = undefined
+  }
+
   if (data.taskParams?.method) {
     params.method = data.taskParams?.method
   }
