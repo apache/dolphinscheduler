@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCopyVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -71,6 +72,8 @@ public class WorkflowCopyLineageTest extends AbstractControllerTest {
 
     @Autowired
     private WorkflowDefinitionService workflowDefinitionService;
+    @Autowired
+    private WorkflowLineageService workflowLineageService;
     @Autowired
     private ProjectMapper projectMapper;
     @Autowired
@@ -148,6 +151,10 @@ public class WorkflowCopyLineageTest extends AbstractControllerTest {
         Assertions.assertEquals(copiedWorkflowCode, externalLineage.getDeptWorkflowDefinitionCode());
         Assertions.assertEquals(2, workflowTaskLineageMapper.queryWorkFlowLineageByDept(
                 Constants.DEFAULT_PROJECT_CODE, copiedWorkflowCode, 0).size());
+
+        ServiceException mismatchedProject = Assertions.assertThrows(ServiceException.class,
+                () -> workflowLineageService.taskDependentMsg(user, SOURCE_PROJECT_CODE, copiedWorkflowCode, 0));
+        Assertions.assertEquals(Status.PROJECT_WORKFLOW_NOT_MATCH.getCode(), mismatchedProject.getCode());
 
         ServiceException exception = Assertions.assertThrows(ServiceException.class,
                 () -> workflowDefinitionService.deleteWorkflowDefinitionByCode(user, copiedWorkflowCode));

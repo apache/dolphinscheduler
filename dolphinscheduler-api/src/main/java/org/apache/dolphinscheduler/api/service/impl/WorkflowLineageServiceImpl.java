@@ -194,6 +194,14 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
         }
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
         long queryTaskCode = 0;
+        if (taskCode == 0) {
+            WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode)
+                    .orElseThrow(() -> new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
+                            String.valueOf(workflowDefinitionCode)));
+            if (workflowDefinition.getProjectCode() != projectCode) {
+                throw new ServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH);
+            }
+        }
         if (taskCode != 0) {
             queryTaskCode = taskCode;
         }
