@@ -19,10 +19,8 @@ package org.apache.dolphinscheduler.registry.api;
 
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
-import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
@@ -89,29 +87,13 @@ public class RegistryClient {
             Server server = new Server();
             switch (registryNodeType) {
                 case MASTER:
-                    MasterHeartBeat masterHeartBeat = JSONUtils.parseObject(heartBeatJson, MasterHeartBeat.class);
-                    server.setCreateTime(new Date(masterHeartBeat.getStartupTime()));
-                    server.setLastHeartbeatTime(new Date(masterHeartBeat.getReportTime()));
-                    server.setId(masterHeartBeat.getProcessId());
-                    server.setHost(masterHeartBeat.getHost());
-                    server.setPort(masterHeartBeat.getPort());
-                    break;
                 case WORKER:
-                    WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(heartBeatJson, WorkerHeartBeat.class);
-                    server.setCreateTime(new Date(workerHeartBeat.getStartupTime()));
-                    server.setLastHeartbeatTime(new Date(workerHeartBeat.getReportTime()));
-                    server.setId(workerHeartBeat.getProcessId());
-                    server.setHost(workerHeartBeat.getHost());
-                    server.setPort(workerHeartBeat.getPort());
-                    break;
                 case ALERT_SERVER:
-                    AlertServerHeartBeat alertServerHeartBeat =
-                            JSONUtils.parseObject(heartBeatJson, AlertServerHeartBeat.class);
-                    server.setCreateTime(new Date(alertServerHeartBeat.getStartupTime()));
-                    server.setLastHeartbeatTime(new Date(alertServerHeartBeat.getReportTime()));
-                    server.setId(alertServerHeartBeat.getProcessId());
-                    server.setHost(alertServerHeartBeat.getHost());
-                    server.setPort(alertServerHeartBeat.getPort());
+                    ServerIdentity identity = JSONUtils.parseObject(heartBeatJson, ServerIdentity.class);
+                    server.setCreateTime(new Date(identity.getStartupTime()));
+                    server.setId(identity.getProcessId());
+                    server.setHost(identity.getHost());
+                    server.setPort(identity.getPort());
                     break;
                 default:
                     log.warn("unknown registry node type: {}", registryNodeType);

@@ -16,6 +16,7 @@
  */
 
 export default {
+  metadata_unavailable: '元数据尚未获取或已过期',
   master: {
     cpu_usage: '处理器使用量',
     memory_usage: '内存使用量',

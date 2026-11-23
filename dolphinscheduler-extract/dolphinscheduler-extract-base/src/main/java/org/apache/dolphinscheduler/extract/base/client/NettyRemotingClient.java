@@ -45,6 +45,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import lombok.extern.slf4j.Slf4j;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -63,7 +68,9 @@ public class NettyRemotingClient implements AutoCloseable {
 
     private final Bootstrap bootstrap = new Bootstrap();
 
-    private final ReentrantLock channelsLock = new ReentrantLock();
+    // A caller keeps its lock alive while using it; unused locks can be collected after nodes leave.
+    private final LoadingCache<Host, ReentrantLock> channelLocks = CacheBuilder.newBuilder().weakValues()
+            .build(CacheLoader.from((Host host) -> new ReentrantLock()));
     private final Map<Host, Channel> channels = new ConcurrentHashMap<>();
 
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
@@ -197,18 +204,27 @@ public class NettyRemotingClient implements AutoCloseable {
     Channel getOrCreateChannel(Host host) {
         Channel channel = channels.get(host);
         if (channel == null || !channel.isActive()) {
+            ReentrantLock hostLock = channelLocks.getUnchecked(host);
+            hostLock.lock();
             try {
-                channelsLock.lock();
                 channel = channels.get(host);
                 if (channel == null || !channel.isActive()) {
+                    if (!isStarted.get()) {
+                        throw new IllegalStateException("RPC client is closed");
+                    }
                     channel = createChannel(host);
                     channels.put(host, channel);
+                    if (!isStarted.get()) {
+                        channels.remove(host, channel);
+                        channel.close();
+                        throw new IllegalStateException("RPC client is closed");
+                    }
                 }
             } finally {
-                channelsLock.unlock();
+                hostLock.unlock();
             }
         }
-        // Wait outside the cache lock so a stalled handshake cannot block other hosts.
+        // Wait outside the connection lock so other callers can reuse the channel.
         Future<Void> authentication = RpcAuthenticationHandler.authenticationFuture(channel);
         if (authentication != null) {
             try {
@@ -267,13 +283,11 @@ public class NettyRemotingClient implements AutoCloseable {
     }
 
     private void closeChannels() {
-        try {
-            channelsLock.lock();
-            channels.values().forEach(Channel::close);
-            channels.clear();
-        } finally {
-            channelsLock.unlock();
-        }
+        channels.forEach((host, channel) -> {
+            if (channels.remove(host, channel)) {
+                channel.close();
+            }
+        });
     }
 
     public void onChannelInactive(final Host host, final Channel channel) {

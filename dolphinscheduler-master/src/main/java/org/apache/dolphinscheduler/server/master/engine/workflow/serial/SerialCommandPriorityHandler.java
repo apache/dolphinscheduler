@@ -39,15 +39,17 @@ public class SerialCommandPriorityHandler extends AbstractSerialCommandHandler {
         for (int i = 0; i < serialCommands.size(); i++) {
             final SerialCommandDto serialCommand = serialCommands.get(i);
             if (i == serialCommands.size() - 1) {
-                if (serialCommand.getState() == SerialCommandDto.State.WAITING) {
-                    launchSerialCommand(serialCommand);
+                if (serialCommand.getState() == SerialCommandDto.State.WAITING && launchSerialCommand(serialCommand)) {
                     log.info("Launched SerialCommand: {}", serialCommand);
                 }
                 continue;
             }
 
             if (serialCommand.getState() == SerialCommandDto.State.WAITING) {
-                discardSerialCommandAndStopWorkflowInstanceInDB(serialCommand);
+                if (!discardSerialCommandAndStopWorkflowInstanceInDB(serialCommand)) {
+                    // Re-read the group before deciding whether a launched predecessor must be stopped.
+                    return;
+                }
                 log.info("Discard SerialCommand: {}", serialCommand);
             } else {
                 stopWorkflowInstanceInMaster(serialCommand);
