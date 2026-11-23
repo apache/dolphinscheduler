@@ -282,7 +282,7 @@ public class WorkflowTaskLineageServiceTest {
         workflowDefinition.setName("TestWorkflow");
 
         when(projectDao.queryByCode(projectCode)).thenReturn(getProject("test"));
-        when(workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode, 0L))
+        when(workflowTaskLineageDao.queryWorkFlowLineageByDept(0L, workflowDefinitionCode, 0L))
                 .thenReturn(dependentWorkflowList);
         when(workflowDefinitionDao.queryByCode(50L)).thenReturn(Optional.of(workflowDefinition));
         when(taskDefinitionDao.queryByCode(999L)).thenReturn(null); // Task definition not found

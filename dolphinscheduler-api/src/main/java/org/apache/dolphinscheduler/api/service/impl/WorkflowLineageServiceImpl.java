@@ -197,8 +197,11 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
         if (taskCode != 0) {
             queryTaskCode = taskCode;
         }
+        // Workflow-level checks must include dependents from every project.
+        long queryProjectCode = taskCode == 0 ? Constants.DEFAULT_PROJECT_CODE : projectCode;
         List<WorkflowTaskLineage> dependentWorkflowList =
-                workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode, queryTaskCode);
+                workflowTaskLineageDao.queryWorkFlowLineageByDept(queryProjectCode, workflowDefinitionCode,
+                        queryTaskCode);
         if (CollectionUtils.isEmpty(dependentWorkflowList)) {
             return Optional.empty();
         }

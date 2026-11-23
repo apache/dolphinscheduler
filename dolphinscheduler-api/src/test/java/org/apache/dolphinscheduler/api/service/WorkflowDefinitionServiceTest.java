@@ -632,7 +632,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         List<WorkflowTaskLineage> incomingLineages = new ArrayList<>(selfLineages);
         incomingLineages.add(externalLineage);
         WorkflowTaskLineageDao lineageDao = Mockito.mock(WorkflowTaskLineageDao.class);
-        when(lineageDao.queryWorkFlowLineageByDept(targetProjectCode, copiedWorkflowCode, 0))
+        when(lineageDao.queryWorkFlowLineageByDept(Constants.DEFAULT_PROJECT_CODE, copiedWorkflowCode, 0))
                 .thenReturn(incomingLineages, selfLineages);
         WorkflowLineageServiceImpl lineageService = new WorkflowLineageServiceImpl();
         ReflectionTestUtils.setField(lineageService, "workflowTaskLineageDao", lineageDao);
