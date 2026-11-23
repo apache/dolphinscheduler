@@ -54,6 +54,7 @@ import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import com.azure.core.http.rest.Response;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
@@ -62,6 +63,8 @@ import com.azure.storage.blob.models.BlobContainerItem;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobItemProperties;
 import com.azure.storage.blob.models.BlobProperties;
+import com.azure.storage.blob.models.BlobRequestConditions;
+import com.azure.storage.blob.models.BlobStorageException;
 import com.azure.storage.blob.models.ListBlobsOptions;
 import com.azure.storage.blob.specialized.BlockBlobClient;
 
@@ -73,7 +76,7 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
     private final BlobServiceClient blobServiceClient;
 
     public AbsStorageOperator(AbsStorageProperties absStorageProperties) {
-        super(absStorageProperties.getResourceUploadPath());
+        super(absStorageProperties.getResourceUploadPath(), FOLDER_SEPARATOR);
         blobServiceClient = new BlobServiceClientBuilder()
                 .endpoint("https://" + absStorageProperties.getStorageAccountName() + ".blob.core.windows.net/")
                 .connectionString(absStorageProperties.getConnectionString())
@@ -84,7 +87,6 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
 
     @Override
     public String getStorageBaseDirectory() {
-        // All directory should end with File.separator
         if (resourceBaseAbsolutePath.startsWith("/")) {
             log.warn("{} -> {} should not start with / in abs", StorageConstants.RESOURCE_UPLOAD_PATH,
                     resourceBaseAbsolutePath);
@@ -120,9 +122,16 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
 
     @Override
     public boolean exists(String fullName) {
-        // A directory is the marker blob "<path>/" in a flat namespace and the blob "<path>" in a hierarchical one
         String absKey = transformAbsolutePathToAbsKey(fullName);
-        return isObjectExists(absKey) || (!absKey.equals(fullName) && isObjectExists(fullName));
+        if (isObjectExists(absKey)) {
+            return true;
+        }
+        if (!absKey.endsWith(FOLDER_SEPARATOR)) {
+            return false;
+        }
+        return isObjectExists(transformAbsKeyToAbsolutePath(absKey))
+                || blobContainerClient.listBlobs(new ListBlobsOptions().setPrefix(absKey).setMaxResultsPerPage(1), null)
+                        .iterator().hasNext();
     }
 
     protected boolean isObjectExists(String objectName) {
@@ -133,7 +142,11 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
     @Override
     public void delete(String filePath, boolean recursive) {
         String absKey = transformAbsolutePathToAbsKey(filePath);
-        if (recursive && getResourceMetaData(filePath).isDirectory()) {
+        if (!absKey.endsWith(FOLDER_SEPARATOR)) {
+            blobContainerClient.getBlobClient(absKey).deleteIfExists();
+            return;
+        }
+        if (recursive) {
             // The prefix listing contains the directory marker blob as well
             ListBlobsOptions options = new ListBlobsOptions().setPrefix(absKey);
             List<String> blobNames = new ArrayList<>();
@@ -146,15 +159,27 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
             for (String blobName : blobNames) {
                 blobContainerClient.getBlobClient(blobName).deleteIfExists();
             }
-            // The directory itself is a blob without the trailing separator in a hierarchical namespace
-            blobContainerClient.getBlobClient(transformAbsKeyToAbsolutePath(absKey)).deleteIfExists();
-            return;
+        } else {
+            blobContainerClient.getBlobClient(absKey).deleteIfExists();
         }
-        blobContainerClient.getBlobClient(absKey).deleteIfExists();
-        if (getResourceMetaData(filePath).isDirectory()) {
-            // In a hierarchical namespace the directory is the blob without the trailing separator. Azure refuses to
-            // delete it while it still has children, and that error is passed on instead of being ignored
-            blobContainerClient.getBlobClient(transformAbsKeyToAbsolutePath(absKey)).deleteIfExists();
+        deleteHierarchicalDirectory(transformAbsKeyToAbsolutePath(absKey));
+    }
+
+    private void deleteHierarchicalDirectory(String name) {
+        BlobClient directory = blobContainerClient.getBlobClient(name);
+        Response<BlobProperties> properties;
+        try {
+            properties = directory.getPropertiesWithResponse(null, null, null);
+        } catch (BlobStorageException e) {
+            if (e.getStatusCode() == 404) {
+                return;
+            }
+            throw e;
+        }
+        if ("directory".equals(properties.getHeaders().getValue("x-ms-resource-type"))) {
+            // Delete only the directory we inspected, even if the key is replaced concurrently.
+            BlobRequestConditions conditions = new BlobRequestConditions().setIfMatch(properties.getValue().getETag());
+            directory.deleteIfExistsWithResponse(null, conditions, null, null);
         }
     }
 
@@ -309,7 +334,7 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
     private String transformAbsolutePathToAbsKey(String absolutePath) {
         ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);
         if (resourceMetaData.isDirectory()) {
-            return FileUtils.concatFilePath(absolutePath, FOLDER_SEPARATOR);
+            return StringUtils.appendIfMissing(absolutePath, FOLDER_SEPARATOR);
         }
         return absolutePath;
     }

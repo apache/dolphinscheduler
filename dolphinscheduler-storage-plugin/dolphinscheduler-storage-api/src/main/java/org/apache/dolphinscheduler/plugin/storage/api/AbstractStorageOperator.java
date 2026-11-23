@@ -31,7 +31,14 @@ public abstract class AbstractStorageOperator implements StorageOperator {
 
     protected final String resourceBaseAbsolutePath;
 
+    private final String pathSeparator;
+
     public AbstractStorageOperator(String resourceBaseAbsolutePath) {
+        this(resourceBaseAbsolutePath, File.separator);
+    }
+
+    protected AbstractStorageOperator(String resourceBaseAbsolutePath, String pathSeparator) {
+        this.pathSeparator = pathSeparator;
         Preconditions.checkNotNull(resourceBaseAbsolutePath, "Resource upload path should not be null");
         this.resourceBaseAbsolutePath = resourceBaseAbsolutePath;
     }
@@ -40,7 +47,7 @@ public abstract class AbstractStorageOperator implements StorageOperator {
     public ResourceMetadata getResourceMetaData(String resourceAbsolutePath) {
         String storageBaseDirectory = getStorageBaseDirectory();
         String resourceSegment = StringUtils.substringAfter(resourceAbsolutePath, storageBaseDirectory);
-        String[] segments = StringUtils.split(resourceSegment, File.separator, 3);
+        String[] segments = StringUtils.split(resourceSegment, pathSeparator, 3);
         if (segments.length == 0) {
             throw new IllegalArgumentException("Invalid resource path: " + resourceAbsolutePath);
         }
@@ -51,7 +58,7 @@ public abstract class AbstractStorageOperator implements StorageOperator {
                 .tenant(segments[0])
                 .resourceType(ResourceType.FILE)
                 .resourceRelativePath(segments.length == 2 ? "/" : segments[2])
-                .resourceParentAbsolutePath(StringUtils.substringBeforeLast(resourceAbsolutePath, File.separator))
+                .resourceParentAbsolutePath(StringUtils.substringBeforeLast(resourceAbsolutePath, pathSeparator))
                 .build();
     }
 
@@ -67,7 +74,7 @@ public abstract class AbstractStorageOperator implements StorageOperator {
             throw new IllegalArgumentException("Tenant code should not be empty");
         }
         // All directory should end with File.separator
-        return FileUtils.concatFilePath(getStorageBaseDirectory(), tenantCode);
+        return FileUtils.concatPathWithSeparator(pathSeparator, getStorageBaseDirectory(), tenantCode);
     }
 
     @Override
@@ -79,7 +86,8 @@ public abstract class AbstractStorageOperator implements StorageOperator {
         String resourceBaseDirectory;
         switch (resourceType) {
             case FILE:
-                resourceBaseDirectory = FileUtils.concatFilePath(tenantBaseDirectory, StorageOperator.FILE_FOLDER_NAME);
+                resourceBaseDirectory = FileUtils.concatPathWithSeparator(pathSeparator, tenantBaseDirectory,
+                        StorageOperator.FILE_FOLDER_NAME);
                 break;
             case ALL:
                 resourceBaseDirectory = tenantBaseDirectory;
@@ -93,7 +101,8 @@ public abstract class AbstractStorageOperator implements StorageOperator {
 
     @Override
     public String getStorageFileAbsolutePath(String tenantCode, String fileName) {
-        return FileUtils.concatFilePath(getStorageBaseDirectory(tenantCode, ResourceType.FILE), fileName);
+        return FileUtils.concatPathWithSeparator(pathSeparator, getStorageBaseDirectory(tenantCode, ResourceType.FILE),
+                fileName);
     }
 
     protected void exceptionIfPathEmpty(String resourceAbsolutePath) {
