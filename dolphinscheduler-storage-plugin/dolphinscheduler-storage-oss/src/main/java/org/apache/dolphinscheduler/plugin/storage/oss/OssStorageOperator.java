@@ -52,6 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.DeleteObjectsRequest;
+import com.aliyun.oss.model.DeleteObjectsResult;
 import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.ListObjectsV2Request;
 import com.aliyun.oss.model.ListObjectsV2Result;
@@ -170,7 +171,20 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
     @Override
     public boolean exists(String fileName) {
         fileName = transformAbsolutePathToOssKey(fileName);
-        return ossClient.doesObjectExist(bucketName, fileName);
+        if (ossClient.doesObjectExist(bucketName, fileName)) {
+            return true;
+        }
+        // A leftover prefix can still have child objects after the directory marker was deleted.
+        return fileName.endsWith("/") && hasObjectsWithPrefix(fileName);
+    }
+
+    private boolean hasObjectsWithPrefix(String prefix) {
+        ListObjectsV2Request listObjectsV2Request = new ListObjectsV2Request()
+                .withBucketName(bucketName)
+                .withPrefix(prefix)
+                .withMaxKeys(1);
+        ListObjectsV2Result listObjectsV2Result = ossClient.listObjectsV2(listObjectsV2Request);
+        return !listObjectsV2Result.getObjectSummaries().isEmpty();
     }
 
     @Override
@@ -199,11 +213,26 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
                     .map(OSSObjectSummary::getKey)
                     .collect(Collectors.toList());
             if (!keys.isEmpty()) {
-                ossClient.deleteObjects(new DeleteObjectsRequest(bucketName).withKeys(keys).withQuiet(true));
+                deleteObjectsAndConfirm(keys);
             }
             truncated = listObjectsV2Result.isTruncated();
             continuationToken = listObjectsV2Result.getNextContinuationToken();
         } while (truncated && continuationToken != null);
+    }
+
+    private void deleteObjectsAndConfirm(List<String> keys) {
+        DeleteObjectsResult deleteObjectsResult = ossClient.deleteObjects(
+                new DeleteObjectsRequest(bucketName).withKeys(keys).withQuiet(false));
+        Set<String> confirmed = new HashSet<>();
+        if (deleteObjectsResult != null && deleteObjectsResult.getDeletedObjects() != null) {
+            confirmed.addAll(deleteObjectsResult.getDeletedObjects());
+        }
+        List<String> unconfirmed = keys.stream()
+                .filter(key -> !confirmed.contains(key))
+                .collect(Collectors.toList());
+        if (!unconfirmed.isEmpty()) {
+            throw new IllegalStateException("OSS did not confirm deletion of objects: " + unconfirmed);
+        }
     }
 
     @Override

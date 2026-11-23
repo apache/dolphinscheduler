@@ -18,7 +18,9 @@
 package org.apache.dolphinscheduler.plugin.storage.oss;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -40,6 +42,7 @@ import org.mockito.Mockito;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.DeleteObjectsRequest;
+import com.aliyun.oss.model.DeleteObjectsResult;
 import com.aliyun.oss.model.ListObjectsV2Request;
 import com.aliyun.oss.model.ListObjectsV2Result;
 import com.aliyun.oss.model.OSSObjectSummary;
@@ -72,7 +75,7 @@ class OssStorageOperatorTest {
         ArgumentCaptor<DeleteObjectsRequest> deleteCaptor = ArgumentCaptor.forClass(DeleteObjectsRequest.class);
         verify(ossClient).deleteObjects(deleteCaptor.capture());
         assertEquals(BUCKET, deleteCaptor.getValue().getBucketName());
-        assertTrue(deleteCaptor.getValue().isQuiet());
+        assertFalse(deleteCaptor.getValue().isQuiet());
         assertEquals(Arrays.asList(
                 DIRECTORY + "/",
                 DIRECTORY + "/b.sql",
@@ -143,9 +146,97 @@ class OssStorageOperatorTest {
         verify(ossClient, never()).deleteObjects(any(DeleteObjectsRequest.class));
     }
 
+    @Test
+    void existsTreatsDirectoryPrefixWithChildrenAsExistingWhenMarkerIsMissing() {
+        OSS ossClient = mockOssClient();
+        when(ossClient.doesObjectExist(eq(BUCKET), eq(DIRECTORY + "/"))).thenReturn(false);
+        when(ossClient.listObjectsV2(any(ListObjectsV2Request.class)))
+                .thenReturn(listResult(false, null, DIRECTORY + "/b.sql"));
+        OssStorageOperator storageOperator = createStorageOperator(ossClient);
+
+        assertTrue(storageOperator.exists(DIRECTORY));
+
+        ArgumentCaptor<ListObjectsV2Request> listCaptor = ArgumentCaptor.forClass(ListObjectsV2Request.class);
+        verify(ossClient).listObjectsV2(listCaptor.capture());
+        assertEquals(BUCKET, listCaptor.getValue().getBucketName());
+        assertEquals(DIRECTORY + "/", listCaptor.getValue().getPrefix());
+        assertEquals(1, listCaptor.getValue().getMaxKeys());
+    }
+
+    @Test
+    void existsIsFalseWhenDirectoryHasNoMarkerAndNoChildren() {
+        OSS ossClient = mockOssClient();
+        when(ossClient.doesObjectExist(eq(BUCKET), eq(DIRECTORY + "/"))).thenReturn(false);
+        when(ossClient.listObjectsV2(any(ListObjectsV2Request.class))).thenReturn(listResult(false, null));
+        OssStorageOperator storageOperator = createStorageOperator(ossClient);
+
+        assertFalse(storageOperator.exists(DIRECTORY));
+    }
+
+    @Test
+    void existsDoesNotListChildrenWhenDirectoryMarkerExists() {
+        OSS ossClient = mockOssClient();
+        when(ossClient.doesObjectExist(eq(BUCKET), eq(DIRECTORY + "/"))).thenReturn(true);
+        OssStorageOperator storageOperator = createStorageOperator(ossClient);
+
+        assertTrue(storageOperator.exists(DIRECTORY));
+        verify(ossClient, never()).listObjectsV2(any(ListObjectsV2Request.class));
+    }
+
+    @Test
+    void resourceCenterCanDeleteDirectoryWhenMarkerIsMissingButChildrenRemain() {
+        // Resource Center: DeleteResourceDtoValidator calls exists(), then
+        // ResourcesServiceImpl.delete() calls delete(path, true).
+        OSS ossClient = mockOssClient();
+        when(ossClient.doesObjectExist(eq(BUCKET), eq(DIRECTORY + "/"))).thenReturn(false);
+        when(ossClient.listObjectsV2(any(ListObjectsV2Request.class))).thenReturn(
+                listResult(false, null, DIRECTORY + "/b.sql", DIRECTORY + "/sub/c.sql"));
+        OssStorageOperator storageOperator = createStorageOperator(ossClient);
+
+        assertTrue(storageOperator.exists(DIRECTORY));
+        storageOperator.delete(DIRECTORY, true);
+
+        ArgumentCaptor<ListObjectsV2Request> listCaptor = ArgumentCaptor.forClass(ListObjectsV2Request.class);
+        verify(ossClient, times(2)).listObjectsV2(listCaptor.capture());
+        assertEquals(1, listCaptor.getAllValues().get(0).getMaxKeys());
+        assertEquals(1000, listCaptor.getAllValues().get(1).getMaxKeys());
+        assertEquals(DIRECTORY + "/", listCaptor.getAllValues().get(0).getPrefix());
+        assertEquals(DIRECTORY + "/", listCaptor.getAllValues().get(1).getPrefix());
+
+        ArgumentCaptor<DeleteObjectsRequest> deleteCaptor = ArgumentCaptor.forClass(DeleteObjectsRequest.class);
+        verify(ossClient).deleteObjects(deleteCaptor.capture());
+        assertFalse(deleteCaptor.getValue().isQuiet());
+        assertEquals(Arrays.asList(DIRECTORY + "/b.sql", DIRECTORY + "/sub/c.sql"),
+                deleteCaptor.getValue().getKeys());
+        verify(ossClient, never()).deleteObject(anyString(), anyString());
+    }
+
+    @Test
+    void deleteDirectoryRecursivelyFailsWhenOssConfirmsOnlyASubset() {
+        OSS ossClient = mockOssClient();
+        when(ossClient.listObjectsV2(any(ListObjectsV2Request.class))).thenReturn(listResult(false, null,
+                DIRECTORY + "/",
+                DIRECTORY + "/b.sql",
+                DIRECTORY + "/sub/c.sql"));
+        when(ossClient.deleteObjects(any(DeleteObjectsRequest.class)))
+                .thenReturn(new DeleteObjectsResult(Collections.singletonList(DIRECTORY + "/")));
+        OssStorageOperator storageOperator = createStorageOperator(ossClient);
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> storageOperator.delete(DIRECTORY, true));
+        assertTrue(exception.getMessage().contains(DIRECTORY + "/b.sql"));
+        assertTrue(exception.getMessage().contains(DIRECTORY + "/sub/c.sql"));
+        assertTrue(exception.getMessage().contains("OSS did not confirm deletion of objects"));
+    }
+
     private OSS mockOssClient() {
         OSS ossClient = mock(OSS.class);
         when(ossClient.doesBucketExist(BUCKET)).thenReturn(true);
+        when(ossClient.deleteObjects(any(DeleteObjectsRequest.class)))
+                .thenAnswer(invocation -> {
+                    DeleteObjectsRequest request = invocation.getArgument(0);
+                    return new DeleteObjectsResult(request.getKeys());
+                });
         return ossClient;
     }
 
