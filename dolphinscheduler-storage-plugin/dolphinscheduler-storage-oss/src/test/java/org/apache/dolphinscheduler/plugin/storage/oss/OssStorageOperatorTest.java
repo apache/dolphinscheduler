@@ -147,34 +147,17 @@ class OssStorageOperatorTest {
     }
 
     @Test
-    void existsTreatsDirectoryPrefixWithChildrenAsExistingWhenMarkerIsMissing() {
+    void existsOnlyChecksTheDirectoryMarkerAndIgnoresLeftoverChildren() {
         OSS ossClient = mockOssClient();
         when(ossClient.doesObjectExist(eq(BUCKET), eq(DIRECTORY + "/"))).thenReturn(false);
-        when(ossClient.listObjectsV2(any(ListObjectsV2Request.class)))
-                .thenReturn(listResult(false, null, DIRECTORY + "/b.sql"));
-        OssStorageOperator storageOperator = createStorageOperator(ossClient);
-
-        assertTrue(storageOperator.exists(DIRECTORY));
-
-        ArgumentCaptor<ListObjectsV2Request> listCaptor = ArgumentCaptor.forClass(ListObjectsV2Request.class);
-        verify(ossClient).listObjectsV2(listCaptor.capture());
-        assertEquals(BUCKET, listCaptor.getValue().getBucketName());
-        assertEquals(DIRECTORY + "/", listCaptor.getValue().getPrefix());
-        assertEquals(1, listCaptor.getValue().getMaxKeys());
-    }
-
-    @Test
-    void existsIsFalseWhenDirectoryHasNoMarkerAndNoChildren() {
-        OSS ossClient = mockOssClient();
-        when(ossClient.doesObjectExist(eq(BUCKET), eq(DIRECTORY + "/"))).thenReturn(false);
-        when(ossClient.listObjectsV2(any(ListObjectsV2Request.class))).thenReturn(listResult(false, null));
         OssStorageOperator storageOperator = createStorageOperator(ossClient);
 
         assertFalse(storageOperator.exists(DIRECTORY));
+        verify(ossClient, never()).listObjectsV2(any(ListObjectsV2Request.class));
     }
 
     @Test
-    void existsDoesNotListChildrenWhenDirectoryMarkerExists() {
+    void existsIsTrueWhenDirectoryMarkerExists() {
         OSS ossClient = mockOssClient();
         when(ossClient.doesObjectExist(eq(BUCKET), eq(DIRECTORY + "/"))).thenReturn(true);
         OssStorageOperator storageOperator = createStorageOperator(ossClient);
@@ -184,16 +167,54 @@ class OssStorageOperatorTest {
     }
 
     @Test
-    void resourceCenterCanDeleteDirectoryWhenMarkerIsMissingButChildrenRemain() {
-        // Resource Center: DeleteResourceDtoValidator calls exists(), then
-        // ResourcesServiceImpl.delete() calls delete(path, true).
+    void existsForRecursiveDeleteTreatsLeftoverPrefixWithChildrenAsExisting() {
+        OSS ossClient = mockOssClient();
+        when(ossClient.doesObjectExist(eq(BUCKET), eq(DIRECTORY + "/"))).thenReturn(false);
+        when(ossClient.listObjectsV2(any(ListObjectsV2Request.class)))
+                .thenReturn(listResult(false, null, DIRECTORY + "/b.sql"));
+        OssStorageOperator storageOperator = createStorageOperator(ossClient);
+
+        assertTrue(storageOperator.existsForRecursiveDelete(DIRECTORY));
+        assertFalse(storageOperator.exists(DIRECTORY));
+
+        ArgumentCaptor<ListObjectsV2Request> listCaptor = ArgumentCaptor.forClass(ListObjectsV2Request.class);
+        verify(ossClient).listObjectsV2(listCaptor.capture());
+        assertEquals(BUCKET, listCaptor.getValue().getBucketName());
+        assertEquals(DIRECTORY + "/", listCaptor.getValue().getPrefix());
+        assertEquals(1, listCaptor.getValue().getMaxKeys());
+    }
+
+    @Test
+    void existsForRecursiveDeleteIsFalseWhenDirectoryHasNoMarkerAndNoChildren() {
+        OSS ossClient = mockOssClient();
+        when(ossClient.doesObjectExist(eq(BUCKET), eq(DIRECTORY + "/"))).thenReturn(false);
+        when(ossClient.listObjectsV2(any(ListObjectsV2Request.class))).thenReturn(listResult(false, null));
+        OssStorageOperator storageOperator = createStorageOperator(ossClient);
+
+        assertFalse(storageOperator.existsForRecursiveDelete(DIRECTORY));
+        assertFalse(storageOperator.exists(DIRECTORY));
+    }
+
+    @Test
+    void existsForRecursiveDeleteDoesNotListChildrenWhenDirectoryMarkerExists() {
+        OSS ossClient = mockOssClient();
+        when(ossClient.doesObjectExist(eq(BUCKET), eq(DIRECTORY + "/"))).thenReturn(true);
+        OssStorageOperator storageOperator = createStorageOperator(ossClient);
+
+        assertTrue(storageOperator.existsForRecursiveDelete(DIRECTORY));
+        verify(ossClient, never()).listObjectsV2(any(ListObjectsV2Request.class));
+    }
+
+    @Test
+    void recursiveDeleteRemovesLeftoverChildrenEvenWhenDirectoryMarkerIsMissing() {
         OSS ossClient = mockOssClient();
         when(ossClient.doesObjectExist(eq(BUCKET), eq(DIRECTORY + "/"))).thenReturn(false);
         when(ossClient.listObjectsV2(any(ListObjectsV2Request.class))).thenReturn(
                 listResult(false, null, DIRECTORY + "/b.sql", DIRECTORY + "/sub/c.sql"));
         OssStorageOperator storageOperator = createStorageOperator(ossClient);
 
-        assertTrue(storageOperator.exists(DIRECTORY));
+        assertFalse(storageOperator.exists(DIRECTORY));
+        assertTrue(storageOperator.existsForRecursiveDelete(DIRECTORY));
         storageOperator.delete(DIRECTORY, true);
 
         ArgumentCaptor<ListObjectsV2Request> listCaptor = ArgumentCaptor.forClass(ListObjectsV2Request.class);

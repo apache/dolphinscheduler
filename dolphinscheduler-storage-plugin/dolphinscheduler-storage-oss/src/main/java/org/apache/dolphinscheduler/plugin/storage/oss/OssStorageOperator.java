@@ -170,6 +170,11 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
 
     @Override
     public boolean exists(String fileName) {
+        return ossClient.doesObjectExist(bucketName, transformAbsolutePathToOssKey(fileName));
+    }
+
+    @Override
+    public boolean existsForRecursiveDelete(String fileName) {
         fileName = transformAbsolutePathToOssKey(fileName);
         if (ossClient.doesObjectExist(bucketName, fileName)) {
             return true;
