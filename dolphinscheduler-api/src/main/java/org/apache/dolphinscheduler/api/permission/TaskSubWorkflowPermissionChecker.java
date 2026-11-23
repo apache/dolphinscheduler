@@ -69,12 +69,17 @@ public class TaskSubWorkflowPermissionChecker {
     }
 
     public void checkPermission(User loginUser, Collection<? extends TaskDefinition> taskDefinitions) {
+        checkPermission(loginUser, taskDefinitions, null);
+    }
+
+    public void checkPermission(User loginUser, Collection<? extends TaskDefinition> taskDefinitions,
+                                WorkflowDefinition pendingDefinition) {
         Collection<? extends TaskDefinition> pendingTasks = taskDefinitions;
         Set<Long> visitedWorkflows = new HashSet<>();
         Set<Long> viewedProjects = new HashSet<>();
         boolean checkSubWorkflowExecute = true;
         while (pendingTasks != null && !pendingTasks.isEmpty()) {
-            checkDependentReferences(loginUser, pendingTasks, viewedProjects);
+            checkDependentReferences(loginUser, pendingTasks, viewedProjects, pendingDefinition);
             List<WorkflowDefinition> subWorkflows =
                     querySubWorkflows(loginUser, pendingTasks, visitedWorkflows, checkSubWorkflowExecute);
             List<TaskDefinition> nextTasks = new ArrayList<>();
@@ -83,6 +88,7 @@ public class TaskSubWorkflowPermissionChecker {
                         workflow.getCode(), workflow.getVersion()));
             }
             pendingTasks = nextTasks;
+            pendingDefinition = null;
             // Save checks EXECUTE on direct subworkflows; descend only to validate dependency references.
             checkSubWorkflowExecute = false;
         }
@@ -107,7 +113,7 @@ public class TaskSubWorkflowPermissionChecker {
         Set<Long> visitedWorkflows = new HashSet<>();
         Set<Long> viewedProjects = new HashSet<>();
         while (pendingTasks != null && !pendingTasks.isEmpty()) {
-            checkDependentReferences(loginUser, pendingTasks, viewedProjects);
+            checkDependentReferences(loginUser, pendingTasks, viewedProjects, null);
             List<WorkflowDefinition> subWorkflows =
                     querySubWorkflows(loginUser, pendingTasks, visitedWorkflows, true);
             List<TaskDefinition> nextTasks = new ArrayList<>();
@@ -127,7 +133,7 @@ public class TaskSubWorkflowPermissionChecker {
     }
 
     private void checkDependentReferences(User loginUser, Collection<? extends TaskDefinition> taskDefinitions,
-                                          Set<Long> viewedProjects) {
+                                          Set<Long> viewedProjects, WorkflowDefinition pendingDefinition) {
         List<DependentItem> items = new ArrayList<>();
         for (TaskDefinition task : taskDefinitions) {
             if (!TaskTypeUtils.isDependentTask(task.getTaskType())) {
@@ -161,13 +167,25 @@ public class TaskSubWorkflowPermissionChecker {
             return;
         }
         Set<Long> workflowCodes = items.stream().map(DependentItem::getDefinitionCode).collect(Collectors.toSet());
-        List<WorkflowDefinition> workflows = workflowDefinitionDao.queryByCodes(workflowCodes);
+        if (pendingDefinition != null) {
+            workflowCodes.remove(pendingDefinition.getCode());
+        }
+        List<WorkflowDefinition> workflows = workflowCodes.isEmpty()
+                ? Collections.emptyList()
+                : workflowDefinitionDao.queryByCodes(workflowCodes);
         if (workflows == null) {
             throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
         }
         Map<Long, WorkflowDefinition> definitions = workflows.stream()
                 .collect(Collectors.toMap(WorkflowDefinition::getCode, workflow -> workflow));
         Map<Long, Set<Long>> workflowTaskCodes = new HashMap<>();
+        if (pendingDefinition != null) {
+            // The new definition and its tasks have not been persisted yet.
+            definitions.put(pendingDefinition.getCode(), pendingDefinition);
+            workflowTaskCodes.put(pendingDefinition.getCode(), taskDefinitions.stream()
+                    .filter(task -> task.getProjectCode() == pendingDefinition.getProjectCode())
+                    .map(TaskDefinition::getCode).collect(Collectors.toSet()));
+        }
         for (DependentItem item : items) {
             WorkflowDefinition workflow = definitions.get(item.getDefinitionCode());
             if (workflow == null || workflow.getProjectCode() != item.getProjectCode()) {

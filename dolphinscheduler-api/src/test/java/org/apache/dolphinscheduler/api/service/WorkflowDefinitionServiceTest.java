@@ -33,13 +33,15 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.permission.ProjectCodeValidator;
 import org.apache.dolphinscheduler.api.permission.TaskResourcePermissionChecker;
 import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowDefinitionServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.WorkflowLineageServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
+import org.apache.dolphinscheduler.api.validator.TaskProjectValidator;
+import org.apache.dolphinscheduler.api.validator.WorkflowRelationValidator;
 import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCopyVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -62,10 +64,12 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
@@ -76,6 +80,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -118,6 +123,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -128,6 +134,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 
 @ExtendWith(MockitoExtension.class)
@@ -151,6 +158,12 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     private WorkflowDefinitionServiceImpl workflowDefinitionService;
 
     @Mock
+    private TaskProjectValidator taskProjectValidator;
+
+    @Mock
+    private WorkflowRelationValidator workflowRelationValidator;
+
+    @Mock
     private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Mock
@@ -158,6 +171,9 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Mock
     private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
+
+    @Mock
+    private WorkflowInstanceMapper workflowInstanceMapper;
 
     @Mock
     private WorkflowTaskRelationDao workflowTaskRelationDao;
@@ -191,9 +207,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Mock
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
-
-    @Mock
-    private ProjectCodeValidator projectCodeValidator;
 
     @Mock
     private TaskResourcePermissionChecker taskResourcePermissionChecker;
@@ -570,15 +583,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
-    void crossProjectMoveIsRejectedBeforeLoadingOrChangingDefinitions() {
-        ServiceException exception = Assertions.assertThrows(ServiceException.class,
-                () -> workflowDefinitionService.batchMoveWorkflowDefinition(user, projectCode,
-                        String.valueOf(processDefinitionCode), projectCodeOther));
-        Assertions.assertEquals(Status.PROJECT_WORKFLOW_NOT_MATCH.getCode(), exception.getCode());
-        Mockito.verifyNoInteractions(workflowDefinitionDao, processService);
-    }
-
-    @Test
     void deletingWorkflowVersionRejectsDifferentProjectBeforeDeleting() {
         WorkflowDefinition definition = getWorkflowDefinition();
         definition.setVersion(2);
@@ -609,6 +613,170 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                         processDefinitionCode, 1));
         Assertions.assertEquals(Status.PROJECT_WORKFLOW_NOT_MATCH.getCode(), error.getCode());
         verify(processService, Mockito.never()).switchVersion(any(), any());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"1,101", "1,0", "1,-1", "2,101", "2,0", "2,-1"})
+    public void testBatchCopyWorkflowDefinitionRemapsSelfDependencies(long targetProjectCode, long depTaskCode) {
+        ReflectionTestUtils.setField(workflowDefinitionService, "taskProjectValidator",
+                new TaskProjectValidator(taskDefinitionDao, taskDefinitionLogMapper));
+        ReflectionTestUtils.setField(workflowDefinitionService, "workflowRelationValidator",
+                new WorkflowRelationValidator(new TaskProjectValidator(taskDefinitionDao, taskDefinitionLogMapper)));
+        when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        if (targetProjectCode != projectCode) {
+            when(projectDao.queryByCode(targetProjectCode)).thenReturn(getProject(targetProjectCode));
+        }
+        WorkflowDefinition definition = getWorkflowDefinition();
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(processDefinitionCode)))
+                .thenReturn(Collections.singletonList(definition));
+        when(processService.saveWorkflowDefine(eq(user), any(), eq(true), eq(true))).thenReturn(1);
+
+        TaskDefinitionLog shellTask = new TaskDefinitionLog();
+        shellTask.setCode(101L);
+        shellTask.setProjectCode(projectCode);
+        shellTask.setVersion(1);
+        shellTask.setTaskType("SHELL");
+        shellTask.setTaskParams("{\"rawScript\":\"echo test\"}");
+        TaskDefinitionLog dependentTask = new TaskDefinitionLog();
+        dependentTask.setCode(102L);
+        dependentTask.setProjectCode(projectCode);
+        dependentTask.setVersion(1);
+        dependentTask.setTaskType("DEPENDENT");
+        String taskParams = String.format(
+                "{\"localParams\":[{\"prop\":\"runDate\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"${bizdate}\"}],"
+                        + "\"dependence\":{\"relation\":\"AND\",\"checkInterval\":15,"
+                        + "\"failurePolicy\":\"DEPENDENT_FAILURE_WAITING\",\"failureWaitingTime\":30,"
+                        + "\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":["
+                        + "{\"projectCode\":1,\"definitionCode\":11,\"depTaskCode\":%d,"
+                        + "\"cycle\":\"day\",\"dateValue\":\"last1Days\",\"parameterPassing\":true}]},"
+                        + "{\"relation\":\"OR\",\"dependItemList\":["
+                        + "{\"projectCode\":1,\"definitionCode\":99,\"depTaskCode\":101,\"cycle\":\"day\",\"dateValue\":\"today\"},"
+                        + "{\"projectCode\":3,\"definitionCode\":98,\"depTaskCode\":999,\"cycle\":\"day\",\"dateValue\":\"last1Days\"},"
+                        + "{\"projectCode\":3,\"definitionCode\":11,\"depTaskCode\":101,\"cycle\":\"day\",\"dateValue\":\"last1Days\"},"
+                        + "{\"projectCode\":1,\"definitionCode\":11,\"depTaskCode\":102,\"cycle\":\"day\",\"dateValue\":\"last2Days\"}]}]}}",
+                depTaskCode);
+        dependentTask.setTaskParams(taskParams);
+        List<TaskDefinitionLog> tasks = Arrays.asList(shellTask, dependentTask);
+        WorkflowTaskRelation relation = getWorkflowTaskRelation(1, 1, projectCode, processDefinitionCode,
+                102L, 1, 101L, 1);
+        List<WorkflowTaskRelation> relations = Collections.singletonList(relation);
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(relations);
+        when(taskDefinitionLogDao.queryTaskDefineLogList(relations)).thenReturn(tasks);
+
+        List<WorkflowDefinitionCopyVO> copies = workflowDefinitionService.batchCopyWorkflowDefinition(
+                user, projectCode, String.valueOf(processDefinitionCode), targetProjectCode);
+
+        Assertions.assertEquals(1, copies.size());
+        long copiedWorkflowCode = copies.get(0).getWorkflowDefinitionCode();
+        Assertions.assertNotEquals(processDefinitionCode, copiedWorkflowCode);
+        ArgumentCaptor<List<TaskDefinitionLog>> tasksCaptor = ArgumentCaptor.forClass(List.class);
+        verify(processService).saveTaskDefine(eq(user), eq(targetProjectCode), tasksCaptor.capture(), eq(true));
+        List<TaskDefinitionLog> copiedTasks = tasksCaptor.getValue();
+        TaskDefinitionLog copiedShell = copiedTasks.stream().filter(task -> "SHELL".equals(task.getTaskType()))
+                .findFirst().get();
+        TaskDefinitionLog copiedDependent = copiedTasks.stream().filter(task -> "DEPENDENT".equals(task.getTaskType()))
+                .findFirst().get();
+        Assertions.assertNotEquals(101L, copiedShell.getCode());
+        Assertions.assertNotEquals(102L, copiedDependent.getCode());
+        Assertions.assertEquals(targetProjectCode, copiedDependent.getProjectCode());
+        Assertions.assertEquals("{\"rawScript\":\"echo test\"}", copiedShell.getTaskParams());
+        ObjectNode expectedParams = JSONUtils.parseObject(taskParams, ObjectNode.class);
+        ObjectNode selfDependency = (ObjectNode) expectedParams.path("dependence").path("dependTaskList")
+                .get(0).path("dependItemList").get(0);
+        selfDependency.put("projectCode", targetProjectCode);
+        selfDependency.put("definitionCode", copiedWorkflowCode);
+        selfDependency.put("depTaskCode", depTaskCode > 0 ? copiedShell.getCode() : depTaskCode);
+        ObjectNode otherSelfDependency = (ObjectNode) expectedParams.path("dependence").path("dependTaskList")
+                .get(1).path("dependItemList").get(3);
+        otherSelfDependency.put("projectCode", targetProjectCode);
+        otherSelfDependency.put("definitionCode", copiedWorkflowCode);
+        otherSelfDependency.put("depTaskCode", copiedDependent.getCode());
+        Assertions.assertEquals(JSONUtils.parseObject(JSONUtils.toJsonString(expectedParams), ObjectNode.class),
+                JSONUtils.parseObject(copiedDependent.getTaskParams(), ObjectNode.class));
+
+        ArgumentCaptor<List<WorkflowTaskLineage>> lineageCaptor = ArgumentCaptor.forClass(List.class);
+        verify(workflowLineageService).updateWorkflowLineage(eq(copiedWorkflowCode), lineageCaptor.capture());
+        List<WorkflowTaskLineage> selfLineages = lineageCaptor.getValue().stream()
+                .filter(lineage -> lineage.getDeptWorkflowDefinitionCode() == copiedWorkflowCode)
+                .collect(Collectors.toList());
+        Assertions.assertEquals(2, selfLineages.size());
+        WorkflowTaskLineage externalLineage = new WorkflowTaskLineage();
+        externalLineage.setWorkflowDefinitionCode(99L);
+        externalLineage.setDeptProjectCode(targetProjectCode);
+        externalLineage.setDeptWorkflowDefinitionCode(copiedWorkflowCode);
+        externalLineage.setTaskDefinitionCode(999L);
+        List<WorkflowTaskLineage> incomingLineages = new ArrayList<>(selfLineages);
+        incomingLineages.add(externalLineage);
+        WorkflowTaskLineageDao lineageDao = Mockito.mock(WorkflowTaskLineageDao.class);
+        when(lineageDao.queryWorkFlowLineageByDept(Constants.DEFAULT_PROJECT_CODE, copiedWorkflowCode, 0))
+                .thenReturn(incomingLineages, selfLineages);
+        WorkflowLineageServiceImpl lineageService = new WorkflowLineageServiceImpl();
+        ReflectionTestUtils.setField(lineageService, "workflowTaskLineageDao", lineageDao);
+        ReflectionTestUtils.setField(lineageService, "workflowDefinitionDao", workflowDefinitionDao);
+        ReflectionTestUtils.setField(lineageService, "taskDefinitionDao", taskDefinitionDao);
+        ReflectionTestUtils.setField(lineageService, "projectDao", projectDao);
+        ReflectionTestUtils.setField(lineageService, "projectService", projectService);
+        ReflectionTestUtils.setField(workflowDefinitionService, "workflowLineageService", lineageService);
+        when(workflowDefinitionDao.queryByCode(copiedWorkflowCode)).thenReturn(Optional.of(definition));
+        // Keep the copied task available so self-lineage cannot be mistaken for an orphan.
+        lenient().when(taskDefinitionDao.queryByCode(copiedDependent.getCode())).thenReturn(copiedDependent);
+        TaskDefinition externalTask = new TaskDefinition();
+        externalTask.setCode(999L);
+        externalTask.setName("external-dependent");
+        when(taskDefinitionDao.queryByCode(999L)).thenReturn(externalTask);
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.deleteWorkflowDefinitionByCode(user, copiedWorkflowCode));
+        Assertions.assertTrue(exception.getMessage().contains("external-dependent"));
+        verify(workflowDefinitionDao, Mockito.never()).deleteByWorkflowDefinitionCode(anyLong());
+        verify(workflowInstanceService, Mockito.never()).deleteWorkflowInstanceByWorkflowDefinitionCode(eq(user),
+                anyLong());
+
+        Assertions.assertDoesNotThrow(
+                () -> workflowDefinitionService.deleteWorkflowDefinitionByCode(user, copiedWorkflowCode));
+        verify(workflowDefinitionDao).deleteByWorkflowDefinitionCode(copiedWorkflowCode);
+        verify(lineageDao).batchDeleteByWorkflowDefinitionCode(Collections.singletonList(copiedWorkflowCode));
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {2L, 3L})
+    public void testBatchCopyRejectsMovedWorkflowWithPersistedForeignTaskBeforeSaving(long targetProjectCode) {
+        ReflectionTestUtils.setField(workflowDefinitionService, "taskProjectValidator",
+                new TaskProjectValidator(taskDefinitionDao, taskDefinitionLogMapper));
+        ReflectionTestUtils.setField(workflowDefinitionService, "workflowRelationValidator",
+                new WorkflowRelationValidator(new TaskProjectValidator(taskDefinitionDao, taskDefinitionLogMapper)));
+        when(projectDao.queryByCode(projectCodeOther)).thenReturn(getProject(projectCodeOther));
+        if (targetProjectCode != projectCodeOther) {
+            when(projectDao.queryByCode(targetProjectCode)).thenReturn(getProject(targetProjectCode));
+        }
+        WorkflowDefinition definition = getWorkflowDefinition();
+        definition.setProjectCode(projectCodeOther);
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(processDefinitionCode)))
+                .thenReturn(Collections.singletonList(definition));
+        List<WorkflowTaskRelation> relations = Collections.singletonList(
+                getWorkflowTaskRelation(1, 1, projectCodeOther, processDefinitionCode, 0, 0, 101L, 1));
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(relations);
+        TaskDefinitionLog task = new TaskDefinitionLog();
+        task.setCode(101L);
+        task.setProjectCode(projectCodeOther);
+        when(taskDefinitionLogDao.queryTaskDefineLogList(relations)).thenReturn(Collections.singletonList(task));
+        TaskDefinition persistedTask = new TaskDefinition();
+        persistedTask.setCode(101L);
+        persistedTask.setProjectCode(projectCode);
+        when(taskDefinitionDao.queryByCodes(Collections.singleton(101L)))
+                .thenReturn(Collections.singletonList(persistedTask));
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.batchCopyWorkflowDefinition(user, projectCodeOther,
+                        String.valueOf(processDefinitionCode), targetProjectCode));
+
+        Assertions.assertEquals(Status.PROJECT_WORKFLOW_NOT_MATCH.getCode(), exception.getCode());
+        verify(scheduleDao, Mockito.never()).insert(any(Schedule.class));
+        verify(processService, Mockito.never()).saveTaskDefine(any(), anyLong(), anyList(), any());
+        verify(processService, Mockito.never()).saveWorkflowDefine(any(), any(), any(), any());
+        verify(processService, Mockito.never()).saveTaskRelation(any(), anyLong(), anyLong(), Mockito.anyInt(),
+                anyList(), anyList(), any());
+        Mockito.verifyNoInteractions(workflowLineageService);
     }
 
     @Test
@@ -1291,7 +1459,8 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(workflowDefinitionDao.verifyByDefineName(projectCode, name)).thenReturn(null);
         when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
         doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
-                .when(taskSubWorkflowPermissionChecker).checkPermission(eq(user), anyList());
+                .when(taskSubWorkflowPermissionChecker)
+                .checkPermission(eq(user), anyList(), any(WorkflowDefinition.class));
 
         ServiceException exception = Assertions.assertThrows(ServiceException.class,
                 () -> workflowDefinitionService.createWorkflowDefinition(
@@ -1301,6 +1470,206 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
         Mockito.verify(processService, Mockito.never())
                 .saveTaskDefine(eq(user), eq(projectCode), anyList(), eq(Boolean.TRUE));
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {1L, 2L})
+    public void testCopyPreservesProjectOwnership(long targetProjectCode) {
+        ReflectionTestUtils.setField(workflowDefinitionService, "taskProjectValidator",
+                new TaskProjectValidator(taskDefinitionDao, taskDefinitionLogMapper));
+        ReflectionTestUtils.setField(workflowDefinitionService, "workflowRelationValidator",
+                new WorkflowRelationValidator(new TaskProjectValidator(taskDefinitionDao, taskDefinitionLogMapper)));
+        when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        if (targetProjectCode != projectCode) {
+            when(projectDao.queryByCode(targetProjectCode)).thenReturn(getProject(targetProjectCode));
+        }
+        WorkflowDefinition definition = getWorkflowDefinition();
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(processDefinitionCode)))
+                .thenReturn(Collections.singletonList(definition));
+        WorkflowTaskRelation relation = getWorkflowTaskRelation(1, 1, projectCode, processDefinitionCode,
+                0, 0, 101L, 1);
+        List<WorkflowTaskRelation> relations = Collections.singletonList(relation);
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(relations);
+        TaskDefinitionLog task = new TaskDefinitionLog();
+        task.setCode(101L);
+        task.setProjectCode(projectCode);
+        task.setVersion(1);
+        task.setTaskType("SHELL");
+        when(taskDefinitionLogDao.queryTaskDefineLogList(relations)).thenReturn(Collections.singletonList(task));
+        when(processService.saveWorkflowDefine(eq(user), any(), eq(true), eq(true))).thenReturn(1);
+
+        List<WorkflowDefinitionCopyVO> copies = workflowDefinitionService.batchCopyWorkflowDefinition(user,
+                projectCode, String.valueOf(processDefinitionCode), targetProjectCode);
+
+        Assertions.assertEquals(1, copies.size());
+        Assertions.assertNotEquals(processDefinitionCode, copies.get(0).getWorkflowDefinitionCode());
+        Assertions.assertNotEquals(101L, task.getCode());
+        Assertions.assertEquals(targetProjectCode, task.getProjectCode());
+        verify(processService).saveTaskRelation(eq(user), eq(targetProjectCode),
+                eq(copies.get(0).getWorkflowDefinitionCode()), eq(1), Mockito.argThat(logs -> logs.stream()
+                        .allMatch(log -> log.getProjectCode() == targetProjectCode
+                                && log.getWorkflowDefinitionCode() == copies.get(0).getWorkflowDefinitionCode())),
+                anyList(), eq(true));
+        Assertions.assertEquals(projectCode, relation.getProjectCode());
+        Assertions.assertEquals(processDefinitionCode, relation.getWorkflowDefinitionCode());
+    }
+
+    @Test
+    public void testCreateRejectsPersistedForeignTaskBeforeSaving() {
+        ReflectionTestUtils.setField(workflowDefinitionService, "taskProjectValidator",
+                new TaskProjectValidator(taskDefinitionDao, taskDefinitionLogMapper));
+        ReflectionTestUtils.setField(workflowDefinitionService, "workflowRelationValidator",
+                new WorkflowRelationValidator(new TaskProjectValidator(taskDefinitionDao, taskDefinitionLogMapper)));
+        when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
+        TaskDefinitionLog foreignTask = new TaskDefinitionLog();
+        foreignTask.setProjectCode(projectCodeOther);
+        when(taskDefinitionDao.queryByCodes(Mockito.anySet())).thenReturn(Collections.singletonList(foreignTask));
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.createWorkflowDefinition(user, projectCode, name, description,
+                        "[]", "[]", timeout, taskRelationJson, taskDefinitionJson, null,
+                        WorkflowExecutionTypeEnum.PARALLEL));
+
+        Assertions.assertEquals(Status.PROJECT_WORKFLOW_NOT_MATCH.getCode(), error.getCode());
+        verify(processService, Mockito.never()).saveTaskDefine(any(), anyLong(), anyList(), any());
+        verify(processService, Mockito.never()).saveWorkflowDefine(any(), any(), any(), any());
+    }
+
+    @Test
+    public void testSwitchWorkflowDefinitionVersionRejectsForeignCurrentRelationBeforeSaving() {
+        ReflectionTestUtils.setField(workflowDefinitionService, "workflowRelationValidator",
+                new WorkflowRelationValidator(new TaskProjectValidator(taskDefinitionDao, taskDefinitionLogMapper)));
+        WorkflowDefinition definition = getWorkflowDefinition();
+        WorkflowDefinitionLog version = new WorkflowDefinitionLog(definition);
+        version.setVersion(1);
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(definition));
+        when(workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, 1))
+                .thenReturn(version);
+        WorkflowTaskRelation targetRelation = getWorkflowTaskRelation(1, 1, projectCode, processDefinitionCode,
+                0, 0, 101L, 1);
+        Mockito.lenient().when(workflowTaskRelationLogMapper.queryByWorkflowCodeAndVersion(processDefinitionCode, 1))
+                .thenReturn(Collections.singletonList(new WorkflowTaskRelationLog(targetRelation)));
+        WorkflowTaskRelation currentRelation = new WorkflowTaskRelation(new WorkflowTaskRelationLog(targetRelation));
+        currentRelation.setProjectCode(projectCodeOther);
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode))
+                .thenReturn(Collections.singletonList(currentRelation));
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.switchWorkflowDefinitionVersion(user, projectCode,
+                        processDefinitionCode, 1));
+
+        Assertions.assertEquals(Status.PROJECT_WORKFLOW_NOT_MATCH.getCode(), error.getCode());
+        verify(processService, Mockito.never()).switchVersion(any(), any());
+        verify(schedulerService, Mockito.never()).offlineSchedulerByWorkflowCode(eq(user), anyLong(), anyLong());
+    }
+
+    @Test
+    public void testUpdateWorkflowDefinitionRejectsForeignCurrentRelationBeforeSaving() {
+        ReflectionTestUtils.setField(workflowDefinitionService, "workflowRelationValidator",
+                new WorkflowRelationValidator(new TaskProjectValidator(taskDefinitionDao, taskDefinitionLogMapper)));
+        WorkflowDefinition definition = getWorkflowDefinition();
+        when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(definition));
+        when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
+        WorkflowTaskRelation currentRelation = getWorkflowTaskRelation(1, 1, projectCodeOther, processDefinitionCode,
+                0, 0, 101L, 1);
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode))
+                .thenReturn(Collections.singletonList(currentRelation));
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.updateWorkflowDefinition(user, projectCode, definition.getName(),
+                        processDefinitionCode, description, "[]", "[]", timeout, taskRelationJson,
+                        taskDefinitionJson, WorkflowExecutionTypeEnum.PARALLEL));
+
+        Assertions.assertEquals(Status.PROJECT_WORKFLOW_NOT_MATCH.getCode(), error.getCode());
+        verify(processService, Mockito.never()).saveTaskDefine(any(), anyLong(), anyList(), any());
+        verify(processService, Mockito.never()).saveWorkflowDefine(any(), any(), any(), any());
+        verify(processService, Mockito.never()).saveTaskRelation(any(), anyLong(), anyLong(), Mockito.anyInt(),
+                anyList(), anyList(), any());
+    }
+
+    @Test
+    public void testDeleteUnreferencedWorkflowDefinitionVersion() {
+        WorkflowDefinition definition = getWorkflowDefinition();
+        definition.setVersion(2);
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(definition));
+        when(workflowDefinitionLogMapper.deleteByWorkflowDefinitionCodeAndVersion(processDefinitionCode, 1))
+                .thenReturn(1);
+        when(workflowTaskRelationLogMapper.deleteByCode(processDefinitionCode, 1)).thenReturn(1);
+
+        workflowDefinitionService.deleteWorkflowDefinitionVersion(user, projectCode, processDefinitionCode, 1);
+
+        verify(workflowDefinitionLogMapper).deleteByWorkflowDefinitionCodeAndVersion(processDefinitionCode, 1);
+        verify(workflowTaskRelationLogMapper).deleteByCode(processDefinitionCode, 1);
+    }
+
+    @Test
+    public void testSwitchWorkflowDefinitionVersionRejectsForeignProject() {
+        WorkflowDefinition definition = getWorkflowDefinition();
+        WorkflowDefinitionLog version = new WorkflowDefinitionLog(definition);
+        version.setProjectCode(projectCodeOther);
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(definition));
+        when(workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, 1))
+                .thenReturn(version);
+        Mockito.lenient().when(processService.switchVersion(any(), any())).thenReturn(1);
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.switchWorkflowDefinitionVersion(user, projectCode,
+                        processDefinitionCode, 1));
+
+        Assertions.assertEquals(Status.PROJECT_WORKFLOW_NOT_MATCH.getCode(), error.getCode());
+        verify(processService, Mockito.never()).switchVersion(any(), any());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {101L, 102L})
+    public void testSwitchWorkflowDefinitionVersionRejectsMissingTaskVersionBeforeSaving(long availableTaskCode) {
+        WorkflowDefinition currentDefinition = getWorkflowDefinition();
+        currentDefinition.setVersion(3);
+        WorkflowDefinitionLog targetVersion = new WorkflowDefinitionLog(currentDefinition);
+        targetVersion.setVersion(1);
+        WorkflowTaskRelation currentRelation = getWorkflowTaskRelation(1, 3, projectCode, processDefinitionCode,
+                0, 0, 101L, 2);
+        List<WorkflowTaskRelation> currentRelations = Collections.singletonList(currentRelation);
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(currentDefinition));
+        when(workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, 1))
+                .thenReturn(targetVersion);
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(currentRelations);
+        List<WorkflowTaskRelationLog> targetRelations = Arrays.asList(
+                new WorkflowTaskRelationLog(getWorkflowTaskRelation(1, 1, projectCode, processDefinitionCode,
+                        0, 0, 101L, 1)),
+                new WorkflowTaskRelationLog(getWorkflowTaskRelation(2, 1, projectCode, processDefinitionCode,
+                        101L, 1, 102L, 1)));
+        when(workflowTaskRelationLogMapper.queryByWorkflowCodeAndVersion(processDefinitionCode, 1))
+                .thenReturn(targetRelations);
+        TaskDefinitionLog availableTask = new TaskDefinitionLog();
+        availableTask.setCode(availableTaskCode);
+        availableTask.setVersion(1);
+        availableTask.setProjectCode(projectCode);
+        availableTask.setTaskType("SHELL");
+        when(taskDefinitionLogMapper.queryByTaskDefinitions(anyList()))
+                .thenReturn(Collections.singletonList(availableTask));
+        Mockito.lenient().when(processService.switchVersion(currentDefinition, targetVersion)).thenReturn(1);
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.switchWorkflowDefinitionVersion(user, projectCode,
+                        processDefinitionCode, 1));
+
+        Assertions.assertEquals(Status.TASK_DEFINE_NOT_EXIST.getCode(), error.getCode());
+        long missingTaskCode = availableTaskCode == 101L ? 102L : 101L;
+        Assertions.assertTrue(error.getMessage().contains(missingTaskCode + " (version 1)"));
+        Assertions.assertEquals(3, currentDefinition.getVersion());
+        Assertions.assertEquals(3, currentRelation.getWorkflowDefinitionVersion());
+        Assertions.assertEquals(2, currentRelation.getPostTaskVersion());
+        verify(processService, Mockito.never()).switchVersion(any(), any());
+        verify(workflowDefinitionDao, Mockito.never()).updateById(any());
+        verify(workflowTaskRelationDao, Mockito.never()).batchInsert(anyList());
+        verify(workflowTaskRelationDao, Mockito.never())
+                .deleteByWorkflowDefinitionCodeAndVersion(anyLong(), Mockito.anyInt());
+        verify(scheduleDao).queryByWorkflowDefinitionCode(processDefinitionCode);
+        Mockito.verifyNoMoreInteractions(scheduleDao);
+        Mockito.verifyNoInteractions(schedulerService, workflowLineageService);
     }
 
     @Test
@@ -1318,8 +1687,11 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 .thenReturn(workflowDefinitionLog);
         when(workflowTaskRelationLogMapper.queryByWorkflowCodeAndVersion(processDefinitionCode, 1))
                 .thenReturn(Collections.singletonList(new WorkflowTaskRelationLog(workflowTaskRelation)));
+        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+        taskDefinitionLog.setCode(workflowTaskRelation.getPostTaskCode());
+        taskDefinitionLog.setVersion(workflowTaskRelation.getPostTaskVersion());
         when(taskDefinitionLogMapper.queryByTaskDefinitions(anyList()))
-                .thenReturn(Collections.singletonList(new TaskDefinitionLog()));
+                .thenReturn(Collections.singletonList(taskDefinitionLog));
         doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
                 .when(taskResourcePermissionChecker).checkPermission(Mockito.anyLong(), anyList());
 
@@ -1377,8 +1749,11 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 .thenReturn(workflowDefinitionLog);
         when(workflowTaskRelationLogMapper.queryByWorkflowCodeAndVersion(processDefinitionCode, 1))
                 .thenReturn(Collections.singletonList(new WorkflowTaskRelationLog(workflowTaskRelation)));
+        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+        taskDefinitionLog.setCode(workflowTaskRelation.getPostTaskCode());
+        taskDefinitionLog.setVersion(workflowTaskRelation.getPostTaskVersion());
         when(taskDefinitionLogMapper.queryByTaskDefinitions(anyList()))
-                .thenReturn(Collections.singletonList(new TaskDefinitionLog()));
+                .thenReturn(Collections.singletonList(taskDefinitionLog));
         doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
                 .when(taskSubWorkflowPermissionChecker).checkPermission(eq(user), anyList());
 
@@ -1433,19 +1808,33 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         WorkflowTaskRelation workflowTaskRelation =
                 getWorkflowTaskRelation(1, 1, projectCode, processDefinitionCode, 0, 0, 123456789L, 1);
         TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+        taskDefinitionLog.setCode(123456789L);
+        taskDefinitionLog.setVersion(1);
         taskDefinitionLog.setTaskType("SHELL");
+        TaskDefinitionLog successorTask = new TaskDefinitionLog();
+        successorTask.setCode(123451234L);
+        successorTask.setVersion(1);
+        successorTask.setTaskType("SHELL");
+        WorkflowTaskRelation successorRelation =
+                getWorkflowTaskRelation(2, 1, projectCode, processDefinitionCode, 123456789L, 1, 123451234L, 1);
 
         when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(workflowDefinition));
         when(workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, 1))
                 .thenReturn(workflowDefinitionLog);
         when(workflowTaskRelationLogMapper.queryByWorkflowCodeAndVersion(processDefinitionCode, 1))
-                .thenReturn(Collections.singletonList(new WorkflowTaskRelationLog(workflowTaskRelation)));
+                .thenReturn(Arrays.asList(new WorkflowTaskRelationLog(workflowTaskRelation),
+                        new WorkflowTaskRelationLog(successorRelation)));
         when(taskDefinitionLogMapper.queryByTaskDefinitions(anyList()))
-                .thenReturn(Collections.singletonList(taskDefinitionLog));
+                .thenReturn(Arrays.asList(successorTask, taskDefinitionLog));
         when(processService.switchVersion(workflowDefinition, workflowDefinitionLog)).thenReturn(1);
 
         workflowDefinitionService.switchWorkflowDefinitionVersion(user, projectCode, processDefinitionCode, 1);
 
+        verify(taskDefinitionLogMapper).queryByTaskDefinitions(Mockito.argThat(tasks -> tasks.size() == 2
+                && tasks.stream().allMatch(task -> task.getVersion() == 1)
+                && tasks.stream().map(task -> task.getCode()).collect(Collectors.toSet())
+                        .equals(new HashSet<>(Arrays.asList(123456789L, 123451234L)))));
+        verify(processService).switchVersion(workflowDefinition, workflowDefinitionLog);
         verify(schedulerService, Mockito.never()).offlineSchedulerByWorkflowCode(user, projectCode,
                 processDefinitionCode);
     }

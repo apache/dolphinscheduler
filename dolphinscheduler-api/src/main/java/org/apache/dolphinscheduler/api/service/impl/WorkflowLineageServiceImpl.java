@@ -197,11 +197,22 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
         }
         projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         long queryTaskCode = 0;
+        if (taskCode == 0) {
+            WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode)
+                    .orElseThrow(() -> new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
+                            String.valueOf(workflowDefinitionCode)));
+            if (workflowDefinition.getProjectCode() != projectCode) {
+                throw new ServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH);
+            }
+        }
         if (taskCode != 0) {
             queryTaskCode = taskCode;
         }
+        // Workflow-level checks must include dependents from every project.
+        long queryProjectCode = taskCode == 0 ? Constants.DEFAULT_PROJECT_CODE : projectCode;
         List<WorkflowTaskLineage> dependentWorkflowList =
-                workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode, queryTaskCode);
+                workflowTaskLineageDao.queryWorkFlowLineageByDept(queryProjectCode, workflowDefinitionCode,
+                        queryTaskCode);
         if (CollectionUtils.isEmpty(dependentWorkflowList)) {
             return Optional.empty();
         }
@@ -209,6 +220,9 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
         List<String> taskDepStrList = new ArrayList<>();
 
         for (WorkflowTaskLineage workflowTaskLineage : dependentWorkflowList) {
+            if (taskCode == 0 && workflowTaskLineage.getWorkflowDefinitionCode() == workflowDefinitionCode) {
+                continue;
+            }
             WorkflowDefinition workflowDefinition =
                     workflowDefinitionDao.queryByCode(workflowTaskLineage.getDeptWorkflowDefinitionCode())
                             .orElse(null);

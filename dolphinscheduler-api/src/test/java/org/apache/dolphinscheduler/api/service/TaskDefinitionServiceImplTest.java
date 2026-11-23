@@ -29,11 +29,12 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.permission.ProjectCodeValidator;
 import org.apache.dolphinscheduler.api.permission.TaskResourcePermissionChecker;
 import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
+import org.apache.dolphinscheduler.api.validator.TaskProjectValidator;
+import org.apache.dolphinscheduler.api.validator.WorkflowRelationValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
@@ -85,6 +86,12 @@ public class TaskDefinitionServiceImplTest {
     private TaskDefinitionServiceImpl taskDefinitionService;
 
     @Mock
+    private TaskProjectValidator taskProjectValidator;
+
+    @Mock
+    private WorkflowRelationValidator workflowRelationValidator;
+
+    @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Mock
@@ -107,9 +114,6 @@ public class TaskDefinitionServiceImplTest {
 
     @Mock
     private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
-
-    @Mock
-    private ProjectCodeValidator projectCodeValidator;
 
     @Mock
     private TaskResourcePermissionChecker taskResourcePermissionChecker;

@@ -353,6 +353,93 @@ public class TaskSubWorkflowPermissionCheckerTest {
 
     @ParameterizedTest
     @ValueSource(longs = {0, -1, 7})
+    void pendingDefinitionAcceptsSelfReferencesBeforeSaving(long taskCode) {
+        WorkflowDefinition pending = getWorkflowDefinition(SUB_WORKFLOW_CODE);
+        TaskDefinition task = getDependentTaskDefinition(SUB_WORKFLOW_PROJECT_CODE, SUB_WORKFLOW_CODE, taskCode);
+        task.setCode(7L);
+        task.setProjectCode(SUB_WORKFLOW_PROJECT_CODE);
+
+        Assertions.assertDoesNotThrow(() -> taskSubWorkflowPermissionChecker.checkPermission(
+                loginUser, Collections.singletonList(task), pending));
+
+        Mockito.verify(projectService).checkProjectPermission(loginUser, SUB_WORKFLOW_PROJECT_CODE,
+                ProjectPermission.VIEW);
+        Mockito.verifyNoInteractions(workflowDefinitionDao, taskDefinitionLogDao);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"98,7,99", "99,8,99", "99,7,98"})
+    void pendingDefinitionRejectsInvalidSelfReference(long referenceProject, long taskCode, long taskProject) {
+        WorkflowDefinition pending = getWorkflowDefinition(SUB_WORKFLOW_CODE);
+        TaskDefinition task = getDependentTaskDefinition(referenceProject, SUB_WORKFLOW_CODE, taskCode);
+        task.setCode(7L);
+        task.setProjectCode(taskProject);
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> taskSubWorkflowPermissionChecker.checkPermission(loginUser, Collections.singletonList(task),
+                        pending));
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), error.getCode());
+        Mockito.verifyNoInteractions(workflowDefinitionDao, taskDefinitionLogDao);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"false,true", "true,false", "true,true"})
+    void pendingDefinitionStillChecksExternalReferences(boolean exists, boolean viewAllowed) {
+        WorkflowDefinition pending = getWorkflowDefinition(SUB_WORKFLOW_CODE);
+        WorkflowDefinition external = getWorkflowDefinition(ANOTHER_SUB_WORKFLOW_CODE);
+        external.setProjectCode(100L);
+        TaskDefinition selfTask = getDependentTaskDefinition(SUB_WORKFLOW_PROJECT_CODE, SUB_WORKFLOW_CODE, 0);
+        TaskDefinition externalTask = getDependentTaskDefinition(100L, ANOTHER_SUB_WORKFLOW_CODE, 7L);
+        TaskDefinitionLog externalMember = new TaskDefinitionLog();
+        externalMember.setCode(7L);
+        externalMember.setProjectCode(100L);
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(ANOTHER_SUB_WORKFLOW_CODE)))
+                .thenReturn(exists ? Collections.singletonList(external) : Collections.emptyList());
+        if (exists && !viewAllowed) {
+            Mockito.doNothing().when(projectService)
+                    .checkProjectPermission(loginUser, SUB_WORKFLOW_PROJECT_CODE, ProjectPermission.VIEW);
+            Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
+                    .checkProjectPermission(loginUser, 100L, ProjectPermission.VIEW);
+        } else if (exists) {
+            Mockito.when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(ANOTHER_SUB_WORKFLOW_CODE, 0))
+                    .thenReturn(Collections.singletonList(externalMember));
+        }
+
+        Runnable check = () -> taskSubWorkflowPermissionChecker.checkPermission(loginUser,
+                Arrays.asList(selfTask, externalTask), pending);
+        if (exists && viewAllowed) {
+            Assertions.assertDoesNotThrow(check::run);
+            Mockito.verify(taskDefinitionLogDao)
+                    .queryByWorkflowDefinitionCodeAndVersion(ANOTHER_SUB_WORKFLOW_CODE, 0);
+        } else {
+            ServiceException error = Assertions.assertThrows(ServiceException.class, check::run);
+            Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), error.getCode());
+        }
+        Mockito.verify(workflowDefinitionDao).queryByCodes(Collections.singleton(ANOTHER_SUB_WORKFLOW_CODE));
+        Mockito.verifyNoMoreInteractions(workflowDefinitionDao);
+    }
+
+    @Test
+    void pendingDefinitionDoesNotReplacePersistedReferencesInChildWorkflows() {
+        WorkflowDefinition pending = getWorkflowDefinition(SUB_WORKFLOW_CODE);
+        WorkflowDefinition child = getWorkflowDefinition(ANOTHER_SUB_WORKFLOW_CODE);
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(ANOTHER_SUB_WORKFLOW_CODE)))
+                .thenReturn(Collections.singletonList(child));
+        Mockito.when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(ANOTHER_SUB_WORKFLOW_CODE, 0))
+                .thenReturn(Collections.singletonList(new TaskDefinitionLog(
+                        getDependentTaskDefinition(SUB_WORKFLOW_PROJECT_CODE, SUB_WORKFLOW_CODE, 0))));
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> taskSubWorkflowPermissionChecker.checkPermission(loginUser,
+                        Collections.singletonList(getSubWorkflowTaskDefinition(ANOTHER_SUB_WORKFLOW_CODE)), pending));
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), error.getCode());
+        Mockito.verify(workflowDefinitionDao).queryByCodes(Collections.singleton(SUB_WORKFLOW_CODE));
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {0, -1, 7})
     void dependentReferencesNeedOnlyViewAndCanReadOfflineWorkflow(long taskCode) {
         WorkflowDefinition target = getWorkflowDefinition(SUB_WORKFLOW_CODE);
         target.setReleaseState(ReleaseState.OFFLINE);

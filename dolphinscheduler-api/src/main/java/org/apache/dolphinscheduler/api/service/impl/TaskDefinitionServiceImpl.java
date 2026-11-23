@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.PermissionCheck;
-import org.apache.dolphinscheduler.api.permission.ProjectCodeValidator;
 import org.apache.dolphinscheduler.api.permission.TaskResourcePermissionChecker;
 import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -28,6 +27,8 @@ import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.service.WorkflowTaskRelationService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.validator.TaskProjectValidator;
+import org.apache.dolphinscheduler.api.validator.WorkflowRelationValidator;
 import org.apache.dolphinscheduler.api.vo.TaskDefinitionVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
@@ -100,7 +101,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private ProcessService processService;
 
     @Autowired
-    private ProjectCodeValidator projectCodeValidator;
+    private TaskProjectValidator taskProjectValidator;
+
+    @Autowired
+    private WorkflowRelationValidator workflowRelationValidator;
 
     @Autowired
     private TaskResourcePermissionChecker taskResourcePermissionChecker;
@@ -140,9 +144,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.", workflowDefinitionCode);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST);
         }
-        projectCodeValidator.validateTasks(workflowDefinition.getProjectCode(), taskDefinitionLogs);
-        projectCodeValidator.validateRelations(workflowDefinition.getProjectCode(), workflowDefinitionCode,
-                workflowTaskRelationList);
+        taskProjectValidator
+                .validate(new TaskProjectValidator.Context(workflowDefinition.getProjectCode(), taskDefinitionLogs));
+        workflowRelationValidator.validate(
+                new WorkflowRelationValidator.Context(workflowDefinition.getProjectCode(), workflowDefinitionCode,
+                        workflowTaskRelationList));
         int insertVersion =
                 processService.saveWorkflowDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.TRUE);
         if (insertVersion <= 0) {
@@ -218,20 +224,27 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (taskDefinitionUpdate == null) {
             throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
         }
-        ProjectCodeValidator.requireProject(projectCode, taskDefinitionUpdate.getProjectCode());
-        projectCodeValidator.validateTasks(projectCode, Collections.singletonList(taskDefinitionUpdate));
+        if (projectCode != taskDefinitionUpdate.getProjectCode()) {
+            throw new ServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH);
+        }
+        taskProjectValidator.validate(
+                new TaskProjectValidator.Context(projectCode, Collections.singletonList(taskDefinitionUpdate)));
         taskResourcePermissionChecker.checkPermission(projectCode, Collections.singletonList(taskDefinitionUpdate));
         taskSubWorkflowPermissionChecker.checkPermission(loginUser, Collections.singletonList(taskDefinitionUpdate));
         List<WorkflowTaskRelation> taskRelationList =
                 workflowTaskRelationDao.queryUpstreamByCode(projectCode, taskCode);
         for (WorkflowTaskRelation relation : taskRelationList) {
-            ProjectCodeValidator.requireProject(projectCode, relation.getProjectCode());
+            if (projectCode != relation.getProjectCode()) {
+                throw new ServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH);
+            }
             WorkflowDefinition workflow = workflowDefinitionDao.queryByCode(relation.getWorkflowDefinitionCode())
                     .orElseThrow(() -> new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
                             relation.getWorkflowDefinitionCode()));
-            ProjectCodeValidator.requireProject(projectCode, workflow.getProjectCode());
-            projectCodeValidator.validateRelations(projectCode, workflow.getCode(),
-                    workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflow.getCode()));
+            if (projectCode != workflow.getProjectCode()) {
+                throw new ServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH);
+            }
+            workflowRelationValidator.validate(new WorkflowRelationValidator.Context(projectCode, workflow.getCode(),
+                    workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflow.getCode())));
         }
         taskDefinitionUpdate.setUserId(loginUser.getId());
         taskDefinitionUpdate.setUpdateTime(new Date());
@@ -300,7 +313,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         TaskDefinitionLog versionToDelete = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
         if (versionToDelete != null) {
-            ProjectCodeValidator.requireProject(projectCode, versionToDelete.getProjectCode());
+            if (projectCode != versionToDelete.getProjectCode()) {
+                throw new ServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH);
+            }
         }
         int delete = taskDefinitionLogMapper.deleteByCodeAndVersion(taskCode, version);
         if (delete <= 0) {
