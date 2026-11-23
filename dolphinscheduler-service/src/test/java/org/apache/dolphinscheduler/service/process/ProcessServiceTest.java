@@ -20,10 +20,12 @@ package org.apache.dolphinscheduler.service.process;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -34,11 +36,13 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -46,6 +50,7 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -62,6 +67,9 @@ public class ProcessServiceTest {
 
     @Mock
     private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
+
+    @Mock
+    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
 
     @Mock
     private WorkflowDefinitionMapper workflowDefinitionMapper;
@@ -133,6 +141,63 @@ public class ProcessServiceTest {
         processDefinitionLog.setCode(1L);
         processDefinitionLog.setVersion(2);
         Assertions.assertEquals(0, processService.switchVersion(workflowDefinition, processDefinitionLog));
+    }
+
+    @Test
+    public void testSwitchTaskDefinitionVersionRestoresHistoryOnlyTask() {
+        TaskDefinitionLog version = new TaskDefinitionLog();
+        version.setId(42);
+        version.setCode(101L);
+        version.setVersion(2);
+        version.setProjectCode(1L);
+        when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(101L, 2)).thenReturn(version);
+        when(taskDefinitionMapper.insert(any(TaskDefinition.class))).thenReturn(1);
+
+        Assertions.assertEquals(1, processService.switchTaskDefinitionVersion(101L, 2));
+
+        ArgumentCaptor<TaskDefinition> restored = ArgumentCaptor.forClass(TaskDefinition.class);
+        Mockito.verify(taskDefinitionMapper).insert(restored.capture());
+        Assertions.assertNull(restored.getValue().getId());
+        Assertions.assertEquals(101L, restored.getValue().getCode());
+        Assertions.assertEquals(2, restored.getValue().getVersion());
+        Assertions.assertEquals(1L, restored.getValue().getProjectCode());
+    }
+
+    @Test
+    public void testSwitchTaskDefinitionVersionRejectsFailedUpdate() {
+        TaskDefinition current = new TaskDefinition(101L, 1);
+        current.setId(7);
+        TaskDefinitionLog version = new TaskDefinitionLog();
+        version.setCode(101L);
+        version.setVersion(2);
+        when(taskDefinitionMapper.queryByCode(101L)).thenReturn(current);
+        when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(101L, 2)).thenReturn(version);
+        when(taskDefinitionMapper.updateById(version)).thenReturn(0);
+
+        Assertions.assertEquals(Constants.EXIT_CODE_FAILURE, processService.switchTaskDefinitionVersion(101L, 2));
+    }
+
+    @Test
+    public void testSwitchWorkflowTaskRelationVersionRejectsPartialTaskRestore() {
+        WorkflowDefinition definition = new WorkflowDefinition();
+        definition.setCode(1L);
+        definition.setProjectCode(1L);
+        definition.setVersion(2);
+        WorkflowTaskRelationLog first = new WorkflowTaskRelationLog();
+        first.setPostTaskCode(101L);
+        first.setPostTaskVersion(1);
+        WorkflowTaskRelationLog second = new WorkflowTaskRelationLog();
+        second.setPreTaskCode(101L);
+        second.setPreTaskVersion(1);
+        second.setPostTaskCode(102L);
+        second.setPostTaskVersion(1);
+        when(workflowTaskRelationLogMapper.queryByWorkflowCodeAndVersion(1L, 2))
+                .thenReturn(Arrays.asList(first, second));
+        when(workflowTaskRelationMapper.batchInsert(Mockito.anyList())).thenReturn(2);
+        when(taskDefinitionMapper.queryByCode(101L)).thenReturn(new TaskDefinition(101L, 1));
+
+        Assertions.assertEquals(Constants.EXIT_CODE_FAILURE,
+                processService.switchWorkflowTaskRelationVersion(definition));
     }
 
     @Test
