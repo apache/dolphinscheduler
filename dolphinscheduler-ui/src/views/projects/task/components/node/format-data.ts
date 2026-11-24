@@ -117,6 +117,15 @@ export function formatParams(data: INodeData): {
     taskParams.socketKeepAlive = data.socketKeepAlive
   }
 
+  if (data.taskType === 'DATAVINES') {
+    taskParams.datavinesAddress = data.datavinesAddress
+    taskParams.datavinesJobId = data.datavinesJobId
+    taskParams.datavinesToken = data.datavinesToken
+    taskParams.datavinesInterval = data.datavinesInterval
+    taskParams.datavinesTimeout = data.datavinesTimeout
+    taskParams.datavinesRetryTimes = data.datavinesRetryTimes
+  }
+
   if (data.taskType === 'SQOOP') {
     taskParams.jobType = data.isCustomTask ? 'CUSTOM' : 'TEMPLATE'
     taskParams.localParams = data.localParams

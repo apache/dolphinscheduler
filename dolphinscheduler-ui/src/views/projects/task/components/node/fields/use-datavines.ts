@@ -55,7 +55,6 @@ export function useDatavines(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['input', 'blur'],
-        required: true,
         validator(validate: any, value: number) {
           if (!value || value <= 0) {
             return new Error(t('project.node.datavines_job_id_tips'))
@@ -94,7 +93,11 @@ export function useDatavines(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['input', 'blur'],
-        required: true
+        validator(validate: any, value: number) {
+          if (value === null || value === undefined || value < 1) {
+            return new Error(t('project.node.datavines_interval_tips'))
+          }
+        }
       }
     },
     {
@@ -108,7 +111,11 @@ export function useDatavines(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['input', 'blur'],
-        required: true
+        validator(validate: any, value: number) {
+          if (value === null || value === undefined || value <= 0) {
+            return new Error(t('project.node.datavines_timeout_tips'))
+          }
+        }
       }
     },
     {
@@ -122,7 +129,11 @@ export function useDatavines(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['input', 'blur'],
-        required: true
+        validator(validate: any, value: number) {
+          if (value === null || value === undefined || value < 0) {
+            return new Error(t('project.node.datavines_retry_times_tips'))
+          }
+        }
       }
     },
     ...useCustomParams({ model, field: 'localParams', isSimple: false })

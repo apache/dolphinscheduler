@@ -1,0 +1,47 @@
+[
+  {
+    "httpRequest": {
+      "method": "POST",
+      "path": "/api/v1/openapi/job/execute/1"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "headers": {
+        "Content-Type": [
+          "application/json"
+        ]
+      },
+      "body": "{\"code\":200,\"msg\":\"Success\",\"data\":1}"
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "GET",
+      "path": "/api/v1/openapi/job/execution/status/1"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "headers": {
+        "Content-Type": [
+          "application/json"
+        ]
+      },
+      "body": "{\"code\":200,\"msg\":\"Success\",\"data\":\"SUCCESS\"}"
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "GET",
+      "path": "/api/v1/openapi/job/execution/result/1"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "headers": {
+        "Content-Type": [
+          "application/json"
+        ]
+      },
+      "body": "{\"code\":200,\"msg\":\"Success\",\"data\":\"SUCCESS\"}"
+    }
+  }
+]
