@@ -441,6 +441,8 @@ export default {
     resources_limit_tips: '请重新选择，资源个数限制:',
     no_resources_tips: '请删除所有未授权或已删除资源',
     useless_resources_tips: '未授权或已删除资源',
+    resources_loading_tips: '资源列表加载中，请稍后重试',
+    resources_load_failed_tips: '资源列表加载失败，请稍后重试',
     custom_parameters: '自定义参数',
     copy_failed: '该浏览器不支持自动复制',
     prop_tips: 'prop(必填)',

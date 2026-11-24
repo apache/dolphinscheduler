@@ -454,6 +454,10 @@ export default {
     resources_limit_tips: 'Please select again, resource limit:',
     no_resources_tips: 'Please delete all non-existent resources',
     useless_resources_tips: 'Unauthorized or deleted resources',
+    resources_loading_tips:
+      'The resource list is still loading, please try again later',
+    resources_load_failed_tips:
+      'Failed to load the resource list, please try again later',
     custom_parameters: 'Custom Parameters',
     copy_success: 'Copy success',
     copy_failed: 'The browser does not support automatic copying',

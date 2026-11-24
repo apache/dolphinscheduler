@@ -69,6 +69,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
 
   const resourcesOptions = resourcesField.options as Ref<ResourceOption[]>
   const resourcesLoading = resourcesField.props.loading as Ref<boolean>
+  const resourcesLoadError = resourcesField.props.loadError as Ref<boolean>
 
   const sqlExecutionTypeSpan = computed(() =>
     model.programType === 'SQL' ? 12 : 0
@@ -225,11 +226,16 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       validate: {
         trigger: ['blur'],
         validator(validate: any, value: string[]) {
-          if (value) {
+          if (value && value.length > 0) {
+            if (resourcesLoading.value) {
+              return new Error(t('project.node.resources_loading_tips'))
+            }
+            if (resourcesLoadError.value) {
+              return new Error(t('project.node.resources_load_failed_tips'))
+            }
             const errorName = spliceUselessResources(
               value,
-              resourcesOptions.value,
-              resourcesLoading.value
+              resourcesOptions.value
             )
             if (errorName) {
               return new Error(
@@ -261,11 +267,16 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       validate: {
         trigger: ['blur'],
         validator(validate: any, value: string[]) {
-          if (value) {
+          if (value && value.length > 0) {
+            if (resourcesLoading.value) {
+              return new Error(t('project.node.resources_loading_tips'))
+            }
+            if (resourcesLoadError.value) {
+              return new Error(t('project.node.resources_load_failed_tips'))
+            }
             const errorName = spliceUselessResources(
               value,
-              resourcesOptions.value,
-              resourcesLoading.value
+              resourcesOptions.value
             )
             if (errorName) {
               return new Error(
@@ -313,11 +324,14 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         trigger: ['blur'],
         validator(validate: any, value: string) {
           if (value) {
-            // the resource tree may still be loading; defer the stale check until it is ready
-            if (
-              !resourcesLoading.value &&
-              !validateResourceExist(value, [], resourcesOptions.value)
-            ) {
+            // keytab existence can only be judged after a successful lookup; keep the saved value while the tree is loading or failed to load
+            if (resourcesLoading.value) {
+              return new Error(t('project.node.resources_loading_tips'))
+            }
+            if (resourcesLoadError.value) {
+              return new Error(t('project.node.resources_load_failed_tips'))
+            }
+            if (!validateResourceExist(value, [], resourcesOptions.value)) {
               model.keytab = null
               return new Error(
                 t('project.node.useless_resources_tips') +

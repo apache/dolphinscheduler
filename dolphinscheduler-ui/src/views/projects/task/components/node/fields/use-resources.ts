@@ -104,13 +104,8 @@ export const getResourceDirAfter = (
 
 export const spliceUselessResources = (
   value: string[],
-  resources: ResourceOption[],
-  loading: boolean
+  resources: ResourceOption[]
 ): string => {
-  // an empty resource tree may just not have finished loading; defer the check while the request is pending
-  if (loading) {
-    return ''
-  }
   const errorNames: string[] = []
   value.forEach((item) => {
     if (!validateResourceExist(item, [], resources)) {
@@ -137,6 +132,7 @@ export function useResources(
 
   const resourcesOptions = ref<ResourceOption[] | IResource[]>([])
   const resourcesLoading = ref(false)
+  const resourcesLoadError = ref(false)
 
   const taskStore = useTaskNodeStore()
 
@@ -150,11 +146,15 @@ export function useResources(
     }
     if (resourcesLoading.value) return
     resourcesLoading.value = true
+    resourcesLoadError.value = false
     try {
       const res = await queryResourceList({ type: 'FILE', fullName: '' })
       utils.removeUselessChildren(res)
       resourcesOptions.value = res || []
       taskStore.updateResource(res)
+    } catch (err) {
+      resourcesLoadError.value = true
+      throw err
     } finally {
       resourcesLoading.value = false
     }
@@ -194,6 +194,7 @@ export function useResources(
       labelField: 'name',
       disabledField: 'disable',
       loading: resourcesLoading,
+      loadError: resourcesLoadError,
       'render-tag': ({
         option,
         handleClose
@@ -236,11 +237,16 @@ export function useResources(
       trigger: ['blur'],
       required: required,
       validator(validate: any, value: string[]) {
-        if (value) {
+        if (value && value.length > 0) {
+          if (resourcesLoading.value) {
+            return new Error(t('project.node.resources_loading_tips'))
+          }
+          if (resourcesLoadError.value) {
+            return new Error(t('project.node.resources_load_failed_tips'))
+          }
           const errorName = spliceUselessResources(
             value,
-            resourcesOptions.value as ResourceOption[],
-            resourcesLoading.value
+            resourcesOptions.value as ResourceOption[]
           )
           if (errorName) {
             return new Error(
