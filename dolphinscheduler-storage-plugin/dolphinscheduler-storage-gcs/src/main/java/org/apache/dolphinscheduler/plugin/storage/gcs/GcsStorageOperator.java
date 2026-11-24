@@ -128,11 +128,8 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
 
     @Override
     public boolean exists(String fullName) {
-        return checkBlobExists(transformAbsolutePathToGcsKey(fullName));
-    }
-
-    private boolean checkBlobExists(String gcsKey) {
-        Blob blob = gcsStorage.get(BlobId.of(bucketName, gcsKey));
+        fullName = transformAbsolutePathToGcsKey(fullName);
+        Blob blob = gcsStorage.get(BlobId.of(bucketName, fullName));
         return blob != null && blob.exists();
     }
 
@@ -142,7 +139,7 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
         String gcsKey = transformAbsolutePathToGcsKey(filePath);
         ResourceMetadata resourceMetaData = getResourceMetaData(filePath);
         if (!resourceMetaData.isDirectory()) {
-            if (checkBlobExists(gcsKey)) {
+            if (exists(filePath)) {
                 gcsStorage.delete(BlobId.of(bucketName, gcsKey));
             }
             return;
@@ -161,9 +158,10 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
             if (!batch.isEmpty()) {
                 gcsStorage.delete(batch);
             }
-        }
-        if (checkBlobExists(gcsKey)) {
-            gcsStorage.delete(BlobId.of(bucketName, gcsKey));
+        } else {
+            if (exists(filePath)) {
+                gcsStorage.delete(BlobId.of(bucketName, gcsKey));
+            }
         }
     }
 
@@ -215,8 +213,8 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
 
         Blob blob = gcsStorage.get(BlobId.of(bucketName, filePath));
         try (
-                BufferedReader bufferedReader = new BufferedReader(
-                        new InputStreamReader(new ByteArrayInputStream(blob.getContent())))) {
+                BufferedReader bufferedReader =
+                        new BufferedReader(new InputStreamReader(new ByteArrayInputStream(blob.getContent())))) {
             Stream<String> stream = bufferedReader.lines().skip(skipLineNums).limit(limit);
             return stream.collect(Collectors.toList());
         }

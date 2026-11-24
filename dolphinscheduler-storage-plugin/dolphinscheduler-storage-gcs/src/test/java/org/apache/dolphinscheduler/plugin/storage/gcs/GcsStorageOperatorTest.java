@@ -20,29 +20,27 @@ package org.apache.dolphinscheduler.plugin.storage.gcs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import com.google.api.gax.paging.Page;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.TestBlobFactory;
 
 public class GcsStorageOperatorTest {
 
@@ -51,11 +49,73 @@ public class GcsStorageOperatorTest {
 
     private Storage mockStorage;
     private GcsStorageOperator storageOperator;
+    private Set<String> existingKeys;
+    private List<BlobId> singleDeletedBlobIds;
+    private List<List<BlobId>> batchDeletedBlobIds;
+    private List<Blob> listBlobsToReturn;
+    private List<Storage.BlobListOption> capturedListOptions;
+    private AtomicInteger getCallCount;
 
     @BeforeEach
     void setUp() {
-        mockStorage = mock(Storage.class);
+        existingKeys = new HashSet<>();
+        singleDeletedBlobIds = new ArrayList<>();
+        batchDeletedBlobIds = new ArrayList<>();
+        listBlobsToReturn = new ArrayList<>();
+        capturedListOptions = new ArrayList<>();
+        getCallCount = new AtomicInteger(0);
+
+        mockStorage = (Storage) Proxy.newProxyInstance(
+                Storage.class.getClassLoader(),
+                new Class<?>[]{Storage.class},
+                (proxy, method, args) -> {
+                    String methodName = method.getName();
+                    if ("get".equals(methodName)) {
+                        getCallCount.incrementAndGet();
+                        BlobId blobId = (BlobId) args[0];
+                        if (existingKeys.contains(blobId.getName())) {
+                            return TestBlobFactory.createBlob((Storage) proxy, blobId);
+                        }
+                        return null;
+                    } else if ("delete".equals(methodName)) {
+                        Object target = args[0];
+                        if (target instanceof BlobId) {
+                            singleDeletedBlobIds.add((BlobId) target);
+                            return true;
+                        } else if (target instanceof Iterable) {
+                            List<BlobId> batch = new ArrayList<>();
+                            for (Object item : (Iterable<?>) target) {
+                                batch.add((BlobId) item);
+                            }
+                            batchDeletedBlobIds.add(batch);
+                            return Collections.nCopies(batch.size(), true);
+                        }
+                        return null;
+                    } else if ("list".equals(methodName)) {
+                        if (args.length > 1 && args[1] instanceof Storage.BlobListOption[]) {
+                            for (Storage.BlobListOption opt : (Storage.BlobListOption[]) args[1]) {
+                                capturedListOptions.add(opt);
+                            }
+                        }
+                        return createMockPage(listBlobsToReturn);
+                    }
+                    return null;
+                });
+
         storageOperator = new GcsStorageOperator(RESOURCE_UPLOAD_PATH, BUCKET_NAME, mockStorage);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Page<Blob> createMockPage(List<Blob> blobs) {
+        return (Page<Blob>) Proxy.newProxyInstance(
+                Page.class.getClassLoader(),
+                new Class<?>[]{Page.class},
+                (proxy, method, args) -> {
+                    if ("iterateAll".equals(method.getName())) {
+                        return blobs;
+                    }
+                    return null;
+                });
     }
 
     @Test
@@ -81,14 +141,13 @@ public class GcsStorageOperatorTest {
     void deleteFile_removesOnlyTargetBlob() {
         String filePath = FileUtils.concatFilePath(storageOperator.getStorageBaseDirectory(), "default", "resources",
                 "test.txt");
-        Blob mockBlob = mock(Blob.class);
-        when(mockBlob.exists()).thenReturn(true);
-        when(mockStorage.get(BlobId.of(BUCKET_NAME, filePath))).thenReturn(mockBlob);
+        existingKeys.add(filePath);
 
         storageOperator.delete(filePath, false);
 
-        verify(mockStorage).delete(BlobId.of(BUCKET_NAME, filePath));
-        verify(mockStorage, never()).list(eq(BUCKET_NAME), any(Storage.BlobListOption.class));
+        assertEquals(1, singleDeletedBlobIds.size());
+        assertEquals(BlobId.of(BUCKET_NAME, filePath), singleDeletedBlobIds.get(0));
+        assertTrue(capturedListOptions.isEmpty());
     }
 
     @Test
@@ -96,19 +155,16 @@ public class GcsStorageOperatorTest {
         String dirPath = FileUtils.concatFilePath(storageOperator.getStorageBaseDirectory(), "default", "resources",
                 "reports");
         String dirKey = FileUtils.concatFilePath(dirPath, "/");
-
-        Blob mockBlob = mock(Blob.class);
-        when(mockBlob.exists()).thenReturn(true);
-        when(mockStorage.get(BlobId.of(BUCKET_NAME, dirKey))).thenReturn(mockBlob);
+        existingKeys.add(dirKey);
 
         storageOperator.delete(dirPath, false);
 
-        verify(mockStorage).delete(BlobId.of(BUCKET_NAME, dirKey));
-        verify(mockStorage, never()).list(eq(BUCKET_NAME), any(Storage.BlobListOption.class));
+        assertEquals(1, singleDeletedBlobIds.size());
+        assertEquals(BlobId.of(BUCKET_NAME, dirKey), singleDeletedBlobIds.get(0));
+        assertTrue(capturedListOptions.isEmpty());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void deleteDirectoryRecursively_removesAllChildBlobsAndMarker() {
         String dirPath = FileUtils.concatFilePath(storageOperator.getStorageBaseDirectory(), "default", "resources",
                 "reports");
@@ -118,106 +174,79 @@ public class GcsStorageOperatorTest {
         BlobId file1Id = BlobId.of(BUCKET_NAME, dirKey + "data.csv");
         BlobId file2Id = BlobId.of(BUCKET_NAME, dirKey + "sub/nested.txt");
 
-        Blob markerBlob = mock(Blob.class);
-        when(markerBlob.getBlobId()).thenReturn(markerId);
-
-        Blob file1Blob = mock(Blob.class);
-        when(file1Blob.getBlobId()).thenReturn(file1Id);
-
-        Blob file2Blob = mock(Blob.class);
-        when(file2Blob.getBlobId()).thenReturn(file2Id);
-
-        Page<Blob> mockPage = mock(Page.class);
-        when(mockPage.iterateAll()).thenReturn(Arrays.asList(markerBlob, file1Blob, file2Blob));
-
-        when(mockStorage.list(eq(BUCKET_NAME), any(Storage.BlobListOption.class))).thenReturn(mockPage);
-        when(mockStorage.get(markerId)).thenReturn(null);
+        listBlobsToReturn.add(TestBlobFactory.createBlob(mockStorage, markerId));
+        listBlobsToReturn.add(TestBlobFactory.createBlob(mockStorage, file1Id));
+        listBlobsToReturn.add(TestBlobFactory.createBlob(mockStorage, file2Id));
 
         storageOperator.delete(dirPath, true);
 
-        ArgumentCaptor<List<BlobId>> captor = ArgumentCaptor.forClass(List.class);
-        verify(mockStorage).delete(captor.capture());
-        List<BlobId> deletedIds = captor.getValue();
+        assertEquals(1, batchDeletedBlobIds.size());
+        List<BlobId> deletedIds = batchDeletedBlobIds.get(0);
         assertEquals(3, deletedIds.size());
         assertEquals(Arrays.asList(markerId, file1Id, file2Id), deletedIds);
+        // Verify no redundant get() call was made after listing
+        assertEquals(0, getCallCount.get());
+        assertTrue(singleDeletedBlobIds.isEmpty());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void deleteDirectoryRecursively_emptyDirectory_deletesMarker() {
+    void deleteDirectoryRecursively_emptyDirectory_deletesMarkerViaListing() {
         String dirPath = FileUtils.concatFilePath(storageOperator.getStorageBaseDirectory(), "default", "resources",
                 "empty");
         String dirKey = FileUtils.concatFilePath(dirPath, "/");
         BlobId markerId = BlobId.of(BUCKET_NAME, dirKey);
 
-        Page<Blob> emptyPage = mock(Page.class);
-        when(emptyPage.iterateAll()).thenReturn(Collections.emptyList());
-        when(mockStorage.list(eq(BUCKET_NAME), any(Storage.BlobListOption.class))).thenReturn(emptyPage);
-
-        Blob markerBlob = mock(Blob.class);
-        when(markerBlob.exists()).thenReturn(true);
-        when(mockStorage.get(markerId)).thenReturn(markerBlob);
+        // Prefix listing returns the directory marker object when directory exists
+        listBlobsToReturn.add(TestBlobFactory.createBlob(mockStorage, markerId));
 
         storageOperator.delete(dirPath, true);
 
-        verify(mockStorage).delete(markerId);
+        assertEquals(1, batchDeletedBlobIds.size());
+        assertEquals(Collections.singletonList(markerId), batchDeletedBlobIds.get(0));
+        // Verify no redundant get() or single delete was called
+        assertEquals(0, getCallCount.get());
+        assertTrue(singleDeletedBlobIds.isEmpty());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void deleteDirectoryRecursively_withPaginationAndChunking_processesAllBatches() {
         String dirPath = FileUtils.concatFilePath(storageOperator.getStorageBaseDirectory(), "default", "resources",
                 "largeDir");
         String dirKey = FileUtils.concatFilePath(dirPath, "/");
 
-        List<Blob> pagedBlobs = new ArrayList<>();
         List<BlobId> expectedBlobIds = new ArrayList<>();
         for (int i = 0; i < 250; i++) {
             BlobId blobId = BlobId.of(BUCKET_NAME, dirKey + "item_" + i + ".txt");
-            Blob blob = mock(Blob.class);
-            when(blob.getBlobId()).thenReturn(blobId);
-            pagedBlobs.add(blob);
+            listBlobsToReturn.add(TestBlobFactory.createBlob(mockStorage, blobId));
             expectedBlobIds.add(blobId);
         }
 
-        Page<Blob> mockPage = mock(Page.class);
-        when(mockPage.iterateAll()).thenReturn(pagedBlobs);
-        when(mockStorage.list(eq(BUCKET_NAME), any(Storage.BlobListOption.class))).thenReturn(mockPage);
-
         storageOperator.delete(dirPath, true);
 
-        ArgumentCaptor<List<BlobId>> captor = ArgumentCaptor.forClass(List.class);
-        // With 250 items and chunk size 100, delete should be called exactly 3 times
-        // (100 + 100 + 50)
-        verify(mockStorage, org.mockito.Mockito.times(3)).delete(captor.capture());
-        List<List<BlobId>> allBatches = captor.getAllValues();
-        assertEquals(3, allBatches.size());
-        assertEquals(100, allBatches.get(0).size());
-        assertEquals(100, allBatches.get(1).size());
-        assertEquals(50, allBatches.get(2).size());
+        // With 250 items and chunk size 100, batch delete should be called exactly 3 times (100 + 100 + 50)
+        assertEquals(3, batchDeletedBlobIds.size());
+        assertEquals(100, batchDeletedBlobIds.get(0).size());
+        assertEquals(100, batchDeletedBlobIds.get(1).size());
+        assertEquals(50, batchDeletedBlobIds.get(2).size());
 
         List<BlobId> allDeletedIds = new ArrayList<>();
-        allBatches.forEach(allDeletedIds::addAll);
+        batchDeletedBlobIds.forEach(allDeletedIds::addAll);
         assertEquals(expectedBlobIds, allDeletedIds);
+        assertEquals(0, getCallCount.get());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void deleteDirectoryRecursively_prefixBoundaryIsolation_doesNotMatchSiblingFolder() {
         String dirPath = FileUtils.concatFilePath(storageOperator.getStorageBaseDirectory(), "default", "resources",
                 "folder");
         String dirKey = FileUtils.concatFilePath(dirPath, "/");
 
-        ArgumentCaptor<Storage.BlobListOption> optionCaptor = ArgumentCaptor.forClass(Storage.BlobListOption.class);
-        Page<Blob> emptyPage = mock(Page.class);
-        when(emptyPage.iterateAll()).thenReturn(Collections.emptyList());
-        when(mockStorage.list(eq(BUCKET_NAME), optionCaptor.capture())).thenReturn(emptyPage);
-
         storageOperator.delete(dirPath, true);
 
         // Verify that the prefix used ends with '/', preventing collision with folder2/
-        Storage.BlobListOption capturedOption = optionCaptor.getValue();
-        assertTrue(capturedOption.toString().contains(dirKey));
-        assertFalse(capturedOption.toString().contains("folder2"));
+        assertEquals(1, capturedListOptions.size());
+        String capturedOptionStr = capturedListOptions.get(0).toString();
+        assertTrue(capturedOptionStr.contains(dirKey));
+        assertFalse(capturedOptionStr.contains("folder2"));
     }
 }
