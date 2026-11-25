@@ -76,9 +76,18 @@ bash ./bin/dolphinscheduler-daemon.sh stop standalone-server
 bash ./bin/dolphinscheduler-daemon.sh status standalone-server
 ```
 
-> Note: Python gateway service is disabled by default. If you want to start the Python gateway
-> service please enable it by changing the yaml config `python-gateway.enabled : true` in api-server's configuration
-> path `api-server/conf/application.yaml`
+> Note: Python gateway service is disabled by default. To enable it, configure both settings in
+> `standalone-server/conf/application.yaml` before starting or restarting Standalone:
+
+```yaml
+api:
+  python-gateway:
+    enabled: true
+    auth-token: "<your-auth-token>"
+```
+
+Replace `<your-auth-token>` with your own non-blank token and configure the Python client to use the same token.
+Standalone fails to start if the gateway is enabled without a non-blank token.
 
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
 
