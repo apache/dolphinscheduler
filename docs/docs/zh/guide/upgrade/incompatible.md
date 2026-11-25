@@ -65,6 +65,8 @@
 
 * 工作流启动参数（`commandParam` 和合并后的 `globalParams`）改为在创建实例时持久化，启动命令不再携带这些参数。升级到 3.5.0 前，请停止新增触发，并等待旧版 Master 消费完普通队列（`t_ds_command`）和串行队列（`t_ds_serial_command`，包括 `SERIAL_WAIT` 实例）中的待启动命令。所有 Master 需统一升级，本次变更不支持新旧版 Master 混合执行。尚未执行的实例因暂停而已经丢失的参数无法自动恢复。([#18801](https://github.com/apache/dolphinscheduler/issues/18801))
 
+* Python Gateway 不再提供默认的 `api.python-gateway.auth-token`，启用时必须显式配置非空白 token。API、Master、Worker、Alert 和 Standalone 不再提供默认的 Actuator 账号密码；开启 `management.security.enabled` 前，必须为 `management.security.username` 和 `management.security.password` 配置非空白值。缺少必需凭据或凭据仅含空白字符时，服务启动失败；未启用的功能无需配置凭据。([#18812](https://github.com/apache/dolphinscheduler/issues/18812))
+
 * 移除工作流移动接口 `POST /projects/{projectCode}/workflow-definition/batch-move`。更新、实例同步及版本切换不再允许改变已有工作流或任务的项目归属；历史归属不一致的数据会被拒绝，不执行自动迁移。可通过跨项目复制创建新定义，但复制不保留原工作流标识或执行历史。 ([#18806](https://github.com/apache/dolphinscheduler/issues/18806))
 
   * 被已有实例引用的历史工作流版本不再允许删除，包括已结束的实例。编辑实例时，其记录的工作流定义版本必须存在且属于同一项目，`syncDefine=false` 也不例外。如果该版本在升级前已被删除，编辑会返回 `WORKFLOW_DEFINITION_NOT_EXIST`，提交完整 DAG 也不会重建缺失版本。需要继续执行时，请从同一项目内的有效工作流定义启动新实例。

@@ -38,14 +38,16 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 Spring Boot Actuator 提供了一系列用于监控和管理应用的 HTTP 端点，默认情况下这些端点可能暴露在公网或内网中，存在信息泄露风险。
 因此，强烈建议您在生产环境中开启端点安全认证，目前提供HTTP Basic Authentication的认证方式，选择如下两种配置方式之一都可以。
 
+启用认证前，请将下方的 `<your-actuator-username>` 和 `<your-actuator-password>` 替换为您自己的非空白账号和密码。缺少凭据或凭据仅含空白字符时，服务将启动失败。
+
 - 您可以通过各个服务的 application.yaml 文件进行单独配置:
 
 ```yaml
 management:
   security:
     enabled: true
-    username: username
-    password: password
+    username: "<your-actuator-username>"
+    password: "<your-actuator-password>"
     exclude: [health,metrics]
 ```
 
@@ -53,16 +55,18 @@ management:
 
 ```sh
 export MANAGEMENT_SECURITY_ENABLED=true
-export MANAGEMENT_SECURITY_USERNAME=username
-export MANAGEMENT_SECURITY_PASSWORD=password
+export MANAGEMENT_SECURITY_USERNAME='<your-actuator-username>'
+export MANAGEMENT_SECURITY_PASSWORD='<your-actuator-password>'
 export MANAGEMENT_SECURITY_EXCLUDE="health,metrics"
 ```
 
 - 添加安全认证之后，您可通过链接如下访问`prometheus格式`指标。
 
+请使用上方配置的相同账号和密码。使用 `Authorization` 请求头时，请将 `<base64-encoded-credentials>` 替换为实际配置的 `用户名:密码` 字符串经 Base64 编码后的结果。
+
 ```sh
-curl -u username:password 'http://localhost:12345/dolphinscheduler/actuator/prometheus'
-curl -H 'Authorization: Basic xxxxx' 'http://localhost:12345/dolphinscheduler/actuator/prometheus' 
+curl -u '<your-actuator-username>:<your-actuator-password>' 'http://localhost:12345/dolphinscheduler/actuator/prometheus'
+curl -H 'Authorization: Basic <base64-encoded-credentials>' 'http://localhost:12345/dolphinscheduler/actuator/prometheus'
 ```
 
 ## 命名规则 & 命名映射

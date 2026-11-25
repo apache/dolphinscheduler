@@ -39,14 +39,16 @@ Spring Boot Actuator provides a series of HTTP endpoints for monitoring and mana
 
 Therefore, we strongly recommend enabling endpoint security authentication in production environments. Currently, HTTP Basic Authentication is supported, and you can choose either of the following two configuration methods.
 
+Replace `<your-actuator-username>` and `<your-actuator-password>` below with your own non-blank credentials before enabling authentication. Missing or blank credentials cause startup to fail.
+
 - You can configure it individually in the application.yaml file of each service:
 
 ```yaml
 management:
   security:
     enabled: true
-    username: username
-    password: password
+    username: "<your-actuator-username>"
+    password: "<your-actuator-password>"
     exclude: [health,metrics]
 ```
 
@@ -54,16 +56,18 @@ management:
 
 ```sh
 export MANAGEMENT_SECURITY_ENABLED=true
-export MANAGEMENT_SECURITY_USERNAME=username
-export MANAGEMENT_SECURITY_PASSWORD=password
+export MANAGEMENT_SECURITY_USERNAME='<your-actuator-username>'
+export MANAGEMENT_SECURITY_PASSWORD='<your-actuator-password>'
 export MANAGEMENT_SECURITY_EXCLUDE="health,metrics"
 ```
 
 - After enabling security authentication, you could access `prometheus-format` metrics using the following commands:
 
+Use the same credentials configured above. For the `Authorization` header, replace `<base64-encoded-credentials>` with the Base64 encoding of the configured `username:password` pair.
+
 ```sh
-curl -u username:password 'http://localhost:12345/dolphinscheduler/actuator/prometheus'
-curl -H 'Authorization: Basic xxxxx' 'http://localhost:12345/dolphinscheduler/actuator/prometheus' 
+curl -u '<your-actuator-username>:<your-actuator-password>' 'http://localhost:12345/dolphinscheduler/actuator/prometheus'
+curl -H 'Authorization: Basic <base64-encoded-credentials>' 'http://localhost:12345/dolphinscheduler/actuator/prometheus'
 ```
 
 ## Naming Convention & Mapping

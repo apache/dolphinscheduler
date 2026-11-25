@@ -74,9 +74,18 @@ bash ./bin/dolphinscheduler-daemon.sh stop standalone-server
 bash ./bin/dolphinscheduler-daemon.sh status standalone-server
 ```
 
-> **_注意_**: Python 网关服务默认为关闭状态，如果您想启动 Python 网关服务，
-> 请修改 YAML 配置文件，将 `python-gateway.enabled` 设置为 `true`，
-> 配置文件路径为 `api-server/conf/application.yaml`
+> **_注意_**: Python 网关服务默认为关闭状态。若要启用，请在启动或重启 Standalone 前，
+> 在 `standalone-server/conf/application.yaml` 中配置以下两项：
+
+```yaml
+api:
+  python-gateway:
+    enabled: true
+    auth-token: "<your-auth-token>"
+```
+
+请将 `<your-auth-token>` 替换为自行生成的非空白 token，并为 Python 客户端配置相同的 token。
+启用网关但未提供非空白 token 时，Standalone 将启动失败。
 
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
 
