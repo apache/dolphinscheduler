@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.task.executor.worker;
 
+import org.apache.dolphinscheduler.plugin.task.api.log.TaskSensitiveLogContext;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
 import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils.MDCAutoClosable;
@@ -59,7 +60,10 @@ public class TaskExecutorWorker extends AbstractTaskExecutorWorker {
         while (true) {
             long minNextTrackDelay = 100;
             for (final ITaskExecutor taskExecutor : activeTaskExecutors.values()) {
-                try (final MDCAutoClosable closable = TaskExecutorMDCUtils.logWithMDC(taskExecutor)) {
+                try (
+                        final MDCAutoClosable closable = TaskExecutorMDCUtils.logWithMDC(taskExecutor);
+                        final TaskSensitiveLogContext ignored =
+                                TaskSensitiveLogContext.open(taskExecutor.getTaskExecutionContext())) {
                     try {
                         if (!taskExecutor.isStarted()) {
                             taskExecutor.start();

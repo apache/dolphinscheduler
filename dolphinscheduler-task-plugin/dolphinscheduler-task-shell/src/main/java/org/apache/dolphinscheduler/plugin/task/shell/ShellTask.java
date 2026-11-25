@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
@@ -51,7 +50,7 @@ public class ShellTask extends AbstractTask {
     public void init() {
 
         shellParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), ShellParameters.class);
-        log.info("Initialize shell task params {}", SensitiveLogHelper.toPrettyJson(shellParameters));
+        log.info("Initialize shell task params {}", JSONUtils.toPrettyJsonString(shellParameters));
 
         if (shellParameters == null || !shellParameters.checkParameters()) {
             throw new TaskException("shell task params is not valid");

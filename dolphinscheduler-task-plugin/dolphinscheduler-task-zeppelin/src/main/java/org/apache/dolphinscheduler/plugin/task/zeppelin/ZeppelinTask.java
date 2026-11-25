@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -87,7 +86,7 @@ public class ZeppelinTask extends AbstractRemoteTask {
         zeppelinParameters.setUsername(zeppelinConnectionParam.getUsername());
         zeppelinParameters.setPassword(zeppelinConnectionParam.getPassword());
         zeppelinParameters.setRestEndpoint(zeppelinConnectionParam.getRestEndpoint());
-        log.info("Initialize zeppelin task params:{}", SensitiveLogHelper.toPrettyJson(zeppelinParameters));
+        log.info("Initialize zeppelin task params:{}", JSONUtils.toPrettyJsonString(zeppelinParameters));
         this.zClient = getZeppelinClient();
     }
 
@@ -119,9 +118,7 @@ public class ZeppelinTask extends AbstractRemoteTask {
                 ObjectMapper mapper = new ObjectMapper();
                 zeppelinParamsMap = mapper.readValue(replacedParams, Map.class);
             }
-            log.info("request zeppelin parameters:{}",
-                    SensitiveLogHelper.mask(JSONUtils.toPrettyJsonString(zeppelinParamsMap),
-                            taskExecutionContext.getPrepareParamsMap()));
+            log.info("request zeppelin parameters:{}", JSONUtils.toPrettyJsonString(zeppelinParamsMap));
 
             // Submit zeppelin task
             String resultContent;

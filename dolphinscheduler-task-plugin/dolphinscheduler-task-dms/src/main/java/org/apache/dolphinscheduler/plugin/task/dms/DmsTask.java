@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -72,7 +71,7 @@ public class DmsTask extends AbstractRemoteTask {
     @Override
     public void init() throws TaskException {
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DmsParameters.class);
-        log.info("Initialize Dms task params {}", SensitiveLogHelper.toPrettyJson(parameters));
+        log.info("Initialize Dms task params {}", JSONUtils.toPrettyJsonString(parameters));
         initDmsHook();
     }
 

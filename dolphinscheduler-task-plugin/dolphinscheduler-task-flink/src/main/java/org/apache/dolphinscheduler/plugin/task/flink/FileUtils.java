@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -35,7 +33,6 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.Map;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
@@ -62,12 +59,11 @@ public class FileUtils {
         String initOptionsString = StringUtils.join(
                 FlinkArgsUtils.buildInitOptionsForSql(flinkParameters),
                 FlinkConstants.FLINK_SQL_NEWLINE).concat(FlinkConstants.FLINK_SQL_NEWLINE);
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        writeScriptFile(initScriptFilePath, initOptionsString + flinkParameters.getInitScript(), paramsMap);
-        writeScriptFile(scriptFilePath, flinkParameters.getRawScript(), paramsMap);
+        writeScriptFile(initScriptFilePath, initOptionsString + flinkParameters.getInitScript());
+        writeScriptFile(scriptFilePath, flinkParameters.getRawScript());
     }
 
-    private static void writeScriptFile(String scriptFileFullPath, String script, Map<String, Property> paramsMap) {
+    private static void writeScriptFile(String scriptFileFullPath, String script) {
         File scriptFile = new File(scriptFileFullPath);
         Path path = scriptFile.toPath();
         if (Files.exists(path)) {
@@ -93,18 +89,17 @@ public class FileUtils {
 
             if (StringUtils.isNotEmpty(script)) {
                 String replacedScript = script.replaceAll("\\r\\n", "\n");
-                FileUtils.writeStringToFile(scriptFile, replacedScript, StandardOpenOption.APPEND, paramsMap);
+                FileUtils.writeStringToFile(scriptFile, replacedScript, StandardOpenOption.APPEND);
             }
         } catch (IOException e) {
             throw new RuntimeException("Generate flink SQL script error", e);
         }
     }
 
-    private static void writeStringToFile(File file, String content, StandardOpenOption standardOpenOption,
-                                          Map<String, Property> paramsMap) {
+    private static void writeStringToFile(File file, String content, StandardOpenOption standardOpenOption) {
         try {
-            log.info("Writing content: {}", SensitiveLogHelper.mask(content, paramsMap));
-            log.info("To file: {}", file.getAbsolutePath());
+            log.info("Writing content: " + content);
+            log.info("To file: " + file.getAbsolutePath());
             Files.write(file.getAbsoluteFile().toPath(), content.getBytes(StandardCharsets.UTF_8), standardOpenOption);
         } catch (IOException e) {
             throw new RuntimeException("Error writing file: " + file.getAbsoluteFile(), e);

@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -65,7 +64,7 @@ public class PythonTask extends AbstractTask {
 
         pythonParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), PythonParameters.class);
 
-        log.info("Initialize python task params {}", SensitiveLogHelper.toPrettyJson(pythonParameters));
+        log.info("Initialize python task params {}", JSONUtils.toPrettyJsonString(pythonParameters));
         if (pythonParameters == null || !pythonParameters.checkParameters()) {
             throw new TaskException("python task params is not valid");
         }
@@ -132,12 +131,11 @@ public class PythonTask extends AbstractTask {
 
             sb.append(System.lineSeparator());
             sb.append(pythonScript);
-            String pythonFileContent = sb.toString();
-            log.info("{}", SensitiveLogHelper.mask(pythonFileContent, taskRequest.getPrepareParamsMap()));
+            log.info(sb.toString());
 
             // write data to file
             FileUtils.writeStringToFile(new File(pythonScriptFile),
-                    pythonFileContent,
+                    sb.toString(),
                     StandardCharsets.UTF_8);
         }
     }

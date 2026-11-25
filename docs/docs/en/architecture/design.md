@@ -268,7 +268,7 @@ In the early schedule design, if there is no priority design and use the fair sc
 </appender>
 ```
 
-- Sensitive parameter values are redacted at the log statement, before the line is written. Task-context dumps and parameter-initialization logs use a logging-only copy whose sensitive property values are replaced with `******`. Script and SQL text is masked only in the logged string: known sensitive values are replaced literally, longer values first. The script file, JDBC binds, remote uploads, and output-parameter parsing keep the original plaintext. Short sensitive values are not scanned across every log line, so they do not rewrite unrelated text. Task process output, Kubernetes pod logs, and remote-shell task output are not rewritten.
+- Worker and master mask sensitive parameter values when a log line is rendered, including the exception attached to that line. While a task runs on its executor thread, known sensitive values and their JSON-escaped forms are replaced with `******`, longer values first. Values shorter than 6 characters are left as-is, so a short secret cannot rewrite unrelated text. The script file, JDBC binds, remote uploads, and output-parameter parsing keep the original plaintext. Task process output and Kubernetes pod logs are collected on other threads and are not literal-masked. Remote-shell task output is logged on the task thread and is explicitly excluded. Datasource password regexes still apply to every line.
 
 ## Sum Up
 

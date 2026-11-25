@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -73,7 +72,7 @@ public class ChunJunTask extends AbstractTask {
     @Override
     public void init() {
         chunJunParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), ChunJunParameters.class);
-        log.info("Initialize chunjun task params {}", SensitiveLogHelper.toPrettyJson(taskRequest.getTaskParams()));
+        log.info("Initialize chunjun task params {}", JSONUtils.toPrettyJsonString(taskRequest.getTaskParams()));
 
         if (!chunJunParameters.checkParameters()) {
             throw new RuntimeException("chunjun task params is not valid");

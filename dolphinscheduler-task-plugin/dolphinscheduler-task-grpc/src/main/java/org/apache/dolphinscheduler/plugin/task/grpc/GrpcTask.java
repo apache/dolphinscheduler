@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.GrpcDynamicService;
@@ -62,7 +61,7 @@ public class GrpcTask extends AbstractTask {
     @Override
     public void init() {
         this.grpcParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), GrpcParameters.class);
-        log.info("Initialize gRPC task params: {}", SensitiveLogHelper.toPrettyJson(grpcParameters));
+        log.info("Initialize gRPC task params: {}", JSONUtils.toPrettyJsonString(grpcParameters));
 
         if (grpcParameters == null || !grpcParameters.checkParameters()) {
             throw new GrpcTaskException(

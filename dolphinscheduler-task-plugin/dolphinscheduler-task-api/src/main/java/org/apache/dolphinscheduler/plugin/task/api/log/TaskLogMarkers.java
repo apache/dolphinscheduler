@@ -27,6 +27,13 @@ public class TaskLogMarkers {
     private static final Marker TASK_LOGGER_INCLUDE_MARKER = MarkerFactory.getMarker("TASK_LOGGER_INCLUDE");
 
     /**
+     * Task stdout logged on the task thread (remote shell). Literal masking must skip these lines.
+     * Process stdout and Kubernetes pod logs are collected on other threads and never see the
+     * task scope, so they do not need this marker.
+     */
+    private static final Marker TASK_OUTPUT_MARKER = MarkerFactory.getMarker("TASK_OUTPUT");
+
+    /**
      * The marker used to exclude logs from the task instance log file.
      */
     public static Marker excludeInTaskLog() {
@@ -35,7 +42,17 @@ public class TaskLogMarkers {
 
     public static Marker includeInTaskLog() {
         return TASK_LOGGER_INCLUDE_MARKER;
+    }
 
+    public static Marker taskOutput() {
+        return TASK_OUTPUT_MARKER;
+    }
+
+    public static boolean isTaskOutput(final Marker marker) {
+        if (marker == null) {
+            return false;
+        }
+        return TASK_OUTPUT_MARKER.equals(marker) || marker.contains(TASK_OUTPUT_MARKER);
     }
 
 }

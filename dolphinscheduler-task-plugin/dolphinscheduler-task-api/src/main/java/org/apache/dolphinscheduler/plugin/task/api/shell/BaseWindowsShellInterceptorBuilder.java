@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api.shell;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.plugin.task.api.log.TaskSensitiveLogContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -59,8 +60,7 @@ public abstract class BaseWindowsShellInterceptorBuilder<T extends BaseWindowsSh
         Path shellAbsolutePath = shellAbsolutePath();
         FileUtils.createFileWith755(shellAbsolutePath);
         Files.write(shellAbsolutePath, finalScript.getBytes(), StandardOpenOption.APPEND);
-        String scriptForLog = digestMaskedScript(finalScript);
-        log.info("Final Shell file is : \n{}", scriptForLog);
+        log.info("Final Shell file is : \n{}", TaskSensitiveLogContext.digestMasked(finalScript));
     }
 
     private String shellBody() {

@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
-import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
@@ -96,8 +95,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
     public void init() {
         final String taskParams = taskExecutionContext.getTaskParams();
         aliyunServerlessSparkParameters = JSONUtils.parseObject(taskParams, AliyunServerlessSparkParameters.class);
-        log.info("aliyunServerlessSparkParameters - {}",
-                SensitiveLogHelper.toPrettyJson(aliyunServerlessSparkParameters));
+        log.info("aliyunServerlessSparkParameters - {}", aliyunServerlessSparkParameters);
         if (this.aliyunServerlessSparkParameters == null || !this.aliyunServerlessSparkParameters.checkParameters()) {
             throw new AliyunServerlessSparkTaskException("Aliyun-Serverless-Spark task parameters are not valid!");
         }

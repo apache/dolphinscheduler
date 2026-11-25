@@ -34,14 +34,12 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -136,7 +134,7 @@ public class SqlTask extends AbstractTask {
         super(taskRequest);
         this.taskExecutionContext = taskRequest;
         this.sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
-        log.info("Initialize sql task parameter {}", SensitiveLogHelper.toPrettyJson(sqlParameters));
+        log.info("Initialize sql task parameter {}", JSONUtils.toPrettyJsonString(sqlParameters));
         if (sqlParameters == null || !sqlParameters.checkParameters()) {
             throw new TaskException("sql task params is not valid");
         }
@@ -156,16 +154,16 @@ public class SqlTask extends AbstractTask {
 
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
-        log.info("Full sql parameters: {}", SensitiveLogHelper.toPrettyJson(sqlParameters));
+        log.info("Full sql parameters: {}", sqlParameters);
         log.info(
                 "sql type : {}, datasource : {}, sql : {} , localParams : {},showType : {},connParams : {},varPool : {} ,query max result limit  {}",
                 sqlParameters.getType(),
                 sqlParameters.getDatasource(),
-                SensitiveLogHelper.mask(sqlParameters.getSql(), taskExecutionContext.getPrepareParamsMap()),
-                PropertySensitiveUtils.maskSensitiveValues(sqlParameters.getLocalParams()),
+                sqlParameters.getSql(),
+                sqlParameters.getLocalParams(),
                 sqlParameters.getShowType(),
                 sqlParameters.getConnParams(),
-                PropertySensitiveUtils.maskSensitiveValues(sqlParameters.getVarPool()),
+                sqlParameters.getVarPool(),
                 sqlParameters.getLimit());
         try {
 
@@ -484,8 +482,7 @@ public class SqlTask extends AbstractTask {
 
     private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
         try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {
-            log.info("{} statement execute query, for sql: {}", handlerType,
-                    SensitiveLogHelper.mask(sqlBinds.getSql(), taskExecutionContext.getPrepareParamsMap()));
+            log.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
             ResultSet resultSet = statement.executeQuery();
             return resultProcess(resultSet);
         }
@@ -498,7 +495,7 @@ public class SqlTask extends AbstractTask {
             try (PreparedStatement tmpStatement = prepareStatementAndBind(connection, sqlBind)) {
                 result = tmpStatement.executeUpdate();
                 log.info("{} statement execute update result: {}, for sql: {}", handlerType, result,
-                        SensitiveLogHelper.mask(sqlBind.getSql(), taskExecutionContext.getPrepareParamsMap()));
+                        sqlBind.getSql());
             }
         }
         return String.valueOf(result);
@@ -530,10 +527,8 @@ public class SqlTask extends AbstractTask {
                     ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
                 }
             }
-            log.info("prepare statement replace sql : {}, sql parameters : {}",
-                    SensitiveLogHelper.mask(sqlBinds.getSql(), taskExecutionContext.getPrepareParamsMap()),
-                    SensitiveLogHelper.mask(String.valueOf(sqlBinds.getParamsMap()),
-                            taskExecutionContext.getPrepareParamsMap()));
+            log.info("prepare statement replace sql : {}, sql parameters : {}", sqlBinds.getSql(),
+                    sqlBinds.getParamsMap());
             sessionStatement = stmt;
             return stmt;
         } catch (Exception exception) {
@@ -551,8 +546,7 @@ public class SqlTask extends AbstractTask {
      */
     private void printReplacedSql(String content, String formatSql, String rgex, Map<Integer, Property> sqlParamsMap) {
         // parameter print style
-        log.info("after replace sql , preparing : {}",
-                SensitiveLogHelper.mask(formatSql, taskExecutionContext.getPrepareParamsMap()));
+        log.info("after replace sql , preparing : {}", formatSql);
         StringBuilder logPrint = new StringBuilder("replaced sql , parameters:");
         if (sqlParamsMap == null) {
             log.info("printReplacedSql: sqlParamsMap is null.");
@@ -562,8 +556,7 @@ public class SqlTask extends AbstractTask {
                         .append(")");
             }
         }
-        log.info("Sql Params are {}",
-                SensitiveLogHelper.mask(logPrint.toString(), taskExecutionContext.getPrepareParamsMap()));
+        log.info("Sql Params are {}", logPrint);
     }
 
     private void ensureSqlContent() {
@@ -613,7 +606,7 @@ public class SqlTask extends AbstractTask {
 
         if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
             String title = ParameterUtils.convertParameterPlaceholders(sqlParameters.getTitle(), placeholderParamsMap);
-            log.info("SQL title : {}", SensitiveLogHelper.mask(title, paramsMap));
+            log.info("SQL title : {}", title);
             sqlParameters.setTitle(title);
         }
 
