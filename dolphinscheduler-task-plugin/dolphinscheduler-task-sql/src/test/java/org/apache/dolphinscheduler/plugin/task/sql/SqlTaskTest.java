@@ -1108,6 +1108,31 @@ class SqlTaskTest {
     }
 
     @Test
+    void testQueryMaxRowsRejectedAtPluginLoad() {
+        // A worker configured with an invalid value must fail while the SQL task plugin
+        // is loaded at startup, before it can accept any SQL task.
+        try (MockedStatic<PropertyUtils> propertyUtils = Mockito.mockStatic(PropertyUtils.class)) {
+            propertyUtils.when(() -> PropertyUtils.getString("sql.task.query.max.rows"))
+                    .thenReturn("0");
+            IllegalArgumentException exception =
+                    Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new SqlTaskChannelFactory().create());
+            Assertions.assertEquals(
+                    "Property sql.task.query.max.rows must be a positive integer, but got: 0",
+                    exception.getMessage());
+        }
+    }
+
+    @Test
+    void testPluginLoadAcceptsValidQueryMaxRows() {
+        try (MockedStatic<PropertyUtils> propertyUtils = Mockito.mockStatic(PropertyUtils.class)) {
+            propertyUtils.when(() -> PropertyUtils.getString("sql.task.query.max.rows"))
+                    .thenReturn("7");
+            Assertions.assertNotNull(new SqlTaskChannelFactory().create());
+        }
+    }
+
+    @Test
     void testResultProcessSendEmailDisabledDoesNotSetNeedAlert() throws Exception {
         // Build a SqlTask with sendEmail = false
         String taskParams = "{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\",\"sendEmail\":false}";

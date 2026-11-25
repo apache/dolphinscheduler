@@ -159,6 +159,17 @@ public class SqlTask extends AbstractTask {
         return rows;
     }
 
+    /**
+     * Validate the sql.task.query.max.rows property while the SQL-task plugin is loaded.
+     * <p>
+     * A misconfigured value (missing, malformed, zero or negative) is meant to fail fast
+     * during worker/api startup, instead of surfacing as a dispatch retry loop when a task
+     * executor is constructed. Retains the property name and the invalid value in the error.
+     */
+    public static void validateQueryMaxRows() {
+        readQueryMaxRows();
+    }
+
     public SqlTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.taskExecutionContext = taskRequest;
