@@ -99,13 +99,12 @@ export function useSqlType(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.query_max_rows'),
       props: {
         placeholder: t('project.node.query_max_rows_tips'),
-        min: 1,
         max: 2147483647
       },
       validate: {
         trigger: ['input', 'blur'],
         validator(unuse, value) {
-          if (value && !Number.isInteger(value)) {
+          if (value != null && (!Number.isInteger(value) || value < 1)) {
             return new Error(t('project.node.integer_tips'))
           }
         }
