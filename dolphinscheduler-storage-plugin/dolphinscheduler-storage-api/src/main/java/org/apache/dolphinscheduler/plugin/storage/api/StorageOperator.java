@@ -83,6 +83,20 @@ public interface StorageOperator {
     boolean exists(String resourceAbsolutePath);
 
     /**
+     * Check whether the resource exists for a recursive delete.
+     * <p> Object-store prefixes can still contain child objects after the directory
+     * marker has been removed. Implementations should return {@code true} in that
+     * case so Resource Center can delete the leftover objects. Other callers, such
+     * as rename or create, should keep using {@link #exists(String)}.
+     *
+     * @param resourceAbsolutePath the resource absolute path
+     * @return true if the resource exists, or a directory prefix still has children
+     */
+    default boolean existsForRecursiveDelete(String resourceAbsolutePath) {
+        return exists(resourceAbsolutePath);
+    }
+
+    /**
      * Delete the resource, if the resourceAbsolutePath is not exists, will do nothing.
      *
      * @param resourceAbsolutePath the resource absolute path
