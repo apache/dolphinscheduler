@@ -67,6 +67,7 @@
 * 项目内的资源查询需要传入 `projectCode`，按项目 `VIEW` 权限及资源授权过滤；不带项目参数的全局资源目录仅管理员可查询。移除数据源和命名空间的个人授权接口，改为向项目授权。
 * 队列不纳入项目资源使用授权，保留旧队列管理、租户关联及原有队列数据，不进行队列数据修正。任务参数 `yarnQueue` 及 `others` 中的队列选项不校验项目授权。旧队列管理的废弃工作由 [#18784](https://github.com/apache/dolphinscheduler/issues/18784) 跟踪。
 * 保存、发布和人工启动、重跑时检查项目资源授权。撤销资源授权不重新鉴权既有运行或排队实例、后台定时触发和自动重试，也不会自动下线已有定时。
+* Python Gateway 不再提供默认的 `api.python-gateway.auth-token`，启用时必须显式配置非空白 token。API、Master、Worker、Alert 和 Standalone 不再提供默认的 Actuator 账号密码；开启 `management.security.enabled` 前，必须为 `management.security.username` 和 `management.security.password` 配置非空白值。缺少必需凭据或凭据仅含空白字符时，服务启动失败；未启用的功能无需配置凭据。([#18812](https://github.com/apache/dolphinscheduler/issues/18812))
 * 移除工作流移动接口 `POST /projects/{projectCode}/workflow-definition/batch-move`。更新、实例同步及版本切换不再允许改变已有工作流或任务的项目归属；历史归属不一致的数据会被拒绝，不执行自动迁移。可通过跨项目复制创建新定义，但复制不保留原工作流标识或执行历史。 ([#18806](https://github.com/apache/dolphinscheduler/issues/18806))
   * 被已有实例引用的历史工作流版本不再允许删除，包括已结束的实例。编辑实例时，其记录的工作流定义版本必须存在且属于同一项目，`syncDefine=false` 也不例外。如果该版本在升级前已被删除，编辑会返回 `WORKFLOW_DEFINITION_NOT_EXIST`，提交完整 DAG 也不会重建缺失版本。需要继续执行时，请从同一项目内的有效工作流定义启动新实例。
 * 内部 RPC 认证默认关闭。升级全部服务后，再协调所有服务在各自的 `common.properties` 中开启 `rpc.authentication.enabled=true` 并配置相同的 `rpc.authentication.secret`，认证开启与关闭的服务不能互通。凭据在进程内缓存，启用认证和轮换密钥需要重启服务。参见 [RPC 认证](../security/authentication-type.md#服务间-rpc-认证)。

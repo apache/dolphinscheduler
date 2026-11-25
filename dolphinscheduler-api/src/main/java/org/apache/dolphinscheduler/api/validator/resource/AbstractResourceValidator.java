@@ -90,6 +90,12 @@ public abstract class AbstractResourceValidator<T> implements IValidator<T> {
         }
     }
 
+    public void exceptionResourceNotExistsForRecursiveDelete(String resourceAbsolutePath) {
+        if (!storageOperator.existsForRecursiveDelete(resourceAbsolutePath)) {
+            throw new ServiceException("Thr resource is not exists: " + resourceAbsolutePath);
+        }
+    }
+
     public void exceptionResourceExists(String resourceAbsolutePath) {
         if (storageOperator.exists(resourceAbsolutePath)) {
             throw new ServiceException("The resource is already exist: " + resourceAbsolutePath);
