@@ -46,8 +46,6 @@
 
 ## 3.4.3
 
-* 工作流启动参数（`commandParam` 和合并后的 `globalParams`）改为在创建实例时持久化，启动命令不再携带这些参数。升级前请停止新增触发，并等待旧版 Master 消费待启动命令（包括 `SERIAL_WAIT` 实例）。所有 Master 需统一升级，本次变更不支持新旧版 Master 混合执行。尚未执行的实例因暂停而已经丢失的参数无法自动恢复。([#18801](https://github.com/apache/dolphinscheduler/issues/18801))
-
 * 为 `t_ds_schedules` 表新增 `missed_fire_policy` 字段。现有定时默认使用 `FIRE_ALL_MISSED`，以保持原有 Quartz `IgnoreMisfires` 行为。([#18464](https://github.com/apache/dolphinscheduler/pull/18464))
 
 * 移除已废弃的 Dynamic Task 查询接口。([#18556](https://github.com/apache/dolphinscheduler/issues/18556))
@@ -65,7 +63,10 @@
 
 ## 3.5.0
 
+* 工作流启动参数（`commandParam` 和合并后的 `globalParams`）改为在创建实例时持久化，启动命令不再携带这些参数。升级到 3.5.0 前，请停止新增触发，并等待旧版 Master 消费完普通队列（`t_ds_command`）和串行队列（`t_ds_serial_command`，包括 `SERIAL_WAIT` 实例）中的待启动命令。所有 Master 需统一升级，本次变更不支持新旧版 Master 混合执行。尚未执行的实例因暂停而已经丢失的参数无法自动恢复。([#18801](https://github.com/apache/dolphinscheduler/issues/18801))
+
 * 移除工作流移动接口 `POST /projects/{projectCode}/workflow-definition/batch-move`。更新、实例同步及版本切换不再允许改变已有工作流或任务的项目归属；历史归属不一致的数据会被拒绝，不执行自动迁移。可通过跨项目复制创建新定义，但复制不保留原工作流标识或执行历史。 ([#18806](https://github.com/apache/dolphinscheduler/issues/18806))
+
   * 被已有实例引用的历史工作流版本不再允许删除，包括已结束的实例。编辑实例时，其记录的工作流定义版本必须存在且属于同一项目，`syncDefine=false` 也不例外。如果该版本在升级前已被删除，编辑会返回 `WORKFLOW_DEFINITION_NOT_EXIST`，提交完整 DAG 也不会重建缺失版本。需要继续执行时，请从同一项目内的有效工作流定义启动新实例。
 * 内部 RPC 认证默认关闭。升级全部服务后，再协调所有服务在各自的 `common.properties` 中开启 `rpc.authentication.enabled=true` 并配置相同的 `rpc.authentication.secret`，认证开启与关闭的服务不能互通。凭据在进程内缓存，启用认证和轮换密钥需要重启服务。参见 [RPC 认证](../security/authentication-type.md#服务间-rpc-认证)。
 * Master、Worker 和 Alert Server 现在按 RPC 请求生成心跳快照，并发请求共享一秒刷新间隔的线程安全系统指标缓存。`BaseHeartBeatTask` 及 Master、Worker、Alert 的心跳任务子类已移除，自定义扩展如继承这些类，需要自行管理调度。Alert Server 取消定期写注册心跳，只在启动时注册稳定进程身份，并在重连时恢复注册。`alert.max-heartbeat-interval` 已移除，API 在收到查询请求时直接通过 RPC 获取 Alert 心跳。
