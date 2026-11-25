@@ -280,6 +280,67 @@ public class SparkTaskTest {
                 sparkTask.getScript());
     }
 
+    @Test
+    public void testBuildCommandWithBlankPrincipal() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setLocalParams(Collections.emptyList());
+        sparkParameters.setProgramType(ProgramType.SCALA);
+        sparkParameters.setMainClass("org.apache.dolphinscheduler.plugin.task.spark.SparkTaskTest");
+        sparkParameters.setDeployMode("client");
+        sparkParameters.setAppName("spark");
+        sparkParameters.setOthers("");
+        sparkParameters.setDriverCores(1);
+        sparkParameters.setDriverMemory("512M");
+        sparkParameters.setNumExecutors(2);
+        sparkParameters.setExecutorMemory("1G");
+        sparkParameters.setExecutorCores(2);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("/lib/dolphinscheduler-task-spark.jar");
+        sparkParameters.setMainJar(mainJar);
+        sparkParameters.setPrincipal("   ");
+        String parameters = JSONUtils.toJsonString(sparkParameters);
+
+        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        ResourceContext resourceContext = new ResourceContext();
+        addResourceItem(resourceContext, "/lib/dolphinscheduler-task-spark.jar");
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
+        Mockito.when(taskExecutionContext.getResourceContext()).thenReturn(resourceContext);
+        SparkTask sparkTask = Mockito.spy(new SparkTask(taskExecutionContext));
+        sparkTask.init();
+        Assertions.assertFalse(sparkTask.getScript().contains("--principal"));
+    }
+
+    @Test
+    public void testBuildCommandWithBlankPrincipalWithKeytab() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setLocalParams(Collections.emptyList());
+        sparkParameters.setProgramType(ProgramType.SCALA);
+        sparkParameters.setMainClass("org.apache.dolphinscheduler.plugin.task.spark.SparkTaskTest");
+        sparkParameters.setDeployMode("client");
+        sparkParameters.setAppName("spark");
+        sparkParameters.setOthers("");
+        sparkParameters.setDriverCores(1);
+        sparkParameters.setDriverMemory("512M");
+        sparkParameters.setNumExecutors(2);
+        sparkParameters.setExecutorMemory("1G");
+        sparkParameters.setExecutorCores(2);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("/lib/dolphinscheduler-task-spark.jar");
+        sparkParameters.setMainJar(mainJar);
+        sparkParameters.setPrincipal("   ");
+        ResourceInfo keytab = new ResourceInfo();
+        keytab.setResourceName("/kerberos keytabs/u&r.keytab");
+        sparkParameters.setKeytab(keytab);
+        String parameters = JSONUtils.toJsonString(sparkParameters);
+
+        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
+
+        // a blank principal paired with a keytab is invalid and must be rejected at init()
+        SparkTask sparkTask = Mockito.spy(new SparkTask(taskExecutionContext));
+        Assertions.assertThrows(RuntimeException.class, sparkTask::init);
+    }
+
     private void addResourceItem(ResourceContext resourceContext, String path) {
         ResourceContext.ResourceItem item = new ResourceContext.ResourceItem();
         item.setResourceAbsolutePathInStorage(path);

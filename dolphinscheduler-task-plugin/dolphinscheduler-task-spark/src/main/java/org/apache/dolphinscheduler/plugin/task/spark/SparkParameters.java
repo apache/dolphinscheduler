@@ -141,11 +141,23 @@ public class SparkParameters extends AbstractParameters {
         boolean baseValid = programType != null && (mainJar != null || rawScript != null);
         /**
          * Kerberos principal and keytab must be configured together: either both empty or both set.
+         * A spaces-only principal is treated as absent to stay consistent with command generation,
+         * otherwise the shell would drop the blank value and Spark would consume the next argument.
          */
         boolean hasPrincipal = StringUtils.isNotBlank(principal);
         boolean hasKeytab = keytab != null && StringUtils.isNotBlank(keytab.getResourceName());
         boolean kerberosValid = hasPrincipal == hasKeytab;
-        return baseValid && kerberosValid;
+        /**
+         * Spark splits --py-files/--archives on commas without an escape syntax, so resource
+         * names containing commas cannot be preserved through the list parsing.
+         */
+        boolean pyFilesValid = pyFiles == null
+                || pyFiles.stream()
+                        .allMatch(pyFile -> pyFile == null || !StringUtils.contains(pyFile.getResourceName(), ","));
+        boolean archivesValid = archives == null
+                || archives.stream()
+                        .allMatch(archive -> archive == null || !StringUtils.contains(archive.getResourceName(), ","));
+        return baseValid && kerberosValid && pyFilesValid && archivesValid;
     }
 
     @Override

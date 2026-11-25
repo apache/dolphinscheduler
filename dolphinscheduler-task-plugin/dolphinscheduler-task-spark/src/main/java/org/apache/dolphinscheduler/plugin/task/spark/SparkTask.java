@@ -201,7 +201,7 @@ public class SparkTask extends AbstractYarnTask {
 
         // --principal / --keytab for Kerberos authentication
         String principal = sparkParameters.getPrincipal();
-        if (StringUtils.isNotEmpty(principal)) {
+        if (StringUtils.isNotBlank(principal)) {
             args.add(SparkConstants.PRINCIPAL);
             args.add(principal);
         }

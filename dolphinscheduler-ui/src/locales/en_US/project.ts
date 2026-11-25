@@ -458,6 +458,8 @@ export default {
       'The resource list is still loading, please try again later',
     resources_load_failed_tips:
       'Failed to load the resource list, please try again later',
+    comma_in_resource_tips:
+      'Resources with commas in their names cannot be selected, as Spark splits this list on commas',
     custom_parameters: 'Custom Parameters',
     copy_success: 'Copy success',
     copy_failed: 'The browser does not support automatic copying',

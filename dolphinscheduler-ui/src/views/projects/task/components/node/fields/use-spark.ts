@@ -227,6 +227,17 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         trigger: ['blur'],
         validator(validate: any, value: string[]) {
           if (value && value.length > 0) {
+            const commaNames = value.filter((name) => name.includes(','))
+            if (commaNames.length > 0) {
+              return new Error(
+                t('project.node.comma_in_resource_tips') +
+                  ': ' +
+                  commaNames
+                    .map((name) => getResourceDirAfter(name, []))
+                    .join(';') +
+                  ';'
+              )
+            }
             if (resourcesLoading.value) {
               return new Error(t('project.node.resources_loading_tips'))
             }
@@ -268,6 +279,17 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         trigger: ['blur'],
         validator(validate: any, value: string[]) {
           if (value && value.length > 0) {
+            const commaNames = value.filter((name) => name.includes(','))
+            if (commaNames.length > 0) {
+              return new Error(
+                t('project.node.comma_in_resource_tips') +
+                  ': ' +
+                  commaNames
+                    .map((name) => getResourceDirAfter(name, []))
+                    .join(';') +
+                  ';'
+              )
+            }
             if (resourcesLoading.value) {
               return new Error(t('project.node.resources_loading_tips'))
             }
@@ -298,7 +320,8 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       validate: {
         trigger: ['input', 'blur'],
         validator(validate: any, value: string) {
-          if (value && !model.keytab) {
+          // a spaces-only principal is treated as absent, consistent with backend validation and command generation
+          if (value && value.trim() && !model.keytab) {
             return new Error(t('project.node.principal_keytab_pair_tips'))
           }
         }
@@ -340,7 +363,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
                   ';'
               )
             }
-            if (!model.principal) {
+            if (!model.principal || !model.principal.trim()) {
               return new Error(t('project.node.principal_keytab_pair_tips'))
             }
           }

@@ -441,6 +441,8 @@ export default {
     resources_limit_tips: '请重新选择，资源个数限制:',
     no_resources_tips: '请删除所有未授权或已删除资源',
     useless_resources_tips: '未授权或已删除资源',
+    comma_in_resource_tips:
+      '不能选择名称中包含逗号的资源，Spark 会按逗号切分该列表',
     resources_loading_tips: '资源列表加载中，请稍后重试',
     resources_load_failed_tips: '资源列表加载失败，请稍后重试',
     custom_parameters: '自定义参数',

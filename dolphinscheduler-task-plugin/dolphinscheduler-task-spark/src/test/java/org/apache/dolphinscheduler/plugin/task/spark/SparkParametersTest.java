@@ -125,4 +125,55 @@ public class SparkParametersTest {
         sparkParameters.setKeytab(keytab);
         Assertions.assertTrue(sparkParameters.checkParameters());
     }
+
+    @Test
+    public void testCheckParametersBlankPrincipalWithoutKeytab() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        sparkParameters.setPrincipal("   ");
+        Assertions.assertTrue(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersBlankPrincipalWithKeytab() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        sparkParameters.setPrincipal("   ");
+        ResourceInfo keytab = new ResourceInfo();
+        keytab.setResourceName("user.keytab");
+        sparkParameters.setKeytab(keytab);
+        Assertions.assertFalse(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersCommaInPyFiles() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        ResourceInfo pyFile = new ResourceInfo();
+        pyFile.setResourceName("/dir/config,prod.zip");
+        sparkParameters.setPyFiles(Arrays.asList(pyFile));
+        Assertions.assertFalse(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersCommaInArchives() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        ResourceInfo archive = new ResourceInfo();
+        archive.setResourceName("/dir/config,prod.tar.gz");
+        sparkParameters.setArchives(Arrays.asList(archive));
+        Assertions.assertFalse(sparkParameters.checkParameters());
+    }
 }
