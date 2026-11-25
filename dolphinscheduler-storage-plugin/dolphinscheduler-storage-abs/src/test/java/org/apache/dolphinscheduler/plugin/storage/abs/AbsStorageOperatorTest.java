@@ -55,6 +55,7 @@ import com.azure.core.http.rest.PagedIterable;
 import com.azure.core.http.rest.Response;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.BlobContainerItem;
@@ -198,6 +199,43 @@ class AbsStorageOperatorTest {
         verify(child).deleteIfExists();
         verify(nested).deleteIfExists();
         verify(directory, never()).deleteIfExistsWithResponse(isNull(), any(), isNull(), isNull());
+    }
+
+    @Test
+    void deleteDirectoryRecursivelyKeepsListedBlobNamesLiteral() {
+        // BlobContainerClient#getBlobClient url-decodes its argument, so a listed name has to be encoded or
+        // "report%20final.csv" would address the other blob "report final.csv"
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        BlobClient directory = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir3");
+        mockResourceType(directory, null);
+        BlobClient percentNamed =
+                mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir3/a%2520b.csv");
+        BlobClient spaceNamed = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir3/a%20b.csv");
+        BlobClient decoded = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir3/a b.csv");
+        mockListBlobs(containerClient, "dolphinscheduler/default/resources/dir3/",
+                "dolphinscheduler/default/resources/dir3/a%20b.csv", "dolphinscheduler/default/resources/dir3/a b.csv");
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        storageOperator.delete("dolphinscheduler/default/resources/dir3", true);
+
+        verify(percentNamed).deleteIfExists();
+        verify(spaceNamed).deleteIfExists();
+        verify(decoded, never()).deleteIfExists();
+    }
+
+    @Test
+    void encodedBlobNameAddressesTheLiteralBlobInTheSdk() {
+        BlobContainerClient realClient = new BlobContainerClientBuilder()
+                .connectionString("DefaultEndpointsProtocol=https;AccountName=test;AccountKey=dGVzdA==;"
+                        + "EndpointSuffix=core.windows.net")
+                .containerName("test-container")
+                .buildClient();
+
+        for (String literalName : Arrays.asList("dir/report%20final.csv", "dir/report final.csv", "dir/a+b.csv",
+                "dir/100%.csv", "dir/ünï.csv", "dir/plain.csv")) {
+            assertEquals(literalName,
+                    realClient.getBlobClient(AbsStorageOperator.encodeBlobName(literalName)).getBlobName());
+        }
     }
 
     @Test

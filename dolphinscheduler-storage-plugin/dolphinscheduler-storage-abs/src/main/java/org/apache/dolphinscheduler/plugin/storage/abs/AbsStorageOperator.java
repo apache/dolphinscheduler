@@ -35,12 +35,15 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -143,7 +146,7 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
     public void delete(String filePath, boolean recursive) {
         String absKey = transformAbsolutePathToAbsKey(filePath);
         if (!absKey.endsWith(FOLDER_SEPARATOR)) {
-            blobContainerClient.getBlobClient(absKey).deleteIfExists();
+            getLiteralBlobClient(absKey).deleteIfExists();
             return;
         }
         if (recursive) {
@@ -157,16 +160,36 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
             // before the names below it, so delete in reverse order to remove the children first
             blobNames.sort(Comparator.reverseOrder());
             for (String blobName : blobNames) {
-                blobContainerClient.getBlobClient(blobName).deleteIfExists();
+                getLiteralBlobClient(blobName).deleteIfExists();
             }
         } else {
-            blobContainerClient.getBlobClient(absKey).deleteIfExists();
+            getLiteralBlobClient(absKey).deleteIfExists();
         }
         deleteHierarchicalDirectory(transformAbsKeyToAbsolutePath(absKey));
     }
 
+    /**
+     * {@link BlobContainerClient#getBlobClient(String)} url-decodes the name, so a literal name such as
+     * {@code report%20final.csv} has to be encoded first or it would address the blob {@code report final.csv}.
+     */
+    private BlobClient getLiteralBlobClient(String blobName) {
+        return blobContainerClient.getBlobClient(encodeBlobName(blobName));
+    }
+
+    static String encodeBlobName(String blobName) {
+        return Arrays.stream(blobName.split(FOLDER_SEPARATOR, -1))
+                .map(AbsStorageOperator::encodeSegment)
+                .collect(Collectors.joining(FOLDER_SEPARATOR));
+    }
+
+    @SneakyThrows
+    private static String encodeSegment(String segment) {
+        // URLEncoder writes a space as "+", which the SDK keeps as a literal plus
+        return URLEncoder.encode(segment, StandardCharsets.UTF_8.name()).replace("+", "%20");
+    }
+
     private void deleteHierarchicalDirectory(String name) {
-        BlobClient directory = blobContainerClient.getBlobClient(name);
+        BlobClient directory = getLiteralBlobClient(name);
         Response<BlobProperties> properties;
         try {
             properties = directory.getPropertiesWithResponse(null, null, null);
