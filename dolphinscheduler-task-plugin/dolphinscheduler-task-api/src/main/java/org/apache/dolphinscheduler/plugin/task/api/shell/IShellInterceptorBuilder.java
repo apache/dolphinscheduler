@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api.shell;
 
 import org.apache.dolphinscheduler.common.exception.FileOperateException;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.io.IOException;
 import java.util.Map;
@@ -45,6 +46,13 @@ public interface IShellInterceptorBuilder<T extends IShellInterceptorBuilder<T, 
     T k8sConfigYaml(String k8sConfigYaml);
 
     T properties(Map<String, String> propertyMap);
+
+    /**
+     * Same values as {@link #properties(Map)}, plus the sensitive flag. The script file is
+     * rendered with the real values. A log of that script replaces only {@code ${name}} of a
+     * sensitive property with {@code ******}.
+     */
+    T taskParams(Map<String, Property> params);
 
     T sudoMode(boolean sudoEnable);
 

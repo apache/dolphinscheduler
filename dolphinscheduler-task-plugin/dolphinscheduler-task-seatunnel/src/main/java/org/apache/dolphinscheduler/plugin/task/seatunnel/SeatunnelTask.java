@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitivePropertyJson;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -75,7 +76,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
 
     @Override
     public void init() {
-        log.info("Intialize SeaTunnel task params {}", JSONUtils.toPrettyJsonString(seatunnelParameters));
+        log.info("Intialize SeaTunnel task params {}", SensitivePropertyJson.forLog(seatunnelParameters));
         if (seatunnelParameters == null || !seatunnelParameters.checkParameters()) {
             throw new TaskException("SeaTunnel task params is not valid");
         }

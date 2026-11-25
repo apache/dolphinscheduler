@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.api.shell;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.plugin.task.api.log.TaskSensitiveLogContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -55,15 +54,15 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
         finalScripts.addAll(customEnvScript());
         // add k8s config
         finalScripts.addAll(k8sConfig());
-        // add shell body
-        finalScripts.add(shellBody());
-        // create shell file
+        String scriptBody = rawScriptBody();
+        finalScripts.add(ParameterUtils.convertParameterPlaceholders(scriptBody, propertyMap));
         String finalScript = finalScripts.stream().collect(Collectors.joining(System.lineSeparator()));
         Path shellAbsolutePath = shellAbsolutePath();
         FileUtils.createFileWith755(shellAbsolutePath);
         Files.write(shellAbsolutePath, finalScript.getBytes(), StandardOpenOption.APPEND);
+        finalScripts.set(finalScripts.size() - 1, digestMaskedScript(scriptBody));
         log.info("Final Script Content:\n====================\n{}\n====================",
-                TaskSensitiveLogContext.digestMasked(finalScript));
+                finalScripts.stream().collect(Collectors.joining(System.lineSeparator())));
 
     }
 
@@ -107,15 +106,14 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
         return Collections.singletonList("export KUBECONFIG=" + kubeConfigPath);
     }
 
-    private String shellBody() {
+    private String rawScriptBody() {
         if (CollectionUtils.isEmpty(scripts)) {
             return StringUtils.EMPTY;
         }
         String scriptBody = scripts
                 .stream()
                 .collect(Collectors.joining(System.lineSeparator()));
-        scriptBody = scriptBody.replaceAll("\\r\\n", System.lineSeparator());
-        return ParameterUtils.convertParameterPlaceholders(scriptBody, propertyMap);
+        return scriptBody.replaceAll("\\r\\n", System.lineSeparator());
     }
 
     private Path shellAbsolutePath() {

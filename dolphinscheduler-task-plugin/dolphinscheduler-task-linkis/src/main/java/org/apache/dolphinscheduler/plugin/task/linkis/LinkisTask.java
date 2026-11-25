@@ -26,11 +26,11 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitivePropertyJson;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -69,7 +69,7 @@ public class LinkisTask extends AbstractRemoteTask {
     @Override
     public void init() {
         linkisParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), LinkisParameters.class);
-        log.info("Initialize Linkis task params {}", JSONUtils.toPrettyJsonString(linkisParameters));
+        log.info("Initialize Linkis task params {}", SensitivePropertyJson.forLog(linkisParameters));
 
         if (!linkisParameters.checkParameters()) {
             throw new RuntimeException("Linkis task params is not valid");
@@ -81,7 +81,7 @@ public class LinkisTask extends AbstractRemoteTask {
         try {
             // construct process
             IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
-                    .properties(ParameterUtils.convert(taskRequest.getPrepareParamsMap()))
+                    .taskParams(taskRequest.getPrepareParamsMap())
                     .appendScript(buildCommand());
             TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, null);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());

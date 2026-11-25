@@ -28,11 +28,11 @@ import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitivePropertyJson;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -90,7 +90,7 @@ public class MlflowTask extends AbstractTask {
 
         mlflowParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), MlflowParameters.class);
 
-        log.info("Initialize MLFlow task params {}", JSONUtils.toPrettyJsonString(mlflowParameters));
+        log.info("Initialize MLFlow task params {}", SensitivePropertyJson.forLog(mlflowParameters));
         if (mlflowParameters == null || !mlflowParameters.checkParameters()) {
             throw new RuntimeException("MLFlow task params is not valid");
         }
@@ -102,7 +102,7 @@ public class MlflowTask extends AbstractTask {
         try {
             // construct process
             IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
-                    .properties(ParameterUtils.convert(getParamsMap()))
+                    .taskParams(getParamsMap())
                     .appendScript(buildCommand());
             TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);
             int exitCode;

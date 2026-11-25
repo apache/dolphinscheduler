@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.plugin.task.openmldb;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitivePlaceholderMask;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitivePropertyJson;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.python.PythonTask;
@@ -63,7 +65,7 @@ public class OpenmldbTask extends PythonTask {
     public void init() {
         pythonParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), OpenmldbParameters.class);
 
-        log.info("Initialize openmldb task params {}", JSONUtils.toPrettyJsonString(pythonParameters));
+        log.info("Initialize openmldb task params {}", SensitivePropertyJson.forLog(pythonParameters));
         if (pythonParameters == null || !pythonParameters.checkParameters()) {
             throw new TaskException("openmldb task params is not valid");
         }
@@ -95,7 +97,9 @@ public class OpenmldbTask extends PythonTask {
 
         // convert sql to python script
         String pythonScript = buildPythonScriptsFromSql(rawSQLScript);
-        log.info("rendered python script : {}", pythonScript);
+        String sqlForLog = SensitivePlaceholderMask.forLog(
+                openmldbParameters.getSql().replaceAll("[\\r]?\\n", "\n"), paramsMap);
+        log.info("rendered python script : {}", buildPythonScriptsFromSql(sqlForLog));
         return pythonScript;
     }
 

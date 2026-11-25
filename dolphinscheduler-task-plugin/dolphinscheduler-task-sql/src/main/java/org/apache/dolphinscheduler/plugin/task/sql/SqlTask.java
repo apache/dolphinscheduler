@@ -34,12 +34,15 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitivePlaceholderMask;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitivePropertyJson;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -134,7 +137,7 @@ public class SqlTask extends AbstractTask {
         super(taskRequest);
         this.taskExecutionContext = taskRequest;
         this.sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
-        log.info("Initialize sql task parameter {}", JSONUtils.toPrettyJsonString(sqlParameters));
+        log.info("Initialize sql task parameter {}", SensitivePropertyJson.forLog(sqlParameters));
         if (sqlParameters == null || !sqlParameters.checkParameters()) {
             throw new TaskException("sql task params is not valid");
         }
@@ -154,16 +157,16 @@ public class SqlTask extends AbstractTask {
 
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
-        log.info("Full sql parameters: {}", sqlParameters);
+        log.info("Full sql parameters: {}", SensitivePropertyJson.forLog(sqlParameters));
         log.info(
                 "sql type : {}, datasource : {}, sql : {} , localParams : {},showType : {},connParams : {},varPool : {} ,query max result limit  {}",
                 sqlParameters.getType(),
                 sqlParameters.getDatasource(),
                 sqlParameters.getSql(),
-                sqlParameters.getLocalParams(),
+                PropertySensitiveUtils.maskSensitiveValues(sqlParameters.getLocalParams()),
                 sqlParameters.getShowType(),
                 sqlParameters.getConnParams(),
-                sqlParameters.getVarPool(),
+                PropertySensitiveUtils.maskSensitiveValues(sqlParameters.getVarPool()),
                 sqlParameters.getLimit());
         try {
 
@@ -527,8 +530,7 @@ public class SqlTask extends AbstractTask {
                     ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
                 }
             }
-            log.info("prepare statement replace sql : {}, sql parameters : {}", sqlBinds.getSql(),
-                    sqlBinds.getParamsMap());
+            log.info("prepare statement parameters : {}", describeParams(sqlBinds.getParamsMap()));
             sessionStatement = stmt;
             return stmt;
         } catch (Exception exception) {
@@ -547,16 +549,31 @@ public class SqlTask extends AbstractTask {
     private void printReplacedSql(String content, String formatSql, String rgex, Map<Integer, Property> sqlParamsMap) {
         // parameter print style
         log.info("after replace sql , preparing : {}", formatSql);
-        StringBuilder logPrint = new StringBuilder("replaced sql , parameters:");
+        log.info("Sql Params are {}", describeParams(sqlParamsMap));
+    }
+
+    private String describeParams(Map<Integer, Property> sqlParamsMap) {
         if (sqlParamsMap == null) {
-            log.info("printReplacedSql: sqlParamsMap is null.");
-        } else {
-            for (int i = 1; i <= sqlParamsMap.size(); i++) {
-                logPrint.append(sqlParamsMap.get(i).getValue()).append("(").append(sqlParamsMap.get(i).getType())
-                        .append(")");
-            }
+            return "printReplacedSql: sqlParamsMap is null.";
         }
-        log.info("Sql Params are {}", logPrint);
+        StringBuilder logPrint = new StringBuilder("replaced sql , parameters:");
+        for (int i = 1; i <= sqlParamsMap.size(); i++) {
+            Property property = sqlParamsMap.get(i);
+            if (property == null) {
+                continue;
+            }
+            logPrint.append(displayValue(property)).append("(").append(property.getType()).append(")");
+        }
+        return logPrint.toString();
+    }
+
+    private String displayValue(Property property) {
+        if (PropertySensitiveUtils.isSensitive(property)
+                && StringUtils.isNotEmpty(property.getValue())
+                && !TaskConstants.SENSITIVE_DATA_MASK.equals(property.getValue())) {
+            return TaskConstants.SENSITIVE_DATA_MASK;
+        }
+        return property.getValue();
     }
 
     private void ensureSqlContent() {
@@ -606,7 +623,7 @@ public class SqlTask extends AbstractTask {
 
         if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
             String title = ParameterUtils.convertParameterPlaceholders(sqlParameters.getTitle(), placeholderParamsMap);
-            log.info("SQL title : {}", title);
+            log.info("SQL title : {}", SensitivePlaceholderMask.forLog(sqlParameters.getTitle(), paramsMap));
             sqlParameters.setTitle(title);
         }
 
@@ -620,13 +637,17 @@ public class SqlTask extends AbstractTask {
         setSqlParamsMap(sql, sqlParamsMap, paramsMap, taskExecutionContext.getTaskInstanceId());
         // Replace the original value in sql ！{...} ，Does not participate in precompilation
         String rgexo = "['\"]*\\!\\{(.*?)\\}['\"]*";
+        Map<Integer, Property> paramsForLog = new HashMap<>();
+        sqlParamsMap.forEach((index, property) -> paramsForLog.put(index, PropertySensitiveUtils.copy(property)));
+        String sqlForLog = replaceOriginalValueForLog(sql, rgexo, paramsMap);
         sql = replaceOriginalValue(sql, rgexo, paramsMap);
         // replace the ${} of the SQL statement with the Placeholder
         // Convert the list parameter
         String formatSql = ParameterUtils.expandListParameter(sqlParamsMap, sql);
         sqlBuilder.append(formatSql);
         // print replace sql
-        printReplacedSql(sql, formatSql, TaskConstants.SQL_PARAMS_REGEX, sqlParamsMap);
+        String formatSqlForLog = ParameterUtils.expandListParameter(paramsForLog, sqlForLog);
+        printReplacedSql(sql, formatSqlForLog, TaskConstants.SQL_PARAMS_REGEX, paramsForLog);
         return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
     }
 
@@ -640,6 +661,20 @@ public class SqlTask extends AbstractTask {
             String paramName = m.group(1);
             String paramValue = sqlParamsMap.get(paramName).getValue();
             content = m.replaceFirst(paramValue);
+        }
+        return content;
+    }
+
+    private String replaceOriginalValueForLog(String content, String rgex, Map<String, Property> sqlParamsMap) {
+        Pattern pattern = Pattern.compile(rgex);
+        while (true) {
+            Matcher m = pattern.matcher(content);
+            if (!m.find()) {
+                break;
+            }
+            String paramName = m.group(1);
+            Property property = sqlParamsMap.get(paramName);
+            content = m.replaceFirst(Matcher.quoteReplacement(displayValue(property)));
         }
         return content;
     }

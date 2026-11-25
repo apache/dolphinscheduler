@@ -230,6 +230,7 @@ public class ParameterUtils {
                     newProperty.setValue(v.toString());
                     newProperty.setProp(property.getProp());
                     newProperty.setDirect(property.getDirect());
+                    newProperty.setSensitive(property.isSensitive());
                     expandMap.put(index++, newProperty);
                 }
             } else {

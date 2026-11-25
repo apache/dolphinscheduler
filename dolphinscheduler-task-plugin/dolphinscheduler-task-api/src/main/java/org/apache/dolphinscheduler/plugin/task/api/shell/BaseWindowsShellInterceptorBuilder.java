@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.task.api.shell;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.plugin.task.api.log.TaskSensitiveLogContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -53,24 +52,24 @@ public abstract class BaseWindowsShellInterceptorBuilder<T extends BaseWindowsSh
         finalScripts.addAll(customEnvScript());
         // add k8s config
         finalScripts.addAll(k8sConfig());
-        // add shell body
-        finalScripts.add(shellBody());
-        // create shell file
+        String scriptBody = rawScriptBody();
+        finalScripts.add(ParameterUtils.convertParameterPlaceholders(scriptBody, propertyMap));
         String finalScript = finalScripts.stream().collect(Collectors.joining(System.lineSeparator()));
         Path shellAbsolutePath = shellAbsolutePath();
         FileUtils.createFileWith755(shellAbsolutePath);
         Files.write(shellAbsolutePath, finalScript.getBytes(), StandardOpenOption.APPEND);
-        log.info("Final Shell file is : \n{}", TaskSensitiveLogContext.digestMasked(finalScript));
+        finalScripts.set(finalScripts.size() - 1, digestMaskedScript(scriptBody));
+        log.info("Final Shell file is : \n{}",
+                finalScripts.stream().collect(Collectors.joining(System.lineSeparator())));
     }
 
-    private String shellBody() {
+    private String rawScriptBody() {
         if (CollectionUtils.isEmpty(scripts)) {
             return StringUtils.EMPTY;
         }
-        String scriptBody = scripts
+        return scripts
                 .stream()
                 .collect(Collectors.joining(System.lineSeparator()));
-        return ParameterUtils.convertParameterPlaceholders(scriptBody, propertyMap);
     }
 
     private Collection<String> k8sConfig() {

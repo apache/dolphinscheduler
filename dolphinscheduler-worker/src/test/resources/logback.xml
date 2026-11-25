@@ -23,7 +23,7 @@
                     converterClass="org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="org.apache.dolphinscheduler.plugin.task.api.log.SensitivePatternLayoutEncoder">
+        <encoder>
             <pattern>
                 [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} %logger{96}:[%line] - [WorkflowInstance-%X{workflowInstanceId:-0}][TaskInstance-%X{taskInstanceId:-0}] - %message%n
             </pattern>
@@ -40,7 +40,7 @@
         <sift>
             <appender name="FILE-${taskInstanceLogFullPath}" class="ch.qos.logback.core.FileAppender">
                 <file>${taskInstanceLogFullPath}</file>
-                <encoder class="org.apache.dolphinscheduler.plugin.task.api.log.SensitivePatternLayoutEncoder">
+                <encoder>
                     <pattern>
                         [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} - %message%n
                     </pattern>
@@ -59,7 +59,7 @@
             <totalSizeCap>50GB</totalSizeCap>
             <cleanHistoryOnStart>true</cleanHistoryOnStart>
         </rollingPolicy>
-        <encoder class="org.apache.dolphinscheduler.plugin.task.api.log.SensitivePatternLayoutEncoder">
+        <encoder>
             <pattern>
                 [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} %logger{96}:[%line] - [WorkflowInstance-%X{workflowInstanceId:-0}][TaskInstance-%X{taskInstanceId:-0}] - %message%n
             </pattern>

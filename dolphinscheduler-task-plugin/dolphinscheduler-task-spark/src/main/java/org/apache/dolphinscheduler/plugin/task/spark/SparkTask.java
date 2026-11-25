@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitivePlaceholderMask;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitivePropertyJson;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -83,7 +85,7 @@ public class SparkTask extends AbstractYarnTask {
             throw new RuntimeException("spark task params is not valid");
         }
 
-        log.info("Initialize spark task params {}", JSONUtils.toPrettyJsonString(sparkParameters));
+        log.info("Initialize spark task params {}", SensitivePropertyJson.forLog(sparkParameters));
     }
 
     @Override
@@ -258,9 +260,11 @@ public class SparkTask extends AbstractYarnTask {
         Path path = file.toPath();
 
         if (!Files.exists(path)) {
-            String script = replaceParam(sqlContent);
+            String normalized = sqlContent.replaceAll("\\r\\n", System.lineSeparator());
+            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+            String script = ParameterUtils.convertParameterPlaceholders(normalized, ParameterUtils.convert(paramsMap));
 
-            log.info("raw script : {}", script);
+            log.info("raw script : {}", SensitivePlaceholderMask.forLog(normalized, paramsMap));
             log.info("task execute path : {}", taskExecutionContext.getExecutePath());
 
             Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
@@ -281,14 +285,6 @@ public class SparkTask extends AbstractYarnTask {
 
         }
         return scriptFileName;
-    }
-
-    private String replaceParam(String script) {
-        script = script.replaceAll("\\r\\n", System.lineSeparator());
-        // replace placeholder
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        script = ParameterUtils.convertParameterPlaceholders(script, ParameterUtils.convert(paramsMap));
-        return script;
     }
 
     @Override

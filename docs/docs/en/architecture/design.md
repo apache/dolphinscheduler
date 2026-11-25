@@ -268,7 +268,7 @@ In the early schedule design, if there is no priority design and use the fair sc
 </appender>
 ```
 
-- Worker and master mask sensitive parameter values when a log line is rendered, including the exception attached to that line. While a task runs on its executor thread, known sensitive values and their JSON-escaped forms are replaced with `******`, longer values first. Values shorter than 6 characters are left as-is, so a short secret cannot rewrite unrelated text. The script file, JDBC binds, remote uploads, and output-parameter parsing keep the original plaintext. Task process output and Kubernetes pod logs are collected on other threads and are not literal-masked. Remote-shell task output is logged on the task thread and is explicitly excluded. Datasource password regexes still apply to every line.
+- Worker and master do not search log text for a secret. A sensitive value of any length is masked only at a known position: `${name}` when a script or SQL text is rendered for the log, the `value` field of a property whose `sensitive` flag is true, and `!{name}` inlined into SQL for the log line. The same characters elsewhere in the line stay as they are. The script file, JDBC binds, remote uploads, and output-parameter parsing keep the original plaintext. Task process output and Kubernetes pod logs are the task's own output and are not rewritten. Datasource password regexes still apply to every line.
 
 ## Sum Up
 
