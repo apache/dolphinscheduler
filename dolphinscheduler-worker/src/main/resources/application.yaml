@@ -76,8 +76,9 @@ server:
 management:
   security:
     enabled: false
-    username: username
-    password: password
+    # Username and password are required when enabled is true.
+    username: ""
+    password: ""
     exclude: [health,metrics]
   endpoints:
     web:

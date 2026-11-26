@@ -18,11 +18,12 @@
 package org.apache.dolphinscheduler.authentication.actuator.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.net.URI;
+import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -76,11 +77,29 @@ class ActuatorAuthenticationAutoConfigurationTest {
 
     @Test
     void shouldPermitActuatorEndpointsWhenAuthenticationIsDisabled() {
-        try (ConfigurableApplicationContext context = startApplication(false)) {
+        try (ConfigurableApplicationContext context = startApplication(false, CONTEXT_PATH, null, null)) {
             assertThat(get(context, "/actuator/prometheus", null, null).getStatusCode())
                     .isEqualTo(HttpStatus.OK);
             assertThat(get(context, "/%61ctuator/prometheus", null, null).getStatusCode())
                     .isEqualTo(HttpStatus.OK);
+        }
+    }
+
+    @Test
+    void shouldRejectMissingOrBlankUsernameWhenAuthenticationIsEnabled() {
+        for (String username : new String[]{null, "", " \t "}) {
+            assertThatThrownBy(() -> startApplication(true, CONTEXT_PATH, username, PASSWORD))
+                    .hasRootCauseInstanceOf(IllegalArgumentException.class)
+                    .hasStackTraceContaining("management.security.username must be configured when enabled.");
+        }
+    }
+
+    @Test
+    void shouldRejectMissingOrBlankPasswordWhenAuthenticationIsEnabled() {
+        for (String password : new String[]{null, "", " \t "}) {
+            assertThatThrownBy(() -> startApplication(true, CONTEXT_PATH, USERNAME, password))
+                    .hasRootCauseInstanceOf(IllegalArgumentException.class)
+                    .hasStackTraceContaining("management.security.password must be configured when enabled.");
         }
     }
 
@@ -89,18 +108,26 @@ class ActuatorAuthenticationAutoConfigurationTest {
     }
 
     private ConfigurableApplicationContext startApplication(boolean securityEnabled, String contextPath) {
-        SpringApplication application = new SpringApplicationBuilder(TestApplication.class)
+        return startApplication(securityEnabled, contextPath, USERNAME, PASSWORD);
+    }
+
+    private ConfigurableApplicationContext startApplication(boolean securityEnabled, String contextPath,
+                                                            String username, String password) {
+        SpringApplicationBuilder application = new SpringApplicationBuilder(TestApplication.class)
                 .web(WebApplicationType.SERVLET)
                 .properties(
                         "server.port=0",
                         "server.servlet.context-path=" + contextPath,
                         "management.security.enabled=" + securityEnabled,
-                        "management.security.username=" + USERNAME,
-                        "management.security.password=" + PASSWORD,
                         "management.security.exclude=health,metrics",
                         "management.endpoints.web.exposure.include=health,metrics,prometheus",
-                        "spring.main.banner-mode=off")
-                .build();
+                        "spring.main.banner-mode=off");
+        if (username != null) {
+            application.properties(Collections.singletonMap("management.security.username", username));
+        }
+        if (password != null) {
+            application.properties(Collections.singletonMap("management.security.password", password));
+        }
         return application.run();
     }
 
