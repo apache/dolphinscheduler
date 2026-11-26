@@ -62,13 +62,26 @@ public class JavaParameters extends AbstractParameters {
     private List<ResourceInfo> resourceList;
 
     /**
+     * Java source snippet to execute using JShell.
+     */
+    private String jshellScript;
+
+    /**
      * Check that the parameters are valid
      *
      * @return boolean
      */
     @Override
     public boolean checkParameters() {
-        return StringUtils.isNotEmpty(runType) && mainJar != null;
+        if (StringUtils.isEmpty(runType)) {
+            return false;
+        }
+
+        if (JavaConstants.RUN_TYPE_JSHELL.equals(runType)) {
+            return StringUtils.isNotBlank(jshellScript);
+        }
+
+        return mainJar != null;
     }
 
     /**
