@@ -25,8 +25,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.SessionService;
+import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,14 +43,25 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 public class UsersControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(UsersControllerTest.class);
+
+    @Autowired
+    private UsersService usersService;
+
+    @Autowired
+    private SessionService sessionService;
+
+    @Autowired
+    private TenantDao tenantDao;
 
     @Test
     public void testCreateUser() throws Exception {
@@ -87,6 +105,108 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertEquals(Status.UPDATE_USER_ERROR.getCode(), result.getCode().intValue());
+    }
+
+    @Test
+    @Transactional
+    public void testUpdateTenantWithUnchangedEmailUsername() throws Exception {
+        String username = "user@example.com";
+        User target = usersService.createUser(UserType.GENERAL_USER, username, username);
+        Tenant tenant = new Tenant("email-user-tenant", "Tenant for the user edit test", 1);
+        Assertions.assertEquals(1, tenantDao.insert(tenant));
+        String targetSessionId = sessionService.createSessionIfAbsent(target).getId();
+
+        mockMvc.perform(post("/users/update")
+                .header(SESSION_ID, sessionId)
+                .params(userUpdateParams(target, tenant.getId())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Status.SUCCESS.getCode()));
+
+        User updated = usersService.queryUser(target.getId());
+        Assertions.assertEquals(target.getId(), updated.getId());
+        Assertions.assertEquals(username, updated.getUserName());
+        Assertions.assertEquals(tenant.getId().intValue(), updated.getTenantId());
+        Assertions.assertEquals(target.getEmail(), updated.getEmail());
+        Assertions.assertEquals(target.getQueue(), updated.getQueue());
+        Assertions.assertEquals(target.getUserType(), updated.getUserType());
+        Assertions.assertEquals(target.getState(), updated.getState());
+        Assertions.assertEquals(target.getUserPassword(), updated.getUserPassword());
+        Assertions.assertNotNull(sessionService.getSession(targetSessionId));
+    }
+
+    @Test
+    @Transactional
+    public void testUpdateUserValidatesChangedUsername() throws Exception {
+        String username = "user@example.com";
+        User target = usersService.createUser(UserType.GENERAL_USER, username, username);
+        MultiValueMap<String, String> params = userUpdateParams(target, target.getTenantId());
+        params.set("userName", "changed@example.com");
+
+        mockMvc.perform(post("/users/update").header(SESSION_ID, sessionId).params(params))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode()));
+
+        params.set("userName", user.getUserName());
+        mockMvc.perform(post("/users/update").header(SESSION_ID, sessionId).params(params))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Status.USER_NAME_EXIST.getCode()));
+        Assertions.assertEquals(username, usersService.queryUser(target.getId()).getUserName());
+
+        params.set("userName", "renamed_user");
+        mockMvc.perform(post("/users/update").header(SESSION_ID, sessionId).params(params))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Status.SUCCESS.getCode()));
+        Assertions.assertEquals("renamed_user", usersService.queryUser(target.getId()).getUserName());
+    }
+
+    @Test
+    @Transactional
+    public void testNonAdminCannotChangeTenantWithUnchangedEmailUsername() throws Exception {
+        String username = "user@example.com";
+        User target = usersService.createUser(UserType.GENERAL_USER, username, username);
+        Tenant tenant = new Tenant("email-user-tenant", "Tenant for the user edit test", 1);
+        Assertions.assertEquals(1, tenantDao.insert(tenant));
+        String targetSessionId = sessionService.createSessionIfAbsent(target).getId();
+
+        mockMvc.perform(post("/users/update")
+                .header(SESSION_ID, targetSessionId)
+                .params(userUpdateParams(target, tenant.getId())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Status.USER_NO_OPERATION_PERM.getCode()));
+        Assertions.assertEquals(target.getTenantId(), usersService.queryUser(target.getId()).getTenantId());
+    }
+
+    @Test
+    @Transactional
+    public void testUpdatePasswordWithUnchangedEmailUsername() throws Exception {
+        String username = "user@example.com";
+        User target = usersService.createUser(UserType.GENERAL_USER, username, username);
+        String targetSessionId = sessionService.createSessionIfAbsent(target).getId();
+        String password = "123456qwe?";
+        MultiValueMap<String, String> params = userUpdateParams(target, target.getTenantId());
+        params.set("userPassword", password);
+
+        mockMvc.perform(post("/users/update").header(SESSION_ID, sessionId).params(params))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Status.SUCCESS.getCode()));
+
+        User updated = usersService.queryUser(target.getId());
+        Assertions.assertEquals(username, updated.getUserName());
+        Assertions.assertEquals(target.getTenantId(), updated.getTenantId());
+        Assertions.assertEquals(EncryptionUtils.getMd5(password), updated.getUserPassword());
+        Assertions.assertNull(sessionService.getSession(targetSessionId));
+    }
+
+    private MultiValueMap<String, String> userUpdateParams(User target, int tenantId) {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("id", target.getId().toString());
+        params.add("userName", target.getUserName());
+        params.add("userPassword", "");
+        params.add("tenantId", String.valueOf(tenantId));
+        params.add("queue", target.getQueue());
+        params.add("email", target.getEmail());
+        params.add("state", String.valueOf(target.getState()));
+        return params;
     }
 
     @Test
