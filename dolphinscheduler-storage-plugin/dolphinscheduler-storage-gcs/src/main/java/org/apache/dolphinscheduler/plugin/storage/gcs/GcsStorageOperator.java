@@ -102,11 +102,11 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
     @SneakyThrows
     @Override
     public void createStorageDir(String directoryAbsolutePath) {
-        directoryAbsolutePath = transformAbsolutePathToGcsKey(directoryAbsolutePath);
         if (exists(directoryAbsolutePath)) {
             throw new FileAlreadyExistsException("directory: " + directoryAbsolutePath + " already exists");
         }
-        BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, directoryAbsolutePath)).build();
+        String gcsKey = transformAbsolutePathToGcsKey(directoryAbsolutePath);
+        BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, gcsKey)).build();
         gcsStorage.create(blobInfo, EMPTY_STRING.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -146,7 +146,8 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
         }
 
         if (recursive) {
-            Page<Blob> blobs = gcsStorage.list(bucketName, Storage.BlobListOption.prefix(gcsKey));
+            Page<Blob> blobs = gcsStorage.list(bucketName, Storage.BlobListOption.prefix(gcsKey),
+                    Storage.BlobListOption.pageSize(1000));
             List<BlobId> batch = new ArrayList<>();
             for (Blob blob : blobs.iterateAll()) {
                 batch.add(blob.getBlobId());
@@ -187,12 +188,12 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
     @SneakyThrows
     @Override
     public void upload(String srcFile, String dstPath, boolean deleteSource, boolean overwrite) {
-        dstPath = transformAbsolutePathToGcsKey(dstPath);
         if (exists(dstPath) && !overwrite) {
             throw new FileAlreadyExistsException("file: " + dstPath + " already exists");
         }
+        String gcsKey = transformAbsolutePathToGcsKey(dstPath);
         BlobInfo blobInfo = BlobInfo.newBuilder(
-                BlobId.of(bucketName, dstPath)).build();
+                BlobId.of(bucketName, gcsKey)).build();
 
         Path srcPath = Paths.get(srcFile);
         gcsStorage.create(blobInfo, Files.readAllBytes(srcPath));
@@ -311,10 +312,11 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
 
     private String transformAbsolutePathToGcsKey(String absolutePath) {
         ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);
-        if (resourceMetaData.isDirectory()) {
-            return FileUtils.concatFilePath(absolutePath, "/");
+        String gcsKey = absolutePath.replace(File.separatorChar, '/');
+        if (resourceMetaData.isDirectory() && !gcsKey.endsWith("/")) {
+            return gcsKey + "/";
         }
-        return absolutePath;
+        return gcsKey;
     }
 
     private String transformGcsKeyToAbsolutePath(String gcsKey) {
