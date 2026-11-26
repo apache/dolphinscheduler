@@ -99,11 +99,8 @@ public class K8sTaskExecutorTest {
     }
     @Test
     public void testWaitTimeoutNormal() {
-        try {
-            k8sTaskExecutor.waitTimeout(true);
-        } catch (TaskException e) {
-            Assertions.assertEquals(e.getMessage(), "K8sTask is timeout");
-        }
+        TaskException e = Assertions.assertThrows(TaskException.class, () -> k8sTaskExecutor.waitTimeout(true));
+        Assertions.assertEquals("K8sTask is timeout", e.getMessage());
     }
 
     @Test
