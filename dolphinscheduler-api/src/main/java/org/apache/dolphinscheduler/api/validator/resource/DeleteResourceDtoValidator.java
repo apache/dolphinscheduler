@@ -37,7 +37,7 @@ public class DeleteResourceDtoValidator extends AbstractResourceValidator<Delete
         User loginUser = deleteResourceDto.getLoginUser();
 
         exceptionResourceAbsolutePathInvalidated(resourceAbsolutePath);
-        exceptionResourceNotExists(resourceAbsolutePath);
+        exceptionResourceNotExistsForRecursiveDelete(resourceAbsolutePath);
         exceptionUserNoResourcePermission(loginUser, resourceAbsolutePath);
     }
 }
