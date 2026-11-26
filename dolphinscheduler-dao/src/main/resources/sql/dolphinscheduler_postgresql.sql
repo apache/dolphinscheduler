@@ -589,7 +589,8 @@ CREATE TABLE t_ds_workflow_instance (
 
 create index workflow_instance_index on t_ds_workflow_instance (workflow_definition_code,id);
 create index start_time_index on t_ds_workflow_instance (start_time,end_time);
-create index idx_project_start_time on t_ds_workflow_instance (project_code ASC, start_time DESC);
+create index idx_wi_project_sub_start_end on t_ds_workflow_instance (project_code, is_sub_workflow, start_time DESC, end_time DESC);
+create index idx_wi_project_sub_def_start_end on t_ds_workflow_instance (project_code, is_sub_workflow, workflow_definition_code, start_time DESC, end_time DESC);
 
 --
 -- Table structure for table t_ds_project
@@ -861,7 +862,8 @@ CREATE TABLE t_ds_task_instance (
 ) ;
 
 create index idx_task_instance_code_version on t_ds_task_instance (task_code, task_definition_version);
-create index idx_project_submit_time on t_ds_task_instance (project_code ASC, submit_time DESC);
+create index idx_ti_project_type_submit_time on t_ds_task_instance (project_code, task_execute_type, submit_time DESC);
+create index idx_ti_project_type_start_time on t_ds_task_instance (project_code, task_execute_type, start_time DESC);
 
 --
 -- Table structure for t_ds_task_instance_context

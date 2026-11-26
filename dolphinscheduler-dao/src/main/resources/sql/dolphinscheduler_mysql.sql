@@ -647,7 +647,8 @@ CREATE TABLE `t_ds_workflow_instance` (
   PRIMARY KEY (`id`),
   KEY `workflow_instance_index` (`workflow_definition_code`,`id`) USING BTREE,
   KEY `start_time_index` (`start_time`,`end_time`) USING BTREE,
-  KEY `idx_project_start_time` (`project_code` ASC, `start_time` DESC) USING BTREE
+  KEY `idx_wi_project_sub_start_end` (`project_code`, `is_sub_workflow`, `start_time` DESC, `end_time` DESC) USING BTREE,
+  KEY `idx_wi_project_sub_def_start_end` (`project_code`, `is_sub_workflow`, `workflow_definition_code`, `start_time` DESC, `end_time` DESC) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
@@ -940,7 +941,8 @@ CREATE TABLE `t_ds_task_instance` (
   PRIMARY KEY (`id`),
   KEY `workflow_instance_id` (`workflow_instance_id`) USING BTREE,
   KEY `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE,
-  KEY `idx_project_submit_time` (`project_code` ASC, `submit_time` DESC) USING BTREE
+  KEY `idx_ti_project_type_submit_time` (`project_code`, `task_execute_type`, `submit_time` DESC) USING BTREE,
+  KEY `idx_ti_project_type_start_time` (`project_code`, `task_execute_type`, `start_time` DESC) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------

@@ -637,7 +637,8 @@ CREATE TABLE t_ds_workflow_instance
     dry_run                    int NULL DEFAULT 0,
     restart_time               datetime     DEFAULT NULL,
     PRIMARY KEY (id),
-    INDEX idx_project_start_time (project_code ASC, start_time DESC)
+    INDEX idx_wi_project_sub_start_end (project_code, is_sub_workflow, start_time DESC, end_time DESC),
+    INDEX idx_wi_project_sub_def_start_end (project_code, is_sub_workflow, workflow_definition_code, start_time DESC, end_time DESC)
 );
 
 -- ----------------------------
@@ -939,7 +940,8 @@ CREATE TABLE t_ds_task_instance
     cpu_quota               int(11) DEFAULT '-1' NOT NULL,
     memory_max              int(11) DEFAULT '-1' NOT NULL,
     PRIMARY KEY (id),
-    INDEX idx_project_submit_time (project_code ASC, submit_time DESC)
+    INDEX idx_ti_project_type_submit_time (project_code, task_execute_type, submit_time DESC),
+    INDEX idx_ti_project_type_start_time (project_code, task_execute_type, start_time DESC)
 );
 
 -- ----------------------------
