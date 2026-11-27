@@ -1740,7 +1740,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 .validate(new WorkflowRelationValidator.Context(projectCode, code, workflowTaskRelationList));
         taskProjectValidator.validate(new TaskProjectValidator.Context(projectCode, taskDefinitionLogList));
         taskResourcePermissionChecker.checkPermission(workflowDefinition.getProjectCode(), taskDefinitionLogList);
-        taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogList);
+        taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogList, workflowDefinitionLog);
 
         int switchVersion = processService.switchVersion(workflowDefinition, workflowDefinitionLog);
         if (switchVersion <= 0) {

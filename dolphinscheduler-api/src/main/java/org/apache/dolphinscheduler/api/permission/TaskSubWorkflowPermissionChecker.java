@@ -180,7 +180,7 @@ public class TaskSubWorkflowPermissionChecker {
                 .collect(Collectors.toMap(WorkflowDefinition::getCode, workflow -> workflow));
         Map<Long, Set<Long>> workflowTaskCodes = new HashMap<>();
         if (pendingDefinition != null) {
-            // The new definition and its tasks have not been persisted yet.
+            // Validate self-references against the tasks being saved or restored.
             definitions.put(pendingDefinition.getCode(), pendingDefinition);
             workflowTaskCodes.put(pendingDefinition.getCode(), taskDefinitions.stream()
                     .filter(task -> task.getProjectCode() == pendingDefinition.getProjectCode())

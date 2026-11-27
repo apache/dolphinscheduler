@@ -600,18 +600,19 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     @Override
     @Transactional
     public void deleteWorkflowInstanceById(User loginUser, Integer workflowInstanceId) {
+        WorkflowInstance instance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
+                .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
         List<Integer> instanceIds = new ArrayList<>();
-        collectDeletableWorkflowInstances(loginUser, workflowInstanceId, new HashSet<>(), new HashSet<>(), instanceIds);
+        collectDeletableWorkflowInstances(loginUser, instance, new HashSet<>(), new HashSet<>(), instanceIds);
         deleteWorkflowInstances(instanceIds);
     }
 
-    private void collectDeletableWorkflowInstances(User loginUser, int instanceId, Set<Integer> visited,
+    private void collectDeletableWorkflowInstances(User loginUser, WorkflowInstance instance, Set<Integer> visited,
                                                    Set<Long> authorizedProjects, List<Integer> instanceIds) {
+        int instanceId = instance.getId();
         if (!visited.add(instanceId)) {
             return;
         }
-        WorkflowInstance instance = processService.findWorkflowInstanceDetailById(instanceId)
-                .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, instanceId));
         if (authorizedProjects.add(instance.getProjectCode())) {
             projectService.checkProjectPermission(loginUser, instance.getProjectCode(), ProjectPermission.DEVELOP);
         }
@@ -628,7 +629,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                     "delete");
         }
         for (Integer childId : workflowInstanceMapDao.querySubWorkflowInstanceIds(instanceId)) {
-            collectDeletableWorkflowInstances(loginUser, childId, visited, authorizedProjects, instanceIds);
+            // Older deletions may have left links to child instances that no longer exist.
+            processService.findWorkflowInstanceDetailById(childId).ifPresent(child -> collectDeletableWorkflowInstances(
+                    loginUser, child, visited, authorizedProjects, instanceIds));
         }
         instanceIds.add(instanceId);
     }
@@ -854,8 +857,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 if (definition.getProjectCode() != instance.getProjectCode()) {
                     throw new ServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH);
                 }
-                collectDeletableWorkflowInstances(loginUser, instance.getId(), visited, authorizedProjects,
-                        instanceIds);
+                WorkflowInstance detail = processService.findWorkflowInstanceDetailById(instance.getId())
+                        .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, instance.getId()));
+                collectDeletableWorkflowInstances(loginUser, detail, visited, authorizedProjects, instanceIds);
             }
             if (page.getRecords().size() < 100) {
                 break;
@@ -870,6 +874,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             taskInstanceService.deleteByWorkflowInstanceId(instanceId);
             alertDao.deleteByWorkflowInstanceId(instanceId);
             workflowInstanceMapDao.deleteByParentId(instanceId);
+            workflowInstanceMapDao.deleteByWorkflowInstanceId(instanceId);
             workflowInstanceDao.deleteById(instanceId);
         }
     }

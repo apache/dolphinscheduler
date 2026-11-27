@@ -28,6 +28,8 @@ import lombok.NonNull;
 
 import org.springframework.stereotype.Repository;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 /**
  * Process Instance Map Dao implementation
  */
@@ -53,5 +55,11 @@ public class WorkflowInstanceMapDaoImpl extends BaseDao<WorkflowInstanceRelation
     @Override
     public void deleteByParentId(int workflowInstanceId) {
         mybatisMapper.deleteByParentId(workflowInstanceId);
+    }
+
+    @Override
+    public void deleteByWorkflowInstanceId(int workflowInstanceId) {
+        mybatisMapper
+                .delete(new QueryWrapper<WorkflowInstanceRelation>().eq("workflow_instance_id", workflowInstanceId));
     }
 }

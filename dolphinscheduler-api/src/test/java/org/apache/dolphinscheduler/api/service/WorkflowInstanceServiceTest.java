@@ -93,6 +93,7 @@ import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -1335,8 +1336,10 @@ public class WorkflowInstanceServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"true,true", "true,false", "false,true", "false,false"})
-    void recursiveDeletionChecksChildProjectBeforeDeletingAnything(boolean allowed, boolean byDefinition) {
+    @CsvSource({"true,true,SUCCESS", "true,false,SUCCESS", "false,true,SUCCESS", "false,false,SUCCESS",
+            "true,true,RUNNING_EXECUTION", "true,false,RUNNING_EXECUTION"})
+    void recursiveDeletionChecksChildrenBeforeDeletingAnything(boolean allowed, boolean byDefinition,
+                                                               WorkflowExecutionStatus childState) {
         User user = getAdminUser();
         WorkflowInstance parent = getProcessInstance();
         parent.setId(1);
@@ -1346,7 +1349,7 @@ public class WorkflowInstanceServiceTest {
         child.setId(2);
         child.setProjectCode(2L);
         child.setWorkflowDefinitionCode(200L);
-        child.setState(WorkflowExecutionStatus.SUCCESS);
+        child.setState(childState);
         WorkflowDefinitionLog parentLog = new WorkflowDefinitionLog();
         parentLog.setProjectCode(1L);
         WorkflowDefinitionLog childLog = new WorkflowDefinitionLog();
@@ -1357,7 +1360,8 @@ public class WorkflowInstanceServiceTest {
                 parent.getWorkflowDefinitionCode(), parent.getWorkflowDefinitionVersion())).thenReturn(parentLog);
         when(workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                 child.getWorkflowDefinitionCode(), child.getWorkflowDefinitionVersion())).thenReturn(childLog);
-        when(workflowInstanceMapDao.querySubWorkflowInstanceIds(1)).thenReturn(Collections.singletonList(2));
+        when(workflowInstanceMapDao.querySubWorkflowInstanceIds(1)).thenReturn(Arrays.asList(3, 2));
+        when(processService.findWorkflowInstanceDetailById(3)).thenReturn(Optional.empty());
         if (byDefinition) {
             WorkflowDefinition definition = getProcessDefinition();
             definition.setProjectCode(1L);
@@ -1375,14 +1379,17 @@ public class WorkflowInstanceServiceTest {
                 workflowInstanceService.deleteWorkflowInstanceById(user, 1);
             }
         };
-        if (!allowed) {
-            doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
-                    .checkProjectPermission(user, 2L, ProjectPermission.DEVELOP);
-            assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
-                    deletion::run);
+        if (!allowed || !childState.isFinalState()) {
+            if (!allowed) {
+                doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
+                        .checkProjectPermission(user, 2L, ProjectPermission.DEVELOP);
+            }
+            assertThrowsServiceException(allowed ? Status.WORKFLOW_INSTANCE_STATE_OPERATION_ERROR
+                    : Status.USER_NO_OPERATION_PERM, deletion::run);
             Mockito.verifyNoInteractions(taskInstanceService, alertDao);
             verify(workflowInstanceDao, never()).deleteById(Mockito.anyInt());
             verify(workflowInstanceMapDao, never()).deleteByParentId(Mockito.anyInt());
+            verify(workflowInstanceMapDao, never()).deleteByWorkflowInstanceId(Mockito.anyInt());
         } else {
             deletion.run();
             verify(projectService).checkProjectPermission(user, 2L, ProjectPermission.DEVELOP);

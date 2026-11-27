@@ -1755,7 +1755,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(taskDefinitionLogMapper.queryByTaskDefinitions(anyList()))
                 .thenReturn(Collections.singletonList(taskDefinitionLog));
         doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
-                .when(taskSubWorkflowPermissionChecker).checkPermission(eq(user), anyList());
+                .when(taskSubWorkflowPermissionChecker).checkPermission(eq(user), anyList(), eq(workflowDefinitionLog));
 
         ServiceException exception = Assertions.assertThrows(ServiceException.class,
                 () -> workflowDefinitionService.switchWorkflowDefinitionVersion(
