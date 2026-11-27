@@ -97,6 +97,24 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
 
     @Test
     public void testGenerateToken() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(post("/access-tokens/generate")
+                .header("sessionId", sessionId))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertTrue(((String) result.getData()).matches("[0-9a-f]{32}"));
+    }
+
+    @Test
+    public void testGenerateTokenWithoutAuthentication() throws Exception {
+        mockMvc.perform(post("/access-tokens/generate"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testGenerateTokenWithLegacyParameters() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId", "1");
         paramsMap.add("expireTime", "2019-12-28 00:00:00");
@@ -108,6 +126,7 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertTrue(((String) result.getData()).matches("[0-9a-f]{32}"));
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
