@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.server.worker.rpc;
 
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.extract.worker.IPhysicalTaskExecutorOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.executor.PhysicalTaskEngineDelegator;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
+import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorNotFoundException;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorDispatchRequest;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorDispatchResponse;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorKillRequest;
@@ -31,6 +33,13 @@ import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorReassign
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorReassignMasterResponse;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,17 +67,50 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
         }
     }
 
+    /**
+     * The time the kill waits for the cancellation before it reports that the task is not confirmed to
+     * be stopped. A cancellation which takes longer, for example a task which submitted many jobs,
+     * keeps running, but it cannot hold the rpc thread of the worker any longer.
+     */
+    private static final long KILL_WAIT_TIMEOUT_MILLIS = 90_000L;
+
+    /**
+     * The cancellation of a task runs on its own threads: a stop waits for the command which cancels
+     * the job of the task, and the rpc threads of the worker must stay free for the other requests.
+     */
+    private static final ExecutorService KILL_EXECUTOR =
+            Executors.newCachedThreadPool(ThreadUtils.newDaemonThreadFactory("physical-task-kill-%d"));
+
     @Override
     public TaskExecutorKillResponse killTask(final TaskExecutorKillRequest taskExecutorKillRequest) {
         log.info("Receive TaskExecutorKillRequest: {}", taskExecutorKillRequest);
         final int taskInstanceId = taskExecutorKillRequest.getTaskInstanceId();
+        final Future<?> killFuture =
+                KILL_EXECUTOR.submit(() -> physicalTaskEngineDelegator.killLogicTask(taskInstanceId));
         try {
-            physicalTaskEngineDelegator.killLogicTask(taskInstanceId);
+            killFuture.get(KILL_WAIT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
             log.info("Handle TaskExecutorKillRequest: {} success", taskExecutorKillRequest);
             return TaskExecutorKillResponse.success();
-        } catch (Throwable throwable) {
-            log.error("Handle TaskExecutorKillRequest: {} failed", taskExecutorKillRequest, throwable);
-            return TaskExecutorKillResponse.fail(ExceptionUtils.getMessage(throwable));
+        } catch (TimeoutException e) {
+            log.error("Handle TaskExecutorKillRequest: {} did not finish within {}ms, the cancellation keeps running",
+                    taskExecutorKillRequest, KILL_WAIT_TIMEOUT_MILLIS);
+            return TaskExecutorKillResponse.fail(String.format(
+                    "The cancellation of the task did not finish within %ds, the task may still be running",
+                    TimeUnit.MILLISECONDS.toSeconds(KILL_WAIT_TIMEOUT_MILLIS)));
+        } catch (ExecutionException e) {
+            final Throwable cause = e.getCause() == null ? e : e.getCause();
+            if (cause instanceof TaskExecutorNotFoundException) {
+                // the task executor is removed once the task is finalized: a task which is not running
+                // any more does not have to be stopped
+                log.warn("Task instance {} is not running any more, it does not have to be stopped", taskInstanceId);
+                return TaskExecutorKillResponse.success();
+            }
+            log.error("Handle TaskExecutorKillRequest: {} failed", taskExecutorKillRequest, cause);
+            return TaskExecutorKillResponse.fail(ExceptionUtils.getMessage(cause));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("Handle TaskExecutorKillRequest: {} interrupted", taskExecutorKillRequest, e);
+            return TaskExecutorKillResponse.fail("The cancellation of the task was interrupted");
         }
     }
 
