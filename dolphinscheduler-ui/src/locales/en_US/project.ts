@@ -251,6 +251,8 @@ export default {
       'The downstream dependent tasks exists. You can not delete the task.',
     warning_delete_scheduler_dependent_tasks_desc:
       'The downstream dependent tasks exists. Are you sure to delete the scheduler?',
+    load_details_failed: 'Unable to load workflow details',
+    back_to_workflow_list: 'Back to workflow list',
     request_failed: 'Request failed, please retry',
     warning_too_large_parallelism_number:
       'The parallelism number is too large. It is better not to be over 10.'

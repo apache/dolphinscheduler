@@ -247,6 +247,8 @@ export default {
       '下游存在依赖，你不能删除该任务.',
     warning_delete_scheduler_dependent_tasks_desc:
       '下游存在依赖, 删除定时可能会对下游任务产生影响. 你确定要删除该定时嘛?',
+    load_details_failed: '无法加载工作流详情',
+    back_to_workflow_list: '返回工作流列表',
     request_failed: '请求失败，请重试',
     warning_too_large_parallelism_number: '并行度设置太大了, 最好不要超过10.'
   },

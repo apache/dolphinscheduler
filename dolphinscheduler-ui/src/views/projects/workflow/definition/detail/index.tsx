@@ -18,7 +18,7 @@
 import { computed, defineComponent, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useThemeStore } from '@/store/theme/theme'
-import { useMessage } from 'naive-ui'
+import { NButton, NResult, useMessage } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Dag from '../../components/dag'
 import {
@@ -60,10 +60,12 @@ export default defineComponent({
     const definition = ref<WorkflowDefinition>()
     const readonly = ref(false)
     const isLoading = ref(true)
+    const loadError = ref(false)
     const dagRef = ref()
 
     const refresh = () => {
       isLoading.value = true
+      loadError.value = false
       const request = preview.value
         ? queryWorkflowDefinitionByVersion(
             code.value,
@@ -71,19 +73,26 @@ export default defineComponent({
             Number(route.params.version)
           )
         : queryWorkflowDefinitionByCode(code.value, projectCode.value)
-      request.then((res: any) => {
-        readonly.value =
-          preview.value || res.workflowDefinition.releaseState === 'ONLINE'
-        definition.value = res
-        isLoading.value = false
-        if (!res.workflowDefinition.locations) {
-          setTimeout(() => {
-            const graph = dagRef.value
-            const { submit } = useGraphAutoLayout({ graph })
-            submit()
-          }, 1000)
-        }
-      })
+      request
+        .then((res: any) => {
+          readonly.value =
+            preview.value || res.workflowDefinition.releaseState === 'ONLINE'
+          definition.value = res
+          if (!res.workflowDefinition.locations) {
+            setTimeout(() => {
+              const graph = dagRef.value
+              const { submit } = useGraphAutoLayout({ graph })
+              submit()
+            }, 1000)
+          }
+        })
+        .catch(() => {
+          definition.value = undefined
+          loadError.value = true
+        })
+        .finally(() => {
+          isLoading.value = false
+        })
     }
 
     const save = ({
@@ -141,7 +150,27 @@ export default defineComponent({
           theme.darkTheme ? Styles['dark'] : Styles['light']
         ]}
       >
-        {!isLoading.value && (
+        {!isLoading.value && loadError.value && (
+          <NResult
+            status='error'
+            title={t('project.workflow.load_details_failed')}
+          >
+            {{
+              footer: () => (
+                <NButton
+                  onClick={() =>
+                    router.push({
+                      path: `/projects/${projectCode.value}/workflow-definition`
+                    })
+                  }
+                >
+                  {t('project.workflow.back_to_workflow_list')}
+                </NButton>
+              )
+            }}
+          </NResult>
+        )}
+        {!isLoading.value && definition.value && !loadError.value && (
           <Dag
             ref={dagRef}
             definition={definition.value}

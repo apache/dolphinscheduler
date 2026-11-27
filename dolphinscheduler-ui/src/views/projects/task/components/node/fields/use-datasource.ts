@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { ref, onMounted, nextTick, Ref } from 'vue'
+import { inject, ref, onMounted, nextTick, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryDataSourceList } from '@/service/modules/data-source'
 import { indexOf, find } from 'lodash'
@@ -32,6 +32,7 @@ export function useDatasource(
   } = {}
 ): IJsonItem[] {
   const { t } = useI18n()
+  const readonly = inject<Ref<boolean>>('readonly', ref(false))
 
   const options = ref([] as { label: string; value: string }[])
   const datasourceOptions = ref([] as { label: string; value: number }[])
@@ -192,6 +193,7 @@ export function useDatasource(
       label: item.name,
       value: item.id
     }))
+    if (readonly.value) return
     const sourceField = params.sourceField || 'datasource'
     if (!res.length && model[sourceField]) model[sourceField] = null
     if (res.length && model[sourceField]) {
