@@ -22,12 +22,6 @@ The former Master, Worker, and DB URLs redirect to the cluster overview. The sta
 
 ![alert-server](../../../img/new_ui/dev/monitor/alert-server.png)
 
-## Database
-
-- Mainly the health status of the DB.
-
-![db](../../../img/new_ui/dev/monitor/db.png)
-
 ## Statistics Management
 
 ### Statistics

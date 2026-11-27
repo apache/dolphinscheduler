@@ -22,12 +22,6 @@ API 实例在 `/nodes/api` 下注册稳定身份，通过 `api.rpc-port`（默�
 
 ![alert-server](../../../img/new_ui/dev/monitor/alert-server.png)
 
-## Database
-
-- 主要是 DB 的健康状况
-
-![db](../../../img/new_ui/dev/monitor/db.png)
-
 ## 统计管理
 
 ### Statistics
