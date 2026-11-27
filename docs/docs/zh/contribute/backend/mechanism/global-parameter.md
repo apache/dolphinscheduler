@@ -35,8 +35,8 @@ Worker 收到后将 varPool 解析为 Map<String,Property> 的格式，其中 ma
 
 其中，List 的元素为每行数据，Map 的 key 为列名，value 为该列对应的值
 
-* 若 SQL 语句返回为有一行数据，则根据用户在定义 task 时定义的 OUT 参数名匹配列名，若没有匹配到则放弃。
-* 若 SQL 语句返回多行，按照根据用户在定义 task 时定义的类型为 LIST 的 OUT 参数名匹配列名，将对应列的所有行数据转换为 `List<String>`，作为该参数的值。若没有匹配到则放弃。
+* 用户在定义 task 时定义的 OUT 参数名与查询结果的列名进行匹配：`LIST` 类型 OUT 参数取匹配列所有行的值并转换为 `List<String>`，序列化为 JSON 数组作为参数值；非 `LIST` 类型 OUT 参数取单行数据对应的值，要求查询恰好返回一行。
+* 若 OUT 参数名未匹配到任何结果列，或非 `LIST` 类型 OUT 参数在查询返回零行或多行时使用，任务将直接失败并抛出 `TaskException`，不再静默丢弃或传递 null 值。
 
 ### SHELL 节点
 
