@@ -26,13 +26,14 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.AccessTokenDao;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.List;
 
@@ -47,6 +48,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @Service
 @Slf4j
 public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTokenService {
+
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     @Autowired
     private AccessTokenDao accessTokenDao;
@@ -118,7 +121,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
 
         // 3. generate access token if absent
         if (StringUtils.isBlank(token)) {
-            token = EncryptionUtils.getMd5(userId + expireTime + System.currentTimeMillis());
+            token = generateToken();
         }
 
         // 4. persist to the database
@@ -140,14 +143,13 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     /**
      * generate token
      *
-     * @param loginUser
-     * @param userId     token for user
-     * @param expireTime token expire time
      * @return token string
      */
     @Override
-    public String generateToken(User loginUser, int userId, String expireTime) {
-        return EncryptionUtils.getMd5(userId + expireTime + System.currentTimeMillis());
+    public String generateToken() {
+        byte[] bytes = new byte[16];
+        SECURE_RANDOM.nextBytes(bytes);
+        return Hex.encodeHexString(bytes);
     }
 
     /**
@@ -200,7 +202,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
 
         // 3. generate access token if absent
         if (StringUtils.isBlank(token)) {
-            token = EncryptionUtils.getMd5(userId + expireTime + System.currentTimeMillis());
+            token = generateToken();
         }
 
         // 4. persist to the database
