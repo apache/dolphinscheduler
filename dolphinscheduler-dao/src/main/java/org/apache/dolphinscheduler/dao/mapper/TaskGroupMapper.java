@@ -75,4 +75,8 @@ public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
     int acquireTaskGroupSlot(@Param("id") Integer id);
 
     int releaseTaskGroupSlot(@Param("id") Integer id);
+
+    TaskGroup queryByIdForUpdate(@Param("id") Integer id);
+
+    int amendTaskGroupUseSize(@Param("id") Integer id, @Param("useSize") int useSize);
 }

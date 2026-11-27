@@ -22,6 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,12 +43,15 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.common.collect.Lists;
 
@@ -67,6 +73,64 @@ class TaskGroupCoordinatorTest {
 
     @Mock
     private WorkflowInstanceDao workflowInstanceDao;
+
+    @Mock
+    private TransactionTemplate transactionTemplate;
+
+    @Test
+    void amendTaskGroupUseSize_recountsUnderTheRowLockAndWritesOnlyUseSize() {
+        final TaskGroup staleSnapshot = TaskGroup.builder().id(1).name("group").groupSize(2).useSize(2).build();
+        final TaskGroup lockedTaskGroup = TaskGroup.builder().id(1).name("group").groupSize(2).useSize(2).build();
+        runTransactionCallbacks();
+        when(taskGroupDao.queryAllTaskGroups()).thenReturn(Lists.newArrayList(staleSnapshot));
+        when(taskGroupDao.queryByIdForUpdate(1)).thenReturn(lockedTaskGroup);
+        when(taskGroupQueueDao.countUsingTaskGroupQueueByGroupId(1)).thenReturn(1);
+
+        taskGroupCoordinator.amendTaskGroupUseSize();
+
+        // The count must be taken after the lock: an allocation committed before the lock is then included.
+        final InOrder inOrder = Mockito.inOrder(taskGroupDao, taskGroupQueueDao);
+        inOrder.verify(taskGroupDao).queryByIdForUpdate(1);
+        inOrder.verify(taskGroupQueueDao).countUsingTaskGroupQueueByGroupId(1);
+        inOrder.verify(taskGroupDao).amendTaskGroupUseSize(1, 1);
+        // Writing back the whole entity would overwrite a use_size committed by a concurrent allocation and any
+        // group_size edit made after the snapshot was read.
+        verify(taskGroupDao, never()).updateById(any(TaskGroup.class));
+    }
+
+    @Test
+    void amendTaskGroupUseSize_usesTheLockedUseSizeInsteadOfTheStaleSnapshot() {
+        // The snapshot says 2, but an allocation that committed since then moved it to the real count.
+        final TaskGroup staleSnapshot = TaskGroup.builder().id(1).name("group").groupSize(2).useSize(2).build();
+        final TaskGroup lockedTaskGroup = TaskGroup.builder().id(1).name("group").groupSize(2).useSize(1).build();
+        runTransactionCallbacks();
+        when(taskGroupDao.queryAllTaskGroups()).thenReturn(Lists.newArrayList(staleSnapshot));
+        when(taskGroupDao.queryByIdForUpdate(1)).thenReturn(lockedTaskGroup);
+        when(taskGroupQueueDao.countUsingTaskGroupQueueByGroupId(1)).thenReturn(1);
+
+        taskGroupCoordinator.amendTaskGroupUseSize();
+
+        verify(taskGroupDao, never()).amendTaskGroupUseSize(any(), anyInt());
+    }
+
+    @Test
+    void amendTaskGroupUseSize_skipsATaskGroupDeletedAfterTheSnapshot() {
+        final TaskGroup staleSnapshot = TaskGroup.builder().id(1).name("group").groupSize(2).useSize(2).build();
+        runTransactionCallbacks();
+        when(taskGroupDao.queryAllTaskGroups()).thenReturn(Lists.newArrayList(staleSnapshot));
+        when(taskGroupDao.queryByIdForUpdate(1)).thenReturn(null);
+
+        taskGroupCoordinator.amendTaskGroupUseSize();
+
+        verify(taskGroupQueueDao, never()).countUsingTaskGroupQueueByGroupId(any());
+        verify(taskGroupDao, never()).amendTaskGroupUseSize(any(), anyInt());
+    }
+
+    @SuppressWarnings("unchecked")
+    private void runTransactionCallbacks() {
+        when(transactionTemplate.execute(any())).thenAnswer(
+                invocation -> ((TransactionCallback<Object>) invocation.getArgument(0)).doInTransaction(null));
+    }
 
     @Test
     void start() {
