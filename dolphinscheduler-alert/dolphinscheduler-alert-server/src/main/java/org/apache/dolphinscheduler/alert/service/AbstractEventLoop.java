@@ -21,17 +21,17 @@ import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class AbstractEventLoop<T> extends BaseDaemonThread implements EventLoop<T> {
 
-    private final EventPendingQueue<T> eventPendingQueue;
+    private final AbstractEventPendingQueue<T> eventPendingQueue;
 
-    private final AtomicInteger handlingEventCount;
+    private final AlertHAServer alertHAServer;
 
     private final int eventHandleWorkerNum;
 
@@ -40,10 +40,11 @@ public abstract class AbstractEventLoop<T> extends BaseDaemonThread implements E
     private final AtomicBoolean runningFlag = new AtomicBoolean(false);
 
     protected AbstractEventLoop(String name,
+                                AlertHAServer alertHAServer,
                                 ThreadPoolExecutor threadPoolExecutor,
-                                EventPendingQueue<T> eventPendingQueue) {
+                                AbstractEventPendingQueue<T> eventPendingQueue) {
         super(name);
-        this.handlingEventCount = new AtomicInteger(0);
+        this.alertHAServer = alertHAServer;
         this.eventHandleWorkerNum = threadPoolExecutor.getMaximumPoolSize();
         this.threadPoolExecutor = threadPoolExecutor;
         this.eventPendingQueue = eventPendingQueue;
@@ -63,20 +64,37 @@ public abstract class AbstractEventLoop<T> extends BaseDaemonThread implements E
     public void run() {
         while (runningFlag.get()) {
             try {
-                if (handlingEventCount.get() >= eventHandleWorkerNum) {
-                    log.debug("There is no idle event worker, waiting for a while...");
+                AbstractEventPendingQueue.EventRun<T> run = eventPendingQueue.getActiveRun();
+                if (!alertHAServer.isActive() || run == null
+                        || eventPendingQueue.getHandlingEventCount() >= eventHandleWorkerNum) {
+                    log.debug("Event dispatch is paused or no event worker is idle, waiting for a while...");
                     Thread.sleep(1000);
                     continue;
                 }
-                T pendingEvent = eventPendingQueue.take();
-                handlingEventCount.incrementAndGet();
-                CompletableFuture.runAsync(() -> handleEvent(pendingEvent), threadPoolExecutor)
-                        .whenComplete((aVoid, throwable) -> {
-                            if (throwable != null) {
-                                log.error("Handle event: {} error", pendingEvent, throwable);
+                T pendingEvent = run.pendingEvents.poll(1, TimeUnit.SECONDS);
+                if (pendingEvent == null || !alertHAServer.isActive() || !eventPendingQueue.reserveDispatch(run)) {
+                    continue;
+                }
+                try {
+                    CompletableFuture.runAsync(() -> {
+                        synchronized (eventPendingQueue) {
+                            if (!runningFlag.get() || !alertHAServer.isActive()
+                                    || !eventPendingQueue.isActiveRun(run)) {
+                                return;
                             }
-                            handlingEventCount.decrementAndGet();
-                        });
+                            // A send admitted here may finish after demotion; queued tasks from old runs are discarded.
+                        }
+                        handleEvent(pendingEvent);
+                    }, threadPoolExecutor).whenComplete((aVoid, throwable) -> {
+                        if (throwable != null) {
+                            log.error("Handle event: {} error", pendingEvent, throwable);
+                        }
+                        eventPendingQueue.releaseDispatch();
+                    });
+                } catch (RuntimeException ex) {
+                    eventPendingQueue.releaseDispatch();
+                    throw ex;
+                }
             } catch (InterruptedException interruptedException) {
                 Thread.currentThread().interrupt();
                 log.error("Loop event thread has been interrupted...");
@@ -89,7 +107,7 @@ public abstract class AbstractEventLoop<T> extends BaseDaemonThread implements E
 
     @Override
     public int getHandlingEventCount() {
-        return handlingEventCount.get();
+        return eventPendingQueue.getHandlingEventCount();
     }
 
     @Override

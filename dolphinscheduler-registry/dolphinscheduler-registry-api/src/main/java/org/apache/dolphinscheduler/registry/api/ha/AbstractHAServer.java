@@ -39,13 +39,17 @@ public abstract class AbstractHAServer implements HAServer {
 
     private final String serverIdentify;
 
-    private ServerStatus serverStatus;
+    private volatile ServerStatus serverStatus;
 
     private final List<ServerStatusChangeListener> serverStatusChangeListeners;
 
-    private static final long DEFAULT_RETRY_INTERVAL = 5_000;
+    private final RoleChangeEventBus roleChangeEventBus;
 
-    private static final int DEFAULT_MAX_RETRY_TIMES = 20;
+    private final RoleChangeEventBusWorker roleChangeWorker;
+
+    static final long DEFAULT_RETRY_INTERVAL = 5_000;
+
+    static final int DEFAULT_MAX_RETRY_TIMES = 20;
 
     public AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify) {
         this.registry = registry;
@@ -53,6 +57,8 @@ public abstract class AbstractHAServer implements HAServer {
         this.serverIdentify = checkNotNull(serverIdentify) + "#" + System.currentTimeMillis();
         this.serverStatus = ServerStatus.STAND_BY;
         this.serverStatusChangeListeners = Lists.newArrayList(new DefaultServerStatusChangeListener());
+        this.roleChangeEventBus = new RoleChangeEventBus();
+        this.roleChangeWorker = new RoleChangeEventBusWorker(this, roleChangeEventBus);
     }
 
     @Override
@@ -61,14 +67,8 @@ public abstract class AbstractHAServer implements HAServer {
 
             @Override
             public void notify(Event event) {
-                if (Event.Type.REMOVE.equals(event.getType())) {
-                    if (serverIdentify.equals(event.getEventData())) {
-                        statusChange(ServerStatus.STAND_BY);
-                    } else {
-                        if (participateElection()) {
-                            statusChange(ServerStatus.ACTIVE);
-                        }
-                    }
+                if (!roleChangeWorker.isClosed()) {
+                    roleChangeEventBus.publish(RoleChangeEvent.create());
                 }
             }
 
@@ -77,12 +77,33 @@ public abstract class AbstractHAServer implements HAServer {
                 return SubscribeScope.PATH_ONLY;
             }
         });
+        roleChangeWorker.start();
+        roleChangeWorker.awaitInitialReconciliation();
+    }
 
-        if (participateElection()) {
-            statusChange(ServerStatus.ACTIVE);
-        } else {
-            log.info("Server {} is standby", serverIdentify);
+    /**
+     * Try to switch the server role based on the current selector ownership, participating in election if needed.
+     *
+     * @return true if the selector remains unclaimed and a delayed retry is needed, not whether a role switch succeeded
+     */
+    boolean trySwitchRole() {
+        if (!ownsSelector()) {
+            changeToStandBy();
+            if (!registry.exists(selectorPath)) {
+                tryParticipateElection();
+            }
         }
+        if (roleChangeWorker.isClosed()) {
+            return false;
+        }
+        if (ownsSelector()) {
+            if (serverStatus != ServerStatus.ACTIVE) {
+                changeToActive();
+            }
+        } else {
+            changeToStandBy();
+        }
+        return !isActive() && !registry.exists(selectorPath);
     }
 
     @Override
@@ -92,31 +113,34 @@ public abstract class AbstractHAServer implements HAServer {
 
     @Override
     public boolean participateElection() {
-        final String electionLock = selectorPath + "-lock";
-        // If meet exception during participate election, will retry.
-        // This can avoid the situation that the server is not elected as leader due to network jitter.
-        for (int i = 0; i < DEFAULT_MAX_RETRY_TIMES; i++) {
+        for (int i = 0; i < DEFAULT_MAX_RETRY_TIMES && !roleChangeWorker.isClosed(); i++) {
             try {
-                try {
-                    if (registry.acquireLock(electionLock)) {
-                        if (!registry.exists(selectorPath)) {
-                            registry.put(selectorPath, serverIdentify, true);
-                            return true;
-                        }
-                        return serverIdentify.equals(registry.get(selectorPath));
-                    }
-                    return false;
-                } finally {
-                    registry.releaseLock(electionLock);
-                }
-            } catch (Exception e) {
-                log.error("Participate election error, meet an exception, will retry after {}ms",
-                        DEFAULT_RETRY_INTERVAL, e);
+                return tryParticipateElection();
+            } catch (Exception ex) {
+                log.error("Participate election error, will retry after {}ms", DEFAULT_RETRY_INTERVAL, ex);
                 ThreadUtils.sleep(DEFAULT_RETRY_INTERVAL);
             }
         }
-        throw new IllegalStateException(
-                "Participate election failed after retry " + DEFAULT_MAX_RETRY_TIMES + " times");
+        throw new IllegalStateException("Participate election failed or HA server is closed");
+    }
+
+    private boolean tryParticipateElection() {
+        final String electionLock = selectorPath + "-lock";
+        if (!registry.acquireLock(electionLock)) {
+            return false;
+        }
+        try {
+            if (roleChangeWorker.isClosed()) {
+                return false;
+            }
+            if (!registry.exists(selectorPath)) {
+                registry.put(selectorPath, serverIdentify, true);
+                return true;
+            }
+            return serverIdentify.equals(registry.get(selectorPath));
+        } finally {
+            registry.releaseLock(electionLock);
+        }
     }
 
     @Override
@@ -129,15 +153,63 @@ public abstract class AbstractHAServer implements HAServer {
         return serverStatus;
     }
 
-    private void statusChange(ServerStatus targetStatus) {
-        final ServerStatus originStatus = serverStatus;
-        serverStatus = targetStatus;
-        synchronized (this) {
-            try {
-                serverStatusChangeListeners.forEach(listener -> listener.change(originStatus, serverStatus));
-            } catch (Exception ex) {
-                log.error("Trigger ServerStatusChangeListener from {} -> {} error", originStatus, targetStatus, ex);
+    private void changeToActive() {
+        try {
+            notifyListeners(ServerStatus.STAND_BY, ServerStatus.ACTIVE);
+            boolean owner = !roleChangeWorker.isClosed() && ownsSelector();
+            synchronized (roleChangeWorker) {
+                if (!roleChangeWorker.isClosed() && owner) {
+                    serverStatus = ServerStatus.ACTIVE;
+                }
+            }
+        } finally {
+            if (serverStatus != ServerStatus.ACTIVE) {
+                notifyStandBy();
             }
         }
+    }
+
+    void changeToStandBy() {
+        if (serverStatus == ServerStatus.ACTIVE) {
+            serverStatus = ServerStatus.STAND_BY;
+            notifyStandBy();
+        }
+    }
+
+    private void notifyStandBy() {
+        try {
+            notifyListeners(ServerStatus.ACTIVE, ServerStatus.STAND_BY);
+        } catch (RuntimeException ex) {
+            // Failed cleanup must not be followed by another activation.
+            roleChangeWorker.close();
+            throw ex;
+        }
+    }
+
+    private boolean ownsSelector() {
+        return registry.exists(selectorPath) && serverIdentify.equals(registry.get(selectorPath));
+    }
+
+    private void notifyListeners(ServerStatus originStatus, ServerStatus targetStatus) {
+        RuntimeException failure = null;
+        for (ServerStatusChangeListener listener : serverStatusChangeListeners) {
+            try {
+                listener.change(originStatus, targetStatus);
+            } catch (RuntimeException ex) {
+                if (failure == null) {
+                    failure = ex;
+                } else if (failure != ex) {
+                    failure.addSuppressed(ex);
+                }
+            }
+        }
+        if (failure != null) {
+            throw failure;
+        }
+    }
+
+    @Override
+    public void close() {
+        roleChangeWorker.close();
     }
 }

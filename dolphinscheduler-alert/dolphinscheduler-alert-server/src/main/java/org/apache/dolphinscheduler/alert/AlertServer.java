@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
 import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
-import org.apache.dolphinscheduler.registry.api.ha.AbstractServerStatusChangeListener;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -79,19 +78,8 @@ public class AlertServer {
         alertRpcServer.start();
         alertRegistryClient.start();
 
-        alertHAServer.addServerStatusChangeListener(new AbstractServerStatusChangeListener() {
-
-            @Override
-            public void changeToActive() {
-                alertBootstrapService.start();
-            }
-
-            @Override
-            public void changeToStandBy() {
-                close();
-            }
-        });
-
+        // The fetcher checks the HA role; keep its thread available across role changes.
+        alertBootstrapService.start();
         alertHAServer.start();
 
         log.info("AlertServer is started ...");
