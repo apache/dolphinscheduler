@@ -58,11 +58,9 @@ public interface AccessTokenService {
     /**
      * generate token
      *
-     * @param userId token for user
-     * @param expireTime token expire time
      * @return token string
      */
-    String generateToken(User loginUser, int userId, String expireTime);
+    String generateToken();
 
     /**
      * delete access token
