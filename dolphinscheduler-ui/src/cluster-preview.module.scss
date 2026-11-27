@@ -1,0 +1,169 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+:global(body) {
+  margin: 0;
+}
+.shell {
+  --preview-surface: #fff;
+  --preview-bg: #f5f6f8;
+  --preview-text: #25314a;
+  --preview-line: #e9ecf0;
+  --preview-muted: #8c94a3;
+  --preview-primary: #1890ff;
+  background: var(--preview-bg);
+  color: var(--preview-text);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Microsoft YaHei', sans-serif;
+}
+.dark {
+  --preview-surface: #18181c;
+  --preview-bg: #101014;
+  --preview-text: #e4e5e9;
+  --preview-line: #303035;
+  --preview-muted: #8c8d99;
+  --preview-primary: #62b2ff;
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 0 22px;
+  height: 64px;
+  background: var(--preview-surface);
+  border-bottom: 1px solid var(--preview-line);
+  > img {
+    width: 172px;
+    height: 38px;
+    object-fit: contain;
+  }
+  nav {
+    display: flex;
+    align-items: stretch;
+    align-self: stretch;
+    gap: 24px;
+    font-size: 13px;
+    > span {
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+  }
+}
+.active {
+  color: var(--preview-primary);
+  border-bottom: 2px solid var(--preview-primary);
+}
+.settings {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--preview-muted);
+}
+.layout {
+  display: grid;
+  grid-template-columns: 172px minmax(0, 1fr);
+  min-height: calc(100vh - 65px);
+}
+.sidebar {
+  background: var(--preview-surface);
+  border-right: 1px solid var(--preview-line);
+  padding-top: 22px;
+}
+.sidebarTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  padding: 0 24px 18px;
+}
+.main {
+  padding: 23px 30px 26px;
+  min-width: 0;
+}
+.breadcrumb {
+  display: flex;
+  gap: 10px;
+  color: var(--preview-muted);
+  font-size: 12px;
+  margin-bottom: 25px;
+}
+@media (max-width: 1100px) {
+  .header {
+    gap: 18px;
+    padding: 0 16px;
+    nav {
+      gap: 16px;
+      font-size: 12px;
+    }
+    > img {
+      width: 155px;
+    }
+  }
+  .layout {
+    grid-template-columns: 150px minmax(0, 1fr);
+  }
+  .main {
+    padding: 20px;
+  }
+  .settings > span:last-child {
+    display: none;
+  }
+}
+@media (max-width: 850px) {
+  .header {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 12px 16px;
+    gap: 12px;
+    nav {
+      order: 3;
+      width: 100%;
+      flex-wrap: wrap;
+      gap: 16px;
+      > span {
+        padding: 5px 0;
+      }
+    }
+  }
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sidebar {
+    display: none;
+  }
+  .main {
+    padding: 18px;
+  }
+}
+@media (max-width: 480px) {
+  .main {
+    padding: 14px;
+  }
+  .breadcrumb {
+    font-size: 11px;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .header nav {
+    font-size: 11px;
+    gap: 12px;
+  }
+}
