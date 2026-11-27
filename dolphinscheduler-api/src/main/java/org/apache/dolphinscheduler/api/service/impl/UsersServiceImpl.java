@@ -354,7 +354,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             }
         }
 
-        if (StringUtils.isNotEmpty(userName)) {
+        if (StringUtils.isNotEmpty(userName) && !StringUtils.equals(userName, user.getUserName())) {
 
             if (!CheckUtils.checkUserName(userName)) {
                 throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);

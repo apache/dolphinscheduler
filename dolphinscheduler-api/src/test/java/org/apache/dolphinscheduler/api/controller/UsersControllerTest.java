@@ -25,8 +25,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,14 +41,22 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 public class UsersControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(UsersControllerTest.class);
+
+    @Autowired
+    private UsersService usersService;
+
+    @Autowired
+    private TenantDao tenantDao;
 
     @Test
     public void testCreateUser() throws Exception {
@@ -87,6 +100,51 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertEquals(Status.UPDATE_USER_ERROR.getCode(), result.getCode().intValue());
+    }
+
+    @Test
+    @Transactional
+    public void testUpdateTenantWithUnchangedEmailUsername() throws Exception {
+        String username = "user@example.com";
+        User target = usersService.createUser(UserType.GENERAL_USER, username, username);
+        Tenant tenant = new Tenant("email-user-tenant", "Tenant for the user edit test", 1);
+        Assertions.assertEquals(1, tenantDao.insert(tenant));
+
+        mockMvc.perform(post("/users/update")
+                .header(SESSION_ID, sessionId)
+                .params(userUpdateParams(target, tenant.getId())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Status.SUCCESS.getCode()));
+
+        User updated = usersService.queryUser(target.getId());
+        Assertions.assertEquals(username, updated.getUserName());
+        Assertions.assertEquals(tenant.getId().intValue(), updated.getTenantId());
+    }
+
+    @Test
+    @Transactional
+    public void testUpdateUserRejectsChangedEmailUsername() throws Exception {
+        String username = "user@example.com";
+        User target = usersService.createUser(UserType.GENERAL_USER, username, username);
+        MultiValueMap<String, String> params = userUpdateParams(target, target.getTenantId());
+        params.set("userName", "changed@example.com");
+
+        mockMvc.perform(post("/users/update").header(SESSION_ID, sessionId).params(params))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode()));
+        Assertions.assertEquals(username, usersService.queryUser(target.getId()).getUserName());
+    }
+
+    private MultiValueMap<String, String> userUpdateParams(User target, int tenantId) {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("id", target.getId().toString());
+        params.add("userName", target.getUserName());
+        params.add("userPassword", "");
+        params.add("tenantId", String.valueOf(tenantId));
+        params.add("queue", target.getQueue());
+        params.add("email", target.getEmail());
+        params.add("state", String.valueOf(target.getState()));
+        return params;
     }
 
     @Test
