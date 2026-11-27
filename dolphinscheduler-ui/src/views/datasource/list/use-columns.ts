@@ -106,6 +106,7 @@ export function useColumns(onCallback: Function) {
                   h(
                     NButton,
                     {
+                      class: 'btn-edit',
                       circle: true,
                       type: 'info',
                       size: 'small',
