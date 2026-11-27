@@ -77,39 +77,43 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    private boolean flag = false;
+    private volatile Thread currentWorker;
 
-    private Thread internalThread;
+    @VisibleForTesting
+    long initialDelayMillis = TimeUnit.MINUTES.toMillis(1);
 
     private static final int DEFAULT_LIMIT = 1000;
 
     public synchronized void start() {
         log.info("TaskGroupCoordinator starting...");
-        if (flag) {
+        if (currentWorker != null) {
             throw new IllegalStateException("TaskGroupCoordinator is already started");
         }
-        if (internalThread != null) {
-            throw new IllegalStateException("InternalThread is already started");
-        }
-        flag = true;
-        internalThread = new BaseDaemonThread(this::doStart) {
+        final Thread worker = new BaseDaemonThread(this::doStart) {
         };
-        internalThread.setName("TaskGroupCoordinator-Thread");
-        internalThread.start();
+        worker.setName("TaskGroupCoordinator-Thread");
+        currentWorker = worker;
+        try {
+            worker.start();
+        } catch (RuntimeException | Error ex) {
+            currentWorker = null;
+            throw ex;
+        }
         log.info("TaskGroupCoordinator started...");
     }
 
     @VisibleForTesting
     boolean isStarted() {
-        return flag;
+        return currentWorker != null;
     }
 
     private void doStart() {
+        final Thread worker = Thread.currentThread();
         // Sleep 1 minutes here to make sure the previous task group slot has been released.
         // This step is not necessary, since the wakeup operation is idempotent, but we can avoid confusion warning.
-        ThreadUtils.sleep(TimeUnit.MINUTES.toMillis(1));
+        ThreadUtils.sleep(initialDelayMillis);
 
-        while (flag) {
+        while (currentWorker == worker) {
             try {
                 final StopWatch taskGroupCoordinatorRoundCost = StopWatch.createStarted();
 
@@ -123,8 +127,9 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
             } catch (Throwable e) {
                 log.error("TaskGroupCoordinator error", e);
             } finally {
-                // sleep 5s
-                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5);
+                if (currentWorker == worker) {
+                    ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5);
+                }
             }
         }
     }
@@ -518,19 +523,18 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
 
     @Override
     public synchronized void close() {
-        if (!flag) {
+        final Thread worker = currentWorker;
+        if (worker == null) {
             log.warn("TaskGroupCoordinator is already closed");
             return;
         }
-        flag = false;
+        // Revoke this worker before sending an interrupt that the DAO may consume.
+        currentWorker = null;
         try {
-            if (internalThread != null) {
-                internalThread.interrupt();
-            }
+            worker.interrupt();
         } catch (Exception ex) {
-            log.error("Close internalThread failed", ex);
+            log.error("Interrupt coordinator worker failed", ex);
         }
-        internalThread = null;
-        log.info("TaskGroupCoordinator closed");
+        log.info("TaskGroupCoordinator stop requested");
     }
 }
