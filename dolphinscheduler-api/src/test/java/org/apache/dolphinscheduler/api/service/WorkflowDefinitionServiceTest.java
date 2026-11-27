@@ -458,6 +458,57 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
+    public void testQueryWorkflowDefinitionByVersionRequiresProjectAccess() {
+        Project project = getProject(projectCode);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectService).checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION);
+
+        assertThatThrownBy(() -> workflowDefinitionService.queryWorkflowDefinitionByVersion(user, projectCode, 46L, 1))
+                .isInstanceOf(ServiceException.class);
+
+        Mockito.verifyNoInteractions(workflowDefinitionDao, workflowDefinitionLogDao, processService);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    public void testQueryWorkflowDefinitionByVersionRejectsMissingOrForeignWorkflow(boolean foreignProject) {
+        Project project = getProject(projectCode);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        if (foreignProject) {
+            WorkflowDefinition current = getWorkflowDefinition();
+            current.setProjectCode(projectCodeOther);
+            when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(current));
+        }
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.queryWorkflowDefinitionByVersion(user, projectCode, 46L, 1));
+
+        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST.getCode(), error.getCode());
+        Mockito.verifyNoInteractions(workflowDefinitionLogDao, processService);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    public void testQueryWorkflowDefinitionByVersionRejectsMissingOrForeignVersion(boolean foreignProject) {
+        Project project = getProject(projectCode);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(getWorkflowDefinition()));
+        if (foreignProject) {
+            WorkflowDefinitionLog history = new WorkflowDefinitionLog(getWorkflowDefinition());
+            history.setProjectCode(projectCodeOther);
+            when(workflowDefinitionLogDao.queryByDefinitionCodeAndVersion(46L, 1)).thenReturn(history);
+        }
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.queryWorkflowDefinitionByVersion(user, projectCode, 46L, 1));
+
+        Assertions.assertEquals(foreignProject ? Status.PROJECT_WORKFLOW_NOT_MATCH.getCode()
+                : Status.WORKFLOW_DEFINITION_NOT_EXIST.getCode(), error.getCode());
+        Mockito.verifyNoInteractions(processService);
+    }
+
+    @Test
     public void testQueryWorkflowDefinitionByName() {
         Project project = getProject(projectCode);
         when(projectDao.queryByCode(projectCode)).thenReturn(project);

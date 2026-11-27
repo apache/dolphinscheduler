@@ -93,6 +93,8 @@ export default {
     tree_limit: '限制大小',
     batch_copy: '批量复制',
     batch_delete: '批量删除',
+    view_version: '查看',
+    version_preview: 'V{version}（只读）',
     version_info: '版本信息',
     version: '版本',
     file_upload: '文件上传',
@@ -245,6 +247,8 @@ export default {
       '下游存在依赖，你不能删除该任务.',
     warning_delete_scheduler_dependent_tasks_desc:
       '下游存在依赖, 删除定时可能会对下游任务产生影响. 你确定要删除该定时嘛?',
+    load_details_failed: '无法加载工作流详情',
+    back_to_workflow_list: '返回工作流列表',
     request_failed: '请求失败，请重试',
     warning_too_large_parallelism_number: '并行度设置太大了, 最好不要超过10.'
   },

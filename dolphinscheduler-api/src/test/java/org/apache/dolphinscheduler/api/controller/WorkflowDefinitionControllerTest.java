@@ -192,6 +192,32 @@ public class WorkflowDefinitionControllerTest {
     }
 
     @Test
+    public void testQueryWorkflowDefinitionByVersionMasksSensitiveParameters() {
+        long projectCode = 1L;
+        long code = 1L;
+        int version = 2;
+        WorkflowDefinitionLog definition = new WorkflowDefinitionLog();
+        definition.setCode(code);
+        definition.setVersion(version);
+        definition.setGlobalParams(sensitiveGlobalParams());
+        TaskDefinition task = new TaskDefinition();
+        task.setTaskParams(sensitiveTaskParams());
+        DagData dagData = new DagData(definition, Collections.emptyList(), Collections.singletonList(task));
+        Mockito.when(processDefinitionService.queryWorkflowDefinitionByVersion(user, projectCode, code, version))
+                .thenReturn(dagData);
+
+        Result<DagData> response =
+                workflowDefinitionController.queryWorkflowDefinitionByVersion(user, projectCode, code, version);
+
+        Assertions.assertTrue(response.isSuccess());
+        Assertions.assertEquals(version, response.getData().getWorkflowDefinition().getVersion());
+        assertMaskedAndOriginalUnchanged(definition.getGlobalParams(),
+                response.getData().getWorkflowDefinition().getGlobalParams());
+        assertMaskedAndOriginalUnchanged(task.getTaskParams(),
+                response.getData().getTaskDefinitionList().get(0).getTaskParams());
+    }
+
+    @Test
     public void testBatchCopyWorkflowDefinition() {
         long projectCode = 1L;
         long targetProjectCode = 2L;

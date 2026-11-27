@@ -152,6 +152,45 @@ public class WorkflowVersionRestoreTest extends AbstractControllerTest {
     }
 
     @Test
+    public void previewsHistoryWithoutRestoringCurrentDefinition() throws Exception {
+        int version = saveInstanceWithNewTask();
+        WorkflowDefinitionLog history =
+                workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(WORKFLOW_CODE, version);
+        history.setGlobalParams(
+                "[{\"prop\":\"version\",\"value\":\"historical\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]");
+        workflowDefinitionLogMapper.updateById(history);
+        TaskDefinition currentTask = taskDefinitionMapper.queryByCode(EXISTING_TASK_CODE);
+        currentTask.setVersion(9);
+        currentTask.setTaskParams("{\"rawScript\":\"echo current\",\"localParams\":[]}");
+        taskDefinitionMapper.updateById(currentTask);
+
+        mockMvc.perform(get("/projects/{projectCode}/workflow-definition/{code}/versions/{version}/detail",
+                PROJECT_CODE, WORKFLOW_CODE, version).header(SESSION_ID, sessionId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Status.SUCCESS.getCode()))
+                .andExpect(jsonPath("$.data.workflowDefinition.version").value(version))
+                .andExpect(jsonPath("$.data.workflowDefinition.globalParamList[0].value").value("historical"))
+                .andExpect(jsonPath("$.data.workflowTaskRelationList.length()").value(2))
+                .andExpect(jsonPath("$.data.taskDefinitionList.length()").value(2))
+                .andExpect(jsonPath("$.data.taskDefinitionList[?(@.code == " + EXISTING_TASK_CODE + ")].version")
+                        .value(org.hamcrest.Matchers.contains(2)))
+                .andExpect(jsonPath(
+                        "$.data.taskDefinitionList[?(@.code == " + EXISTING_TASK_CODE + ")].taskParams.rawScript")
+                                .value(org.hamcrest.Matchers.contains("echo test")))
+                .andExpect(jsonPath("$.data.taskDefinitionList[?(@.code == " + NEW_TASK_CODE + ")].version")
+                        .value(org.hamcrest.Matchers.contains(1)));
+
+        Assertions.assertEquals(1, workflowDefinitionMapper.queryByCode(WORKFLOW_CODE).getVersion());
+        Assertions.assertEquals("[]", workflowDefinitionMapper.queryByCode(WORKFLOW_CODE).getGlobalParams());
+        Assertions.assertEquals(1, workflowTaskRelationMapper.queryByWorkflowDefinitionCode(WORKFLOW_CODE).size());
+        Assertions.assertEquals(9, taskDefinitionMapper.queryByCode(EXISTING_TASK_CODE).getVersion());
+        Assertions.assertEquals(currentTask.getTaskParams(),
+                taskDefinitionMapper.queryByCode(EXISTING_TASK_CODE).getTaskParams());
+        Assertions.assertNull(taskDefinitionMapper.queryByCode(NEW_TASK_CODE));
+        Mockito.verifyNoInteractions(schedulerService);
+    }
+
+    @Test
     public void restoresTasksCreatedOnlyInInstanceHistory() throws Exception {
         int version = saveInstanceWithNewTask();
         ServiceException beforeRestore = Assertions.assertThrows(ServiceException.class,

@@ -130,6 +130,17 @@ export function queryWorkflowDefinitionByCode(
   })
 }
 
+export function queryWorkflowDefinitionByVersion(
+  code: number,
+  projectCode: number,
+  version: number
+): any {
+  return axios({
+    url: `/projects/${projectCode}/workflow-definition/${code}/versions/${version}/detail`,
+    method: 'get'
+  })
+}
+
 export function updateWorkflowDefinition(
   data: WorkflowDefinitionReq & ReleaseStateReq,
   code: number,

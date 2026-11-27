@@ -54,6 +54,10 @@ const props = {
     type: Object as PropType<WorkflowDefinition>,
     default: undefined
   },
+  readonly: {
+    type: Boolean,
+    default: false
+  },
   instance: {
     type: Object as PropType<WorkflowInstance>,
     default: undefined
@@ -120,6 +124,7 @@ export default defineComponent({
       }
     }
     const onSubmit = () => {
+      if (props.readonly) return
       formRef.value.validate(async (valid: any) => {
         if (!valid) {
           const params = {
@@ -178,10 +183,16 @@ export default defineComponent({
         show={props.visible}
         title={t('project.dag.basic_info')}
         onConfirm={onSubmit}
+        confirmShow={!props.readonly}
         onCancel={onCancel}
         autoFocus={false}
       >
-        <NForm model={formValue.value} rules={rule} ref={formRef}>
+        <NForm
+          model={formValue.value}
+          rules={rule}
+          ref={formRef}
+          disabled={props.readonly}
+        >
           <NFormItem label={t('project.node.workflow_name')} path='name'>
             <NInput
               allowInput={trim}
@@ -239,6 +250,10 @@ export default defineComponent({
             path='globalParams'
           >
             <NDynamicInput
+              min={props.readonly ? formValue.value.globalParams.length : 0}
+              max={
+                props.readonly ? formValue.value.globalParams.length : undefined
+              }
               v-model:value={formValue.value.globalParams}
               onCreate={() => {
                 return {
@@ -317,7 +332,7 @@ export default defineComponent({
               }}
             </NDynamicInput>
           </NFormItem>
-          {props.definition && !props.instance && (
+          {props.definition && !props.instance && !props.readonly && (
             <NFormItem path='timeoutFlag' showLabel={false}>
               <NCheckbox v-model:checked={formValue.value.release}>
                 {t('project.dag.online_directly')}

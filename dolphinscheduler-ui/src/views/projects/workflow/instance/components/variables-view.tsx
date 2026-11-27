@@ -16,15 +16,22 @@
  */
 
 import { useRoute } from 'vue-router'
-import { defineComponent, onMounted, ref, computed } from 'vue'
+import { defineComponent, onMounted, ref, computed, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { viewVariables } from '@/service/modules/workflow-instances'
 import { viewWorkflowDefinitionVariables } from '@/service/modules/workflow-definition'
 import styles from './variables.module.scss'
 import { NButton } from 'naive-ui'
+import type { WorkflowDefinition } from '../../components/dag/types'
 
 export default defineComponent({
   name: 'variables-view',
+  props: {
+    definition: {
+      type: Object as PropType<WorkflowDefinition>,
+      default: undefined
+    }
+  },
   emits: ['copy'],
   setup(props, ctx) {
     const paramsRef = ref<any>()
@@ -49,6 +56,23 @@ export default defineComponent({
     })
 
     const getViewVariables = () => {
+      if (props.definition) {
+        const localParams: Record<string, any> = {}
+        props.definition.taskDefinitionList.forEach((task) => {
+          const localParamsList = task.taskParams?.localParams || []
+          if (localParamsList.length) {
+            localParams[task.name] = {
+              taskType: task.taskType,
+              localParamsList
+            }
+          }
+        })
+        paramsRef.value = {
+          globalParams: props.definition.workflowDefinition.globalParamList,
+          localParams
+        }
+        return
+      }
       if (Number.isNaN(instanceId)) {
         viewWorkflowDefinitionVariables(projectCode, workflowCode).then(
           (res: any) => {

@@ -72,6 +72,10 @@ const props = {
     type: Boolean as PropType<boolean>,
     default: false
   },
+  preview: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  },
   projectCode: {
     type: Number as PropType<number>,
     default: 0
@@ -115,7 +119,11 @@ export default defineComponent({
       copyTask,
       workflowDefinition,
       removeTasks
-    } = useTaskEdit({ graph, definition: toRef(props, 'definition') })
+    } = useTaskEdit({
+      graph,
+      definition: toRef(props, 'definition'),
+      readonly: toRef(props, 'readonly')
+    })
 
     // Right click cell
     const { nodeVariables, menuHide, menuStart, viewLog } = useNodeMenu({
@@ -221,6 +229,7 @@ export default defineComponent({
     }
     const { getConnects, getLocations } = useBusinessMapper()
     const onSave = (saveForm: any) => {
+      if (props.preview) return
       const edges = graph.value?.getEdges() || []
       const nodes = graph.value?.getNodes() || []
       if (!nodes.length) {
@@ -358,6 +367,7 @@ export default defineComponent({
       >
         <DagToolbar
           layoutToggle={layoutToggle}
+          preview={props.preview}
           instance={props.instance}
           definition={props.definition}
           onVersionToggle={versionToggle}
@@ -367,7 +377,7 @@ export default defineComponent({
           v-model:dependenciesData={dependenciesData}
         />
         <div class={Styles.content}>
-          <DagSidebar onDragStart={onDragStart} />
+          {!props.preview && <DagSidebar onDragStart={onDragStart} />}
           <DagCanvas onDrop={onDrop} />
         </div>
         <DagAutoLayoutModal
@@ -377,7 +387,7 @@ export default defineComponent({
           formValue={formValue}
           formRef={formRef}
         />
-        {!!props.definition && (
+        {!!props.definition && !props.preview && (
           <VersionModal
             isInstance={!!props.instance}
             v-model:row={props.definition.workflowDefinition}
@@ -388,6 +398,7 @@ export default defineComponent({
         <DagSaveModal
           v-model:show={saveModalShow.value}
           onSave={onSave}
+          readonly={props.preview}
           definition={props.definition}
           instance={props.instance}
         />
@@ -404,10 +415,10 @@ export default defineComponent({
           onCancel={taskCancel}
         />
         <ContextMenuItem
-          startDisplay={startDisplay.value}
+          startDisplay={!props.preview && startDisplay.value}
           executeTaskDisplay={executeTaskDisplay.value}
-          menuDisplay={menuDisplay.value}
-          copyDisplay={copyDisplay.value}
+          menuDisplay={!props.preview && menuDisplay.value}
+          copyDisplay={!props.preview && copyDisplay.value}
           taskInstance={taskInstance.value}
           cell={nodeVariables.menuCell as Cell}
           visible={nodeVariables.menuVisible}
@@ -429,7 +440,7 @@ export default defineComponent({
           content={dependenciesData.tip}
           onConfirm={dependenciesData.action}
         />
-        {!!props.definition && (
+        {!!props.definition && !props.preview && (
           <StartModal
             v-model:row={props.definition.workflowDefinition}
             v-model:show={nodeVariables.startModalShow}
