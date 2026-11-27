@@ -22,6 +22,7 @@ import {
   NameReq,
   FileNameReq,
   FullNameReq,
+  IsDirectoryReq,
   TenantCodeReq,
   ContentReq,
   DescriptionReq,
@@ -111,7 +112,9 @@ export function updateResource(
   })
 }
 
-export function deleteResource(params: FullNameReq & TenantCodeReq): any {
+export function deleteResource(
+  params: FullNameReq & IsDirectoryReq & TenantCodeReq
+): any {
   return axios({
     url: '/resources',
     method: 'delete',

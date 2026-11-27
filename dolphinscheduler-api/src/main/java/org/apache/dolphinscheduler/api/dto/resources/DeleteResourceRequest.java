@@ -32,4 +32,7 @@ public class DeleteResourceRequest {
 
     private User loginUser;
     private String resourceAbsolutePath;
+
+    // the type of the listed row, null when the caller does not know it
+    private Boolean isDirectory;
 }

@@ -158,11 +158,72 @@ class DeleteResourceDtoValidatorTest {
         verify(child).deleteIfExists();
     }
 
+    @Test
+    void deleteTheFileRowOfASameNamedPairKeepsTheDirectory() {
+        BlobClient exact = mockBlobExists(DIRECTORY, true);
+        mockPlainBlobProperties(exact);
+        mockBlobExists(DIRECTORY + "/", false);
+        String childName = DIRECTORY + "/summary.csv";
+        BlobClient child = mockBlobExists(childName, true);
+        mockChildren(DIRECTORY, childName);
+
+        deleteThroughResourceCenter(false);
+
+        verify(exact).deleteIfExists();
+        verify(child, never()).deleteIfExists();
+    }
+
+    @Test
+    void deleteTheDirectoryRowOfASameNamedPairKeepsTheFile() {
+        BlobClient exact = mockBlobExists(DIRECTORY, true);
+        mockPlainBlobProperties(exact);
+        mockBlobExists(DIRECTORY + "/", false);
+        String childName = DIRECTORY + "/summary.csv";
+        BlobClient child = mockBlobExists(childName, true);
+        mockChildren(DIRECTORY, childName);
+
+        deleteThroughResourceCenter(true);
+
+        verify(child).deleteIfExists();
+        verify(exact, never()).deleteIfExists();
+        verify(exact, never()).deleteIfExistsWithResponse(isNull(), Mockito.any(), isNull(), isNull());
+    }
+
+    @Test
+    void deleteTheFileRowIsRejectedWhenOnlyTheDirectoryExists() {
+        BlobClient exact = mockBlobExists(DIRECTORY, false);
+        BlobStorageException missing = mock(BlobStorageException.class);
+        when(missing.getStatusCode()).thenReturn(404);
+        when(exact.getPropertiesWithResponse(null, null, null)).thenThrow(missing);
+        mockBlobExists(DIRECTORY + "/", false);
+        String childName = DIRECTORY + "/summary.csv";
+        BlobClient child = mockBlobExists(childName, true);
+        mockChildren(DIRECTORY, childName);
+
+        assertThrowServiceException(
+                "Internal Server Error: Thr resource is not exists: " + DIRECTORY,
+                () -> deleteThroughResourceCenter(false));
+        verify(child, never()).deleteIfExists();
+    }
+
+    private void mockPlainBlobProperties(BlobClient blobClient) {
+        // a flat-namespace blob has no x-ms-resource-type header, only a hierarchical directory has
+        @SuppressWarnings("unchecked")
+        Response<BlobProperties> properties = mock(Response.class);
+        when(properties.getHeaders()).thenReturn(new HttpHeaders());
+        when(blobClient.getPropertiesWithResponse(null, null, null)).thenReturn(properties);
+    }
+
     private void deleteThroughResourceCenter() {
+        deleteThroughResourceCenter(null);
+    }
+
+    private void deleteThroughResourceCenter(Boolean isDirectory) {
         ResourcesServiceImpl service = new ResourcesServiceImpl();
         ReflectionTestUtils.setField(service, "storageOperator", storageOperator);
         ReflectionTestUtils.setField(service, "deleteResourceDtoValidator", deleteResourceDtoValidator);
-        service.delete(DeleteResourceRequest.builder().loginUser(adminUser).resourceAbsolutePath(DIRECTORY).build());
+        service.delete(DeleteResourceRequest.builder().loginUser(adminUser).resourceAbsolutePath(DIRECTORY)
+                .isDirectory(isDirectory).build());
     }
 
     private void mockChildren(String path, String... names) {

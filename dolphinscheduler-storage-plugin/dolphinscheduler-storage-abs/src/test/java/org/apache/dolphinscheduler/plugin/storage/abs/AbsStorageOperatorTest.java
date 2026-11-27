@@ -64,6 +64,7 @@ import com.azure.storage.blob.models.BlobItemProperties;
 import com.azure.storage.blob.models.BlobProperties;
 import com.azure.storage.blob.models.BlobStorageException;
 import com.azure.storage.blob.models.ListBlobsOptions;
+import com.azure.storage.blob.specialized.BlockBlobClient;
 
 class AbsStorageOperatorTest {
 
@@ -117,6 +118,38 @@ class AbsStorageOperatorTest {
         assertEquals("dolphinscheduler/default/resources", file.getPfullName());
         assertEquals(10L, file.getSize());
         assertEquals(Date.from(LAST_MODIFIED.toInstant()), file.getUpdateTime());
+    }
+
+    @Test
+    void listStorageEntityTypesABlobAndADirectoryWithTheSameName() {
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        mockListBlobsByHierarchy(containerClient);
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        List<StorageEntity> storageEntities =
+                storageOperator.listStorageEntity("dolphinscheduler/default/resources/dir5");
+
+        assertEquals(2, storageEntities.size());
+        assertEquals("dolphinscheduler/default/resources/dir5/reports", storageEntities.get(0).getFullName());
+        assertFalse(storageEntities.get(0).isDirectory());
+        assertEquals(10L, storageEntities.get(0).getSize());
+        assertEquals("dolphinscheduler/default/resources/dir5/reports", storageEntities.get(1).getFullName());
+        assertTrue(storageEntities.get(1).isDirectory());
+    }
+
+    @Test
+    void listStorageEntityKeepsHierarchicalDirectoriesAsOneDirectoryRow() {
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        mockListBlobsByHierarchy(containerClient);
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        List<StorageEntity> storageEntities =
+                storageOperator.listStorageEntity("dolphinscheduler/default/resources/dir6");
+
+        assertEquals(Arrays.asList("dolphinscheduler/default/resources/dir6/empty",
+                "dolphinscheduler/default/resources/dir6/full"),
+                storageEntities.stream().map(StorageEntity::getFullName).collect(Collectors.toList()));
+        assertTrue(storageEntities.stream().allMatch(StorageEntity::isDirectory));
     }
 
     @Test
@@ -336,6 +369,86 @@ class AbsStorageOperatorTest {
     }
 
     @Test
+    void uploadCopyAndCreateDirectoryKeepBlobNamesLiteral() {
+        // exists() checks the literal name, so the writes have to address the same literal blob or a rename to
+        // "c%20d.csv" would pass the existence check and then overwrite "c d.csv"
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        BlobClient uploaded = mockBlobClient(containerClient, "dolphinscheduler/default/resources/a%2520b.csv");
+        BlobClient source = mockBlobClient(containerClient, "dolphinscheduler/default/resources/b%2520c.csv");
+        when(source.getBlobUrl()).thenReturn("https://test-account.blob.core.windows.net/c/b%2520c.csv");
+        BlobClient target = mockBlobClient(containerClient, "dolphinscheduler/default/resources/c%2520d.csv");
+        BlockBlobClient targetBlock = mock(BlockBlobClient.class);
+        when(target.getBlockBlobClient()).thenReturn(targetBlock);
+        BlobClient marker = mockBlobClient(containerClient, "dolphinscheduler/default/resources/d%2520e/");
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        storageOperator.upload("/tmp/a.csv", "dolphinscheduler/default/resources/a%20b.csv", false, false);
+        storageOperator.copy("dolphinscheduler/default/resources/b%20c.csv",
+                "dolphinscheduler/default/resources/c%20d.csv", false, true);
+        storageOperator.createStorageDir("dolphinscheduler/default/resources/d%20e");
+
+        verify(uploaded).uploadFromFile("/tmp/a.csv", false);
+        verify(targetBlock).uploadFromUrl("https://test-account.blob.core.windows.net/c/b%2520c.csv", true);
+        verify(marker).exists();
+    }
+
+    @Test
+    void deleteTheFileRowOfASameNamedPairKeepsTheDirectory() {
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        BlobClient file = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir5/reports");
+        mockResourceType(file, null);
+        BlobClient child = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir5/reports/a.csv");
+        mockListBlobs(containerClient, "dolphinscheduler/default/resources/dir5/reports/",
+                "dolphinscheduler/default/resources/dir5/reports/a.csv");
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        storageOperator.delete("dolphinscheduler/default/resources/dir5/reports", true, false);
+
+        verify(file).deleteIfExists();
+        verify(child, never()).deleteIfExists();
+    }
+
+    @Test
+    void deleteTheDirectoryRowOfASameNamedPairKeepsTheFile() {
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        BlobClient file = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir5/reports");
+        mockResourceType(file, null);
+        BlobClient child = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir5/reports/a.csv");
+        mockListBlobs(containerClient, "dolphinscheduler/default/resources/dir5/reports/",
+                "dolphinscheduler/default/resources/dir5/reports/a.csv");
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        storageOperator.delete("dolphinscheduler/default/resources/dir5/reports", true, true);
+
+        verify(child).deleteIfExists();
+        verify(file, never()).deleteIfExists();
+        verify(file, never()).deleteIfExistsWithResponse(any(), any(), any(), any());
+    }
+
+    @Test
+    void existsForRecursiveDeleteWithTheTypeChecksOnlyThatTarget() {
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        // "only-file" is a blob without anything under it, "only-dir/" has a child but no blob "only-dir"
+        BlobClient onlyFile = mockBlobClient(containerClient, "dolphinscheduler/default/resources/only-file");
+        when(onlyFile.exists()).thenReturn(true);
+        mockResourceType(onlyFile, null);
+        mockBlobExists(containerClient, "dolphinscheduler/default/resources/only-file/", false);
+        mockListBlobs(containerClient, "dolphinscheduler/default/resources/only-file/");
+        mockBlobExists(containerClient, "dolphinscheduler/default/resources/only-dir/", false);
+        BlobClient noFile = mockBlobClient(containerClient, "dolphinscheduler/default/resources/only-dir");
+        when(noFile.exists()).thenReturn(false);
+        mockResourceType(noFile, null);
+        mockListBlobs(containerClient, "dolphinscheduler/default/resources/only-dir/",
+                "dolphinscheduler/default/resources/only-dir/a.csv");
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        assertTrue(storageOperator.existsForRecursiveDelete("dolphinscheduler/default/resources/only-file", false));
+        assertFalse(storageOperator.existsForRecursiveDelete("dolphinscheduler/default/resources/only-file", true));
+        assertTrue(storageOperator.existsForRecursiveDelete("dolphinscheduler/default/resources/only-dir", true));
+        assertFalse(storageOperator.existsForRecursiveDelete("dolphinscheduler/default/resources/only-dir", false));
+    }
+
+    @Test
     void existsOfAFileChecksTheFileOnly() {
         BlobContainerClient containerClient = mock(BlobContainerClient.class);
         mockBlobExists(containerClient, "dolphinscheduler/default/resources/a.sh", true);
@@ -419,7 +532,8 @@ class AbsStorageOperatorTest {
         when(blobItems.iterator()).thenReturn(
                 Arrays.stream(names).map(name -> new BlobItem().setName(name)).collect(Collectors.toList())
                         .iterator());
-        when(containerClient.listBlobs(argThat((ListBlobsOptions options) -> prefix.equals(options.getPrefix())),
+        when(containerClient.listBlobs(
+                argThat((ListBlobsOptions options) -> options != null && prefix.equals(options.getPrefix())),
                 isNull())).thenReturn(blobItems);
     }
 
@@ -437,6 +551,15 @@ class AbsStorageOperatorTest {
                 newFileBlobItem("dolphinscheduler/default/resources/a.sh.bak")));
         blobsByPrefix.put("dolphinscheduler/default/resources/dir1/", Collections.singletonList(
                 newFileBlobItem("dolphinscheduler/default/resources/dir1/b.sql")));
+        // a flat namespace can hold the blob "reports" next to the blobs under "reports/"
+        blobsByPrefix.put("dolphinscheduler/default/resources/dir5/", Arrays.asList(
+                newFileBlobItem("dolphinscheduler/default/resources/dir5/reports"),
+                new BlobItem().setName("dolphinscheduler/default/resources/dir5/reports/").setIsPrefix(true)));
+        // with a hierarchical namespace a directory is a blob flagged as folder, next to its prefix if not empty
+        blobsByPrefix.put("dolphinscheduler/default/resources/dir6/", Arrays.asList(
+                newHierarchicalDirectoryBlobItem("dolphinscheduler/default/resources/dir6/empty"),
+                newHierarchicalDirectoryBlobItem("dolphinscheduler/default/resources/dir6/full"),
+                new BlobItem().setName("dolphinscheduler/default/resources/dir6/full/").setIsPrefix(true)));
 
         when(containerClient.listBlobsByHierarchy(eq("/"), any(ListBlobsOptions.class), isNull()))
                 .thenAnswer(invocation -> {
@@ -447,6 +570,12 @@ class AbsStorageOperatorTest {
                             blobsByPrefix.getOrDefault(options.getPrefix(), Collections.emptyList()).iterator());
                     return blobItems;
                 });
+    }
+
+    private BlobItem newHierarchicalDirectoryBlobItem(String name) {
+        return new BlobItem().setName(name).setIsPrefix(false)
+                .setMetadata(Collections.singletonMap("hdi_isfolder", "true"))
+                .setProperties(new BlobItemProperties().setContentLength(0L).setLastModified(LAST_MODIFIED));
     }
 
     private BlobItem newFileBlobItem(String name) {

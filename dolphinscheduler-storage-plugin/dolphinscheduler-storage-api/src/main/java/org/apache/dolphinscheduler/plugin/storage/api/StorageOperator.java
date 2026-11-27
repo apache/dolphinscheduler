@@ -97,12 +97,37 @@ public interface StorageOperator {
     }
 
     /**
+     * Check whether the resource of the given type exists for a recursive delete. A storage that can hold a file and a
+     * directory with the same name overrides this, the default ignores the type and calls
+     * {@link #existsForRecursiveDelete(String)}.
+     *
+     * @param resourceAbsolutePath the resource absolute path
+     * @param isDirectory          whether the resource is a directory
+     * @return true if the resource of the given type exists, or a directory prefix still has children
+     */
+    default boolean existsForRecursiveDelete(String resourceAbsolutePath, boolean isDirectory) {
+        return existsForRecursiveDelete(resourceAbsolutePath);
+    }
+
+    /**
      * Delete the resource, if the resourceAbsolutePath is not exists, will do nothing.
      *
      * @param resourceAbsolutePath the resource absolute path
      * @param recursive            whether to delete all the sub file/directory under the given resource
      */
     void delete(String resourceAbsolutePath, boolean recursive);
+
+    /**
+     * Delete the resource of the given type, if it does not exist, will do nothing. A storage that can hold a file and a
+     * directory with the same name overrides this, the default ignores the type.
+     *
+     * @param resourceAbsolutePath the resource absolute path
+     * @param recursive            whether to delete all the sub file/directory under the given resource
+     * @param isDirectory          whether the resource is a directory
+     */
+    default void delete(String resourceAbsolutePath, boolean recursive, boolean isDirectory) {
+        delete(resourceAbsolutePath, recursive);
+    }
 
     /**
      * Copy the resource from the source path to the destination path.

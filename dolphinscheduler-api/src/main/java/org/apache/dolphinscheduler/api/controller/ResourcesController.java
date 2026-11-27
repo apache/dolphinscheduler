@@ -272,17 +272,20 @@ public class ResourcesController extends BaseController {
 
     @Operation(summary = "deleteResource", description = "DELETE_RESOURCE_BY_ID_NOTES")
     @Parameters({
-            @Parameter(name = "fullName", description = "RESOURCE_FULLNAME", required = true, schema = @Schema(implementation = String.class, example = "file:////tmp/dolphinscheduler/storage/default/resources/demo.sql"))
+            @Parameter(name = "fullName", description = "RESOURCE_FULLNAME", required = true, schema = @Schema(implementation = String.class, example = "file:////tmp/dolphinscheduler/storage/default/resources/demo.sql")),
+            @Parameter(name = "isDirectory", description = "RESOURCE_IS_DIRECTORY", required = false, schema = @Schema(implementation = Boolean.class))
     })
     @DeleteMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_RESOURCE_ERROR)
     @OperatorLog(auditType = AuditType.FILE_DELETE)
     public Result<Void> deleteResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                       @RequestParam(value = "fullName") String resourceAbsolutePath) {
+                                       @RequestParam(value = "fullName") String resourceAbsolutePath,
+                                       @RequestParam(value = "isDirectory", required = false) Boolean isDirectory) {
         DeleteResourceRequest deleteResourceRequest = DeleteResourceRequest.builder()
                 .loginUser(loginUser)
                 .resourceAbsolutePath(resourceAbsolutePath)
+                .isDirectory(isDirectory)
                 .build();
         resourceService.delete(deleteResourceRequest);
         return Result.success();

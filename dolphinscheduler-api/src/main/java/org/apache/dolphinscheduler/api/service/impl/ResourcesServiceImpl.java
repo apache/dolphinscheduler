@@ -304,9 +304,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         DeleteResourceDto deleteResourceDto = DeleteResourceDto.builder()
                 .loginUser(deleteResourceRequest.getLoginUser())
                 .resourceAbsolutePath(deleteResourceRequest.getResourceAbsolutePath())
+                .isDirectory(deleteResourceRequest.getIsDirectory())
                 .build();
         deleteResourceDtoValidator.validate(deleteResourceDto);
-        storageOperator.delete(deleteResourceDto.getResourceAbsolutePath(), true);
+        if (deleteResourceDto.getIsDirectory() == null) {
+            storageOperator.delete(deleteResourceDto.getResourceAbsolutePath(), true);
+        } else {
+            storageOperator.delete(deleteResourceDto.getResourceAbsolutePath(), true,
+                    deleteResourceDto.getIsDirectory());
+        }
     }
 
     @Override

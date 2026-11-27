@@ -40,6 +40,10 @@ interface FullNameReq {
   fullName: string
 }
 
+interface IsDirectoryReq {
+  isDirectory?: boolean
+}
+
 interface IdReq {
   id: number
 }
@@ -114,6 +118,7 @@ export {
   NameReq,
   FileNameReq,
   FullNameReq,
+  IsDirectoryReq,
   TenantCodeReq,
   IdReq,
   ContentReq,

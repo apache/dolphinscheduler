@@ -90,6 +90,12 @@ public abstract class AbstractResourceValidator<T> implements IValidator<T> {
         }
     }
 
+    public void exceptionResourceNotExistsForRecursiveDelete(String resourceAbsolutePath, boolean isDirectory) {
+        if (!storageOperator.existsForRecursiveDelete(resourceAbsolutePath, isDirectory)) {
+            throw new ServiceException("Thr resource is not exists: " + resourceAbsolutePath);
+        }
+    }
+
     public void exceptionResourceNotExistsForRecursiveDelete(String resourceAbsolutePath) {
         if (!storageOperator.existsForRecursiveDelete(resourceAbsolutePath)) {
             throw new ServiceException("Thr resource is not exists: " + resourceAbsolutePath);
