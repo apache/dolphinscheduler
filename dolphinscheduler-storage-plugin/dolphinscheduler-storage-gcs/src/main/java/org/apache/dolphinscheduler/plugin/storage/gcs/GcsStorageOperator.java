@@ -165,8 +165,13 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
                     Storage.BlobListOption.pageSize(1000));
             List<BlobId> batch = new ArrayList<>();
             List<String> failedKeys = new ArrayList<>();
+            boolean markerFound = false;
             for (Blob blob : blobs.iterateAll()) {
-                batch.add(blob.getBlobId());
+                if (gcsKey.equals(blob.getName())) {
+                    markerFound = true;
+                    continue;
+                }
+                batch.add(BlobId.of(bucketName, blob.getName()));
                 if (batch.size() >= 100) {
                     deleteBatchAndRecordFailures(batch, failedKeys);
                     batch = new ArrayList<>();
@@ -177,6 +182,9 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
             }
             if (!failedKeys.isEmpty()) {
                 throw new IllegalStateException("GCS failed to delete objects: " + failedKeys);
+            }
+            if (markerFound && !gcsStorage.delete(BlobId.of(bucketName, gcsKey))) {
+                throw new IllegalStateException("GCS failed to delete objects: " + Collections.singletonList(gcsKey));
             }
         } else {
             if (exists(filePath)) {

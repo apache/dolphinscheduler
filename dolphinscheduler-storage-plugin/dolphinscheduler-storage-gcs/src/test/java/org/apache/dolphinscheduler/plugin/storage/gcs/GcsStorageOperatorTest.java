@@ -432,10 +432,53 @@ public class GcsStorageOperatorTest {
                 () -> faultOperator.delete(dirPath, true));
         assertTrue(ex.getMessage().contains(failingKey));
 
-        // Verify the failing object remains while the rest (including the second batch) were deleted
+        // Verify the failing object and directory marker remain while the rest (including the second batch) were
+        // deleted
+        assertTrue(storageOperator.exists(dirPath));
         assertNotNull(storage.get(BlobId.of(BUCKET_NAME, failingKey)));
         assertNull(storage.get(BlobId.of(BUCKET_NAME, toGcsKey(FileUtils.concatFilePath(dirPath, "item_000.txt")))));
         assertNull(storage.get(BlobId.of(BUCKET_NAME, toGcsKey(FileUtils.concatFilePath(dirPath, "item_104.txt")))));
+
+        // Retry with the real operator and verify both the remaining child and the directory marker are deleted
+        storageOperator.delete(dirPath, true);
+        assertFalse(storageOperator.exists(dirPath));
+        assertNull(storage.get(BlobId.of(BUCKET_NAME, failingKey)));
+        assertNull(storage.get(BlobId.of(BUCKET_NAME, toGcsDirKey(dirPath))));
+    }
+
+    @Test
+    void delete_directory_recursive_preservesNoncurrentObjectVersionOnVersionedBucket() {
+        String versionedBucket = "dolphinscheduler-versioned-bucket";
+        storage.create(BucketInfo.newBuilder(versionedBucket).setVersioningEnabled(true).build());
+        GcsStorageOperator versionedOperator = new GcsStorageOperator(RESOURCE_UPLOAD_PATH, versionedBucket, storage);
+
+        String dirPath = FileUtils.concatFilePath(versionedOperator.getStorageBaseDirectory(), "default", "resources",
+                "versionedDir");
+        versionedOperator.createStorageDir(dirPath);
+
+        String fileKey = toGcsKey(FileUtils.concatFilePath(dirPath, "versioned.txt"));
+        Blob created = storage.create(BlobInfo.newBuilder(BlobId.of(versionedBucket, fileKey)).build(),
+                "v1".getBytes(StandardCharsets.UTF_8));
+        Long generation = created.getGeneration();
+        assertNotNull(generation);
+
+        versionedOperator.delete(dirPath, true);
+
+        // Live object and marker should disappear
+        assertFalse(versionedOperator.exists(dirPath));
+        assertNull(storage.get(BlobId.of(versionedBucket, fileKey)));
+
+        // Noncurrent version should remain retrievable when listing with versions(true)
+        boolean foundNoncurrentVersion = false;
+        for (Blob versionedBlob : storage.list(versionedBucket,
+                Storage.BlobListOption.prefix(toGcsDirKey(dirPath)),
+                Storage.BlobListOption.versions(true)).iterateAll()) {
+            if (fileKey.equals(versionedBlob.getName()) && generation.equals(versionedBlob.getGeneration())) {
+                foundNoncurrentVersion = true;
+                break;
+            }
+        }
+        assertTrue(foundNoncurrentVersion, "Expected previous object generation to remain as a noncurrent version");
     }
 
     @Test
