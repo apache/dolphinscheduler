@@ -133,6 +133,21 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
         return blob != null && blob.exists();
     }
 
+    @Override
+    public boolean existsForRecursiveDelete(String resourceAbsolutePath) {
+        String gcsKey = transformAbsolutePathToGcsKey(resourceAbsolutePath);
+        Blob blob = gcsStorage.get(BlobId.of(bucketName, gcsKey));
+        if (blob != null && blob.exists()) {
+            return true;
+        }
+        if (!getResourceMetaData(resourceAbsolutePath).isDirectory()) {
+            return false;
+        }
+        Page<Blob> blobs = gcsStorage.list(bucketName, Storage.BlobListOption.prefix(gcsKey),
+                Storage.BlobListOption.pageSize(1));
+        return blobs.iterateAll().iterator().hasNext();
+    }
+
     @SneakyThrows
     @Override
     public void delete(String filePath, boolean recursive) {
@@ -149,20 +164,46 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
             Page<Blob> blobs = gcsStorage.list(bucketName, Storage.BlobListOption.prefix(gcsKey),
                     Storage.BlobListOption.pageSize(1000));
             List<BlobId> batch = new ArrayList<>();
+            List<String> failedKeys = new ArrayList<>();
             for (Blob blob : blobs.iterateAll()) {
                 batch.add(blob.getBlobId());
                 if (batch.size() >= 100) {
-                    gcsStorage.delete(batch);
+                    deleteBatchAndRecordFailures(batch, failedKeys);
                     batch = new ArrayList<>();
                 }
             }
             if (!batch.isEmpty()) {
-                gcsStorage.delete(batch);
+                deleteBatchAndRecordFailures(batch, failedKeys);
+            }
+            if (!failedKeys.isEmpty()) {
+                throw new IllegalStateException("GCS failed to delete objects: " + failedKeys);
             }
         } else {
             if (exists(filePath)) {
                 gcsStorage.delete(BlobId.of(bucketName, gcsKey));
             }
+        }
+    }
+
+    private void deleteBatchAndRecordFailures(List<BlobId> batch, List<String> failedKeys) {
+        List<Boolean> results = gcsStorage.delete(batch);
+        if (results == null) {
+            batch.forEach(blobId -> failedKeys.add(blobId.getName()));
+            return;
+        }
+        int checkedCount = Math.min(batch.size(), results.size());
+        for (int i = 0; i < checkedCount; i++) {
+            if (!Boolean.TRUE.equals(results.get(i))) {
+                failedKeys.add(batch.get(i).getName());
+            }
+        }
+        if (results.size() < batch.size()) {
+            for (int i = results.size(); i < batch.size(); i++) {
+                failedKeys.add(batch.get(i).getName());
+            }
+        } else if (results.size() > batch.size()) {
+            throw new IllegalStateException(
+                    "Unexpected GCS batch delete result count: expected " + batch.size() + ", got " + results.size());
         }
     }
 

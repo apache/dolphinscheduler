@@ -21,15 +21,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 
 import java.io.File;
+import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import lombok.SneakyThrows;
@@ -331,5 +334,132 @@ public class GcsStorageOperatorTest {
         assertNotNull(blob);
         assertTrue(blob.exists());
         assertEquals(expectedContent, new String(blob.getContent(), StandardCharsets.UTF_8));
+    }
+
+    @Test
+    void existsForRecursiveDelete_markerlessDirectoryWithChild_returnsTrueWhileExistsReturnsFalse() {
+        String dirPath = FileUtils.concatFilePath(storageOperator.getStorageBaseDirectory(), "default", "resources",
+                "markerlessDir");
+        String childPath = FileUtils.concatFilePath(dirPath, "child.txt");
+        storage.create(BlobInfo.newBuilder(BlobId.of(BUCKET_NAME, toGcsKey(childPath))).build(),
+                "child".getBytes(StandardCharsets.UTF_8));
+
+        assertFalse(storageOperator.exists(dirPath));
+        assertTrue(storageOperator.existsForRecursiveDelete(dirPath));
+
+        storageOperator.delete(dirPath, true);
+        assertFalse(storageOperator.existsForRecursiveDelete(dirPath));
+        assertNull(storage.get(BlobId.of(BUCKET_NAME, toGcsKey(childPath))));
+    }
+
+    @Test
+    void existsForRecursiveDelete_markerlessDirectoryWithoutChildren_returnsFalse() {
+        String dirPath = FileUtils.concatFilePath(storageOperator.getStorageBaseDirectory(), "default", "resources",
+                "missingMarkerlessDir");
+
+        assertFalse(storageOperator.exists(dirPath));
+        assertFalse(storageOperator.existsForRecursiveDelete(dirPath));
+    }
+
+    @Test
+    void existsForRecursiveDelete_siblingPrefixOnly_returnsFalse() {
+        String dirPath = FileUtils.concatFilePath(storageOperator.getStorageBaseDirectory(), "default", "resources",
+                "isolated-reports");
+        String siblingChildPath = FileUtils.concatFilePath(storageOperator.getStorageBaseDirectory(), "default",
+                "resources", "isolated-reports-old", "legacy.txt");
+        storage.create(BlobInfo.newBuilder(BlobId.of(BUCKET_NAME, toGcsKey(siblingChildPath))).build(),
+                "legacy".getBytes(StandardCharsets.UTF_8));
+
+        assertFalse(storageOperator.existsForRecursiveDelete(dirPath));
+    }
+
+    @Test
+    void existsForRecursiveDelete_missingFile_returnsFalse() {
+        String missingFilePath = FileUtils.concatFilePath(storageOperator.getStorageBaseDirectory(), "default",
+                "resources", "missing-file.txt");
+
+        assertFalse(storageOperator.existsForRecursiveDelete(missingFilePath));
+    }
+
+    @Test
+    void delete_directory_partialBatchFailure_continuesOtherBatchesAndThrowsWithFailedKey() {
+        String dirPath = FileUtils.concatFilePath(storageOperator.getStorageBaseDirectory(), "default", "resources",
+                "partialFailureDir");
+        storageOperator.createStorageDir(dirPath);
+
+        int totalFiles = 105;
+        String failingKey = toGcsKey(FileUtils.concatFilePath(dirPath, "item_010.txt"));
+        for (int i = 0; i < totalFiles; i++) {
+            String fileName = String.format("item_%03d.txt", i);
+            String fileKey = toGcsKey(FileUtils.concatFilePath(dirPath, fileName));
+            storage.create(BlobInfo.newBuilder(BlobId.of(BUCKET_NAME, fileKey)).build(), new byte[0]);
+        }
+
+        // Delegate to real fake-gcs-server Storage, injecting Boolean.FALSE for one specific key in batch delete
+        Storage faultInjectingStorage = (Storage) Proxy.newProxyInstance(
+                Storage.class.getClassLoader(),
+                new Class<?>[]{Storage.class},
+                (proxy, method, args) -> {
+                    if ("delete".equals(method.getName()) && args.length == 1 && args[0] instanceof Iterable) {
+                        List<BlobId> ids = new ArrayList<>();
+                        for (Object item : (Iterable<?>) args[0]) {
+                            ids.add((BlobId) item);
+                        }
+                        List<BlobId> toActuallyDelete = new ArrayList<>();
+                        int failIndex = -1;
+                        for (int i = 0; i < ids.size(); i++) {
+                            if (failingKey.equals(ids.get(i).getName())) {
+                                failIndex = i;
+                            } else {
+                                toActuallyDelete.add(ids.get(i));
+                            }
+                        }
+                        List<Boolean> realResults = toActuallyDelete.isEmpty()
+                                ? new ArrayList<>()
+                                : new ArrayList<>(storage.delete(toActuallyDelete));
+                        if (failIndex >= 0) {
+                            realResults.add(failIndex, Boolean.FALSE);
+                        }
+                        return realResults;
+                    }
+                    return method.invoke(storage, args);
+                });
+
+        GcsStorageOperator faultOperator = new GcsStorageOperator(RESOURCE_UPLOAD_PATH, BUCKET_NAME,
+                faultInjectingStorage);
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> faultOperator.delete(dirPath, true));
+        assertTrue(ex.getMessage().contains(failingKey));
+
+        // Verify the failing object remains while the rest (including the second batch) were deleted
+        assertNotNull(storage.get(BlobId.of(BUCKET_NAME, failingKey)));
+        assertNull(storage.get(BlobId.of(BUCKET_NAME, toGcsKey(FileUtils.concatFilePath(dirPath, "item_000.txt")))));
+        assertNull(storage.get(BlobId.of(BUCKET_NAME, toGcsKey(FileUtils.concatFilePath(dirPath, "item_104.txt")))));
+    }
+
+    @Test
+    void delete_directory_unexpectedBatchResultCount_throwsException() {
+        String dirPath = FileUtils.concatFilePath(storageOperator.getStorageBaseDirectory(), "default", "resources",
+                "unexpectedResultDir");
+        String fileKey = toGcsKey(FileUtils.concatFilePath(dirPath, "item.txt"));
+        storage.create(BlobInfo.newBuilder(BlobId.of(BUCKET_NAME, fileKey)).build(), new byte[0]);
+
+        Storage truncatedResultStorage = (Storage) Proxy.newProxyInstance(
+                Storage.class.getClassLoader(),
+                new Class<?>[]{Storage.class},
+                (proxy, method, args) -> {
+                    if ("delete".equals(method.getName()) && args.length == 1 && args[0] instanceof Iterable) {
+                        return Collections.emptyList();
+                    }
+                    return method.invoke(storage, args);
+                });
+
+        GcsStorageOperator faultOperator = new GcsStorageOperator(RESOURCE_UPLOAD_PATH, BUCKET_NAME,
+                truncatedResultStorage);
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> faultOperator.delete(dirPath, true));
+        assertTrue(ex.getMessage().contains(fileKey));
     }
 }
