@@ -35,6 +35,7 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
+import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
@@ -269,6 +270,12 @@ class AbsStorageOperatorTest {
             assertEquals(literalName,
                     realClient.getBlobClient(AbsStorageOperator.encodeBlobName(literalName)).getBlobName());
         }
+        // copy() passes getBlobUrl() on to the service, the name must be encoded there exactly once
+        // (the SDK writes the separator as %2F)
+        assertEquals("https://test.blob.core.windows.net/test-container/dir%2Freport%2520final.csv",
+                realClient.getBlobClient(AbsStorageOperator.encodeBlobName("dir/report%20final.csv")).getBlobUrl());
+        assertEquals("https://test.blob.core.windows.net/test-container/dir%2Freport%20final.csv",
+                realClient.getBlobClient(AbsStorageOperator.encodeBlobName("dir/report final.csv")).getBlobUrl());
     }
 
     @Test
@@ -361,7 +368,6 @@ class AbsStorageOperatorTest {
         BlobContainerClient containerClient = mock(BlobContainerClient.class);
         mockBlobExists(containerClient, "dolphinscheduler/default/resources/report%2520final.csv", true);
         mockBlobExists(containerClient, "dolphinscheduler/default/resources/report%20final.csv", false);
-        mockBlobExists(containerClient, "dolphinscheduler/default/resources/report final.csv", false);
         AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
 
         assertTrue(storageOperator.exists("dolphinscheduler/default/resources/report%20final.csv"));
@@ -390,6 +396,7 @@ class AbsStorageOperatorTest {
         verify(uploaded).uploadFromFile("/tmp/a.csv", false);
         verify(targetBlock).uploadFromUrl("https://test-account.blob.core.windows.net/c/b%2520c.csv", true);
         verify(marker).exists();
+        verify(marker).upload(any(InputStream.class), eq(0L));
     }
 
     @Test

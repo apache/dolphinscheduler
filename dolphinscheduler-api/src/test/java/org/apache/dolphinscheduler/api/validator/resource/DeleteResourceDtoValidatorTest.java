@@ -206,6 +206,20 @@ class DeleteResourceDtoValidatorTest {
         verify(child, never()).deleteIfExists();
     }
 
+    @Test
+    void deletePercentNamedFileThroughResourceCenter() {
+        // only "report%20final.csv" exists, the decoded "report final.csv" does not
+        String path = DIRECTORY + "/report%20final.csv";
+        BlobClient percentNamed = mockBlobExists(DIRECTORY + "/report%2520final.csv", true);
+        BlobClient decoded = mockBlobExists(DIRECTORY + "/report%20final.csv", false);
+
+        deleteThroughResourceCenter(path, null);
+        deleteThroughResourceCenter(path, false);
+
+        verify(percentNamed, Mockito.times(2)).deleteIfExists();
+        verify(decoded, never()).deleteIfExists();
+    }
+
     private void mockPlainBlobProperties(BlobClient blobClient) {
         // a flat-namespace blob has no x-ms-resource-type header, only a hierarchical directory has
         @SuppressWarnings("unchecked")
@@ -219,10 +233,14 @@ class DeleteResourceDtoValidatorTest {
     }
 
     private void deleteThroughResourceCenter(Boolean isDirectory) {
+        deleteThroughResourceCenter(DIRECTORY, isDirectory);
+    }
+
+    private void deleteThroughResourceCenter(String path, Boolean isDirectory) {
         ResourcesServiceImpl service = new ResourcesServiceImpl();
         ReflectionTestUtils.setField(service, "storageOperator", storageOperator);
         ReflectionTestUtils.setField(service, "deleteResourceDtoValidator", deleteResourceDtoValidator);
-        service.delete(DeleteResourceRequest.builder().loginUser(adminUser).resourceAbsolutePath(DIRECTORY)
+        service.delete(DeleteResourceRequest.builder().loginUser(adminUser).resourceAbsolutePath(path)
                 .isDirectory(isDirectory).build());
     }
 
