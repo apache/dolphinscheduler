@@ -29,6 +29,8 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitivePlaceholderMask;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitivePropertyJson;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -52,6 +54,11 @@ public class HttpTask extends AbstractTask {
     private TaskExecutionContext taskExecutionContext;
 
     /**
+     * URL with sensitive {@code ${name}} replaced, for logs only.
+     */
+    private String urlForLog;
+
+    /**
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
@@ -64,7 +71,7 @@ public class HttpTask extends AbstractTask {
     @Override
     public void init() {
         this.httpParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), HttpParameters.class);
-        log.info("Initialize http task params: {}", JSONUtils.toPrettyJsonString(httpParameters));
+        log.info("Initialize http task params: {}", SensitivePropertyJson.forLog(httpParameters));
 
         if (httpParameters == null || !httpParameters.checkParameters()) {
             throw new RuntimeException("http task params is not valid");
@@ -75,8 +82,10 @@ public class HttpTask extends AbstractTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         // Resolve ${...} / $[...] placeholders in the URL with the same parameter map used for
         // headers, query parameters and body; otherwise the raw template is used as the host.
-        httpParameters.setUrl(ParameterUtils.convertParameterPlaceholders(httpParameters.getUrl(),
-                ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap())));
+        Map<String, Property> params = taskExecutionContext.getPrepareParamsMap();
+        String urlTemplate = httpParameters.getUrl();
+        urlForLog = SensitivePlaceholderMask.forLog(urlTemplate, params);
+        httpParameters.setUrl(ParameterUtils.convertParameterPlaceholders(urlTemplate, ParameterUtils.convert(params)));
 
         OkHttpResponse httpResponse = sendRequest();
 
@@ -94,7 +103,7 @@ public class HttpTask extends AbstractTask {
             case BODY_CONTAINS:
                 if (StringUtils.isEmpty(body) || !body.contains(httpParameters.getCondition())) {
                     log.error("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
-                            httpParameters.getUrl(), statusCode, HttpCheckCondition.BODY_CONTAINS.name(), body);
+                            loggedUrl(), statusCode, HttpCheckCondition.BODY_CONTAINS.name(), body);
                     exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
                     return;
                 }
@@ -102,7 +111,7 @@ public class HttpTask extends AbstractTask {
             case BODY_NOT_CONTAINS:
                 if (StringUtils.isEmpty(body) || body.contains(httpParameters.getCondition())) {
                     log.error("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
-                            httpParameters.getUrl(), statusCode, HttpCheckCondition.BODY_NOT_CONTAINS.name(), body);
+                            loggedUrl(), statusCode, HttpCheckCondition.BODY_NOT_CONTAINS.name(), body);
                     exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
                     return;
                 }
@@ -110,7 +119,7 @@ public class HttpTask extends AbstractTask {
             case STATUS_CODE_CUSTOM:
                 if (statusCode != Integer.parseInt(httpParameters.getCondition())) {
                     log.error("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
-                            httpParameters.getUrl(), statusCode, HttpCheckCondition.STATUS_CODE_CUSTOM.name(), body);
+                            loggedUrl(), statusCode, HttpCheckCondition.STATUS_CODE_CUSTOM.name(), body);
                     exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
                     return;
                 }
@@ -118,7 +127,7 @@ public class HttpTask extends AbstractTask {
             case STATUS_CODE_DEFAULT:
                 if (HttpConstants.RESPONSE_CODE_SUCCESS != statusCode) {
                     log.error("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
-                            httpParameters.getUrl(), statusCode, HttpCheckCondition.STATUS_CODE_DEFAULT.name(), body);
+                            loggedUrl(), statusCode, HttpCheckCondition.STATUS_CODE_DEFAULT.name(), body);
                     exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
                     return;
                 }
@@ -129,7 +138,7 @@ public class HttpTask extends AbstractTask {
         }
 
         // default success log
-        log.info("http request success, url: {}, statusCode: {}, body: {}", httpParameters.getUrl(), statusCode, body);
+        log.info("http request success, url: {}, statusCode: {}, body: {}", loggedUrl(), statusCode, body);
         exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
     }
 
@@ -270,8 +279,10 @@ public class HttpTask extends AbstractTask {
         }
 
         if (!requestBodyJsonNode.isObject()) {
-            throw new IllegalArgumentException(String.format("Http request body should be a json object, but got: %s",
-                    convertedParams));
+            throw new IllegalArgumentException(String.format(
+                    "Http request body should be a json object, but got: %s",
+                    SensitivePlaceholderMask.forLog(httpParameters.getHttpRequestBody(),
+                            taskExecutionContext.getPrepareParamsMap())));
         }
 
         return JSONUtils.parseObject(requestBodyJsonNode.toString(), new TypeReference<Map<String, Object>>() {
@@ -291,5 +302,9 @@ public class HttpTask extends AbstractTask {
         outputProperty.setType(DataType.VARCHAR);
         outputProperty.setValue(response);
         httpParameters.addPropertyToValPool(outputProperty);
+    }
+
+    private String loggedUrl() {
+        return urlForLog == null ? httpParameters.getUrl() : urlForLog;
     }
 }

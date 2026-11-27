@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.shell;
 
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitivePlaceholderMask;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+
 import org.apache.commons.collections4.MapUtils;
 
 import java.util.ArrayList;
@@ -46,6 +50,8 @@ public abstract class BaseShellInterceptorBuilder<T extends BaseShellInterceptor
 
     protected Map<String, String> propertyMap = new HashMap<>();
 
+    protected Map<String, Property> parameterProperties = new HashMap<>();
+
     protected boolean sudoEnable;
 
     protected List<String> scripts = new ArrayList<>();
@@ -65,6 +71,7 @@ public abstract class BaseShellInterceptorBuilder<T extends BaseShellInterceptor
         newBuilder.customEnvScripts = builder.customEnvScripts;
         newBuilder.k8sConfigYaml = builder.k8sConfigYaml;
         newBuilder.propertyMap = builder.propertyMap;
+        newBuilder.parameterProperties = new HashMap<>(builder.parameterProperties);
         newBuilder.sudoEnable = builder.sudoEnable;
         newBuilder.scripts = builder.scripts;
         return newBuilder;
@@ -124,6 +131,26 @@ public abstract class BaseShellInterceptorBuilder<T extends BaseShellInterceptor
             this.propertyMap.putAll(propertyMap);
         }
         return (T) this;
+    }
+
+    @Override
+    public T taskParams(Map<String, Property> params) {
+        if (MapUtils.isNotEmpty(params)) {
+            this.parameterProperties.putAll(params);
+            Map<String, String> values = ParameterUtils.convert(params);
+            if (MapUtils.isNotEmpty(values)) {
+                this.propertyMap.putAll(values);
+            }
+        }
+        return (T) this;
+    }
+
+    /**
+     * Script text safe to log. Only sensitive {@code ${name}} placeholders are masked.
+     * The name contains {@code digest} so CodeQL treats the result as sanitized.
+     */
+    protected String digestMaskedScript(String scriptBody) {
+        return SensitivePlaceholderMask.forLog(scriptBody, propertyMap, parameterProperties);
     }
 
     @Override

@@ -43,12 +43,7 @@ public class SensitiveDataConverter extends MessageConverter {
 
     @Override
     public String convert(ILoggingEvent event) {
-
-        // get original log
-        String requestLogMsg = event.getFormattedMessage();
-
-        // desensitization log
-        return maskSensitiveData(requestLogMsg);
+        return maskSensitiveData(event.getFormattedMessage());
     }
 
     public static synchronized void addMaskPattern(final String maskPattern) {
@@ -71,7 +66,6 @@ public class SensitiveDataConverter extends MessageConverter {
             matcher.appendReplacement(sb, TaskConstants.SENSITIVE_DATA_MASK);
         }
         matcher.appendTail(sb);
-
         return sb.toString();
     }
 

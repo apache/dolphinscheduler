@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitivePlaceholderMask;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
@@ -140,32 +141,32 @@ public class RemoteShellTask extends AbstractTask {
             return fileName;
         }
 
-        String script = remoteShellParameters.getRawScript().replaceAll("\\r\\n", "\n");
-        script = parseScript(script);
+        String rawScript = remoteShellParameters.getRawScript().replaceAll("\\r\\n", "\n");
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        String script = ParameterUtils.convertParameterPlaceholders(rawScript, ParameterUtils.convert(paramsMap));
+        String scriptForLog = SensitivePlaceholderMask.forLog(rawScript, paramsMap);
 
         String environment = taskExecutionContext.getEnvironmentConfig();
         if (environment != null) {
             environment = environment.replaceAll("\\r\\n", "\n");
             environment = environment.replace("\r\n", "\n");
             script = environment + "\n" + script;
+            scriptForLog = environment + "\n" + scriptForLog;
         }
         script = String.format(RemoteExecutor.COMMAND.HEADER) + script;
+        scriptForLog = String.format(RemoteExecutor.COMMAND.HEADER) + scriptForLog;
         script += String.format(RemoteExecutor.COMMAND.ADD_STATUS_COMMAND, RemoteExecutor.STATUS_TAG_MESSAGE);
+        scriptForLog += String.format(RemoteExecutor.COMMAND.ADD_STATUS_COMMAND, RemoteExecutor.STATUS_TAG_MESSAGE);
 
         FileUtils.createFileWith755(path);
         Files.write(path, script.getBytes(), StandardOpenOption.APPEND);
-        log.info("raw script : {}", script);
+        log.info("raw script : {}", scriptForLog);
         return fileName;
     }
 
     @Override
     public AbstractParameters getParameters() {
         return remoteShellParameters;
-    }
-
-    private String parseScript(String script) {
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        return ParameterUtils.convertParameterPlaceholders(script, ParameterUtils.convert(paramsMap));
     }
 
     public void initRemoteExecutor() {

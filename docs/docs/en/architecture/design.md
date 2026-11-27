@@ -268,6 +268,8 @@ In the early schedule design, if there is no priority design and use the fair sc
 </appender>
 ```
 
+- Worker and master do not search log text for a secret. A sensitive value of any length is masked only at a known position: `${name}` when a script or SQL text is rendered for the log, the `value` field of a property whose `sensitive` flag is true, and `!{name}` inlined into SQL for the log line. The same characters elsewhere in the line stay as they are. The script file, JDBC binds, remote uploads, and output-parameter parsing keep the original plaintext. Task process output and Kubernetes pod logs are the task's own output and are not rewritten. Datasource password regexes still apply to every line.
+
 ## Sum Up
 
 From the perspective of scheduling, this article preliminarily introduces the architecture principles and implementation ideas of the big data distributed workflow scheduling system: DolphinScheduler. To be continued.

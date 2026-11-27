@@ -115,7 +115,7 @@ public class RemoteExecutor implements AutoCloseable {
             pid = getTaskPid(taskId);
             String trackCommand = String.format(COMMAND.TRACK_COMMAND, logN + 1, getRemoteShellHome(), taskId);
             int readLines = runRemoteAndProcessLines(trackCommand, line -> {
-                log.info(line);
+                log.info("{}", line);
                 taskOutputParameterParser.appendParseLog(line);
             });
             if (readLines > 0) {
@@ -211,9 +211,7 @@ public class RemoteExecutor implements AutoCloseable {
         String checkDirCommand = String.format(COMMAND.CHECK_DIR, getRemoteShellHome(), getRemoteShellHome());
         runRemote(checkDirCommand);
         uploadScript(taskId, localFile);
-
-        log.info("The final script is: \n{}",
-                runRemote(String.format(COMMAND.CAT_FINAL_SCRIPT, getRemoteShellHome(), taskId)));
+        log.info("Uploaded final script for task {}", taskId);
     }
 
     public void uploadScript(String taskId, String localFile) throws IOException {
@@ -296,8 +294,6 @@ public class RemoteExecutor implements AutoCloseable {
         static final String HEADER = "#!/bin/bash\n";
 
         static final String ADD_STATUS_COMMAND = "\necho %s$?";
-
-        static final String CAT_FINAL_SCRIPT = "cat %s%s.sh";
 
         static final String PSTREE_COMMAND = "pstree -p %s";
 

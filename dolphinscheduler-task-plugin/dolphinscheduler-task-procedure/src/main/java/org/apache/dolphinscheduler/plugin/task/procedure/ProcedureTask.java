@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitivePropertyJson;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -69,7 +70,7 @@ public class ProcedureTask extends AbstractTask {
 
         this.procedureParameters =
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ProcedureParameters.class);
-        log.info("Initialize procedure task params {}", JSONUtils.toPrettyJsonString(procedureParameters));
+        log.info("Initialize procedure task params {}", SensitivePropertyJson.forLog(procedureParameters));
 
         // check parameters
         if (procedureParameters == null || !procedureParameters.checkParameters()) {

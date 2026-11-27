@@ -26,11 +26,11 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitivePropertyJson;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -66,7 +66,7 @@ public class JupyterTask extends AbstractRemoteTask {
     public void init() {
 
         jupyterParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), JupyterParameters.class);
-        log.info("Initialize jupyter task params {}", JSONUtils.toPrettyJsonString(jupyterParameters));
+        log.info("Initialize jupyter task params {}", SensitivePropertyJson.forLog(jupyterParameters));
 
         if (null == jupyterParameters) {
             log.error("jupyter params is null");
@@ -83,7 +83,7 @@ public class JupyterTask extends AbstractRemoteTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
-                    .properties(ParameterUtils.convert(taskRequest.getPrepareParamsMap()))
+                    .taskParams(taskRequest.getPrepareParamsMap())
                     .appendScript(buildCommand());
 
             TaskResponse response = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);

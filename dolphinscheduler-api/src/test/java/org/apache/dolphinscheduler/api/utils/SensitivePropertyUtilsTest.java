@@ -50,6 +50,13 @@ class SensitivePropertyUtilsTest {
     }
 
     @Test
+    void requireNoPlaceholderAcceptsSensitiveValueOnCreate() {
+        Assertions.assertDoesNotThrow(
+                () -> SensitivePropertyUtils.requireNoPlaceholder(
+                        Collections.singletonList(sensitive("pwd", "Secret123"))));
+    }
+
+    @Test
     void mergeKeepsOriginalOnPlaceholder() {
         List<Property> merged = SensitivePropertyUtils.merge(
                 Collections.singletonList(sensitive("pwd", TaskConstants.SENSITIVE_DATA_MASK)),
@@ -74,6 +81,14 @@ class SensitivePropertyUtilsTest {
         Assertions.assertThrows(ServiceException.class,
                 () -> SensitivePropertyUtils.merge(
                         Collections.singletonList(nonSensitive("pwd", TaskConstants.SENSITIVE_DATA_MASK)),
+                        Collections.singletonList(sensitive("pwd", "Secret123"))));
+    }
+
+    @Test
+    void mergeAcceptsLongSensitiveValueOnUpdate() {
+        Assertions.assertDoesNotThrow(
+                () -> SensitivePropertyUtils.merge(
+                        Collections.singletonList(sensitive("pwd", "new-secret-value")),
                         Collections.singletonList(sensitive("pwd", "Secret123"))));
     }
 
@@ -139,6 +154,26 @@ class SensitivePropertyUtilsTest {
         Assertions.assertEquals(1, restored.size());
         Assertions.assertEquals("extra", restored.get(0).getProp());
         Assertions.assertEquals("plain", restored.get(0).getValue());
+        Assertions.assertFalse(restored.get(0).isSensitive());
+    }
+
+    @Test
+    void restoreStartParamsPlaceholderKeepsStoredValue() {
+        // Placeholder keeps the stored value, including a short legacy one.
+        List<Property> restored = SensitivePropertyUtils.restoreStartParams(
+                Collections.singletonList(sensitive("pwd", TaskConstants.SENSITIVE_DATA_MASK)),
+                Collections.singletonList(sensitive("pwd", "abc")));
+
+        Assertions.assertEquals("abc", restored.get(0).getValue());
+    }
+
+    @Test
+    void restoreStartParamsAcceptsShortOverrideOfNonSensitiveGlobal() {
+        List<Property> restored = SensitivePropertyUtils.restoreStartParams(
+                Collections.singletonList(sensitive("plain", "abc")),
+                Collections.singletonList(nonSensitive("plain", "xyz")));
+
+        Assertions.assertEquals("abc", restored.get(0).getValue());
         Assertions.assertFalse(restored.get(0).isSensitive());
     }
 

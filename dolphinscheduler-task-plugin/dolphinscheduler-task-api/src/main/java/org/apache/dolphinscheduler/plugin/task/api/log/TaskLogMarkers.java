@@ -35,6 +35,6 @@ public class TaskLogMarkers {
 
     public static Marker includeInTaskLog() {
         return TASK_LOGGER_INCLUDE_MARKER;
-
     }
+
 }

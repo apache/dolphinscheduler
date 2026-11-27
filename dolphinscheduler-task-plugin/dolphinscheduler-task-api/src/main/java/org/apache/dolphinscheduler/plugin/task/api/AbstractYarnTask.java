@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.List;
 
@@ -46,7 +45,7 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             IShellInterceptorBuilder shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
-                    .properties(ParameterUtils.convert(taskRequest.getPrepareParamsMap()))
+                    .taskParams(taskRequest.getPrepareParamsMap())
                     // todo: do we need to move the replace to subclass?
                     .appendScript(getScript().replaceAll("\\r\\n", System.lineSeparator()));
             // SHELL task exit code

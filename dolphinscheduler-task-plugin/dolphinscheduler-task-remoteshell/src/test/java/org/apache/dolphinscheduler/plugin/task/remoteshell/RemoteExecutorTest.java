@@ -124,9 +124,7 @@ public class RemoteExecutorTest {
         doNothing().when(remoteExecutor).uploadScript(Mockito.anyString(), Mockito.anyString());
         String checkDirCommand =
                 "if [ ! -d /tmp/dolphinscheduler-remote-shell-root/ ]; then mkdir -p /tmp/dolphinscheduler-remote-shell-root/; fi";
-        String catScriptCommand = "cat /tmp/dolphinscheduler-remote-shell-root/1234.sh";
         doReturn("").when(remoteExecutor).runRemote(checkDirCommand);
-        doReturn("").when(remoteExecutor).runRemote(catScriptCommand);
 
         remoteExecutor.saveCommand("1234", "/tmp/dolphinscheduler/test.sh");
         verify(remoteExecutor).runRemote(checkDirCommand);
