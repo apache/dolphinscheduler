@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
+import org.apache.dolphinscheduler.common.model.ApiServerHeartBeat;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeat;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -34,6 +35,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.extract.alert.IAlertMetadataService;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.server.RpcServer;
+import org.apache.dolphinscheduler.extract.common.IApiMetadataService;
 import org.apache.dolphinscheduler.extract.master.IMasterMetadataService;
 import org.apache.dolphinscheduler.extract.worker.IWorkerMetadataService;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
@@ -48,18 +50,22 @@ import org.springframework.test.util.ReflectionTestUtils;
 class MonitorMetadataRpcTest {
 
     @Test
-    void apiFetchesMasterWorkerAndAlertSnapshotsOverRpc() throws Exception {
+    void apiFetchesAllServiceSnapshotsOverRpc() throws Exception {
         int port;
         try (ServerSocket socket = new ServerSocket(0)) {
             port = socket.getLocalPort();
         }
+        ApiServerHeartBeat api = ApiServerHeartBeat.builder().host("localhost").port(port).processId(5)
+                .startupTime(5).reportTime(500).httpPort(12345).cpuUsage(0.15).serverStatus(ServerStatus.NORMAL)
+                .build();
         MasterHeartBeat master = MasterHeartBeat.builder().host("localhost").port(port).processId(10).startupTime(1)
-                .reportTime(100).serverStatus(ServerStatus.BUSY).cpuUsage(0.75).build();
+                .reportTime(100).isCoordinator(true).serverStatus(ServerStatus.BUSY).cpuUsage(0.75).build();
         WorkerHeartBeat worker = WorkerHeartBeat.builder().host("localhost").port(port).processId(20).startupTime(2)
                 .reportTime(200).serverStatus(ServerStatus.NORMAL).workerGroup("analytics").build();
         AlertServerHeartBeat alert = AlertServerHeartBeat.builder().host("localhost").port(port).processId(30)
                 .startupTime(3).reportTime(300).isActive(true).cpuUsage(0.25).serverStatus(ServerStatus.NORMAL).build();
         RegistryClient registry = mock(RegistryClient.class);
+        register(registry, RegistryNodeType.API, api);
         register(registry, RegistryNodeType.MASTER, master);
         register(registry, RegistryNodeType.WORKER, worker);
         register(registry, RegistryNodeType.ALERT_SERVER, alert);
@@ -67,16 +73,23 @@ class MonitorMetadataRpcTest {
                 RpcServer server = new RpcServer(NettyServerConfig.builder().serverName("ApiMetadataRpcTest")
                         .listenPort(port).build());
                 MonitorServiceImpl manager = new MonitorServiceImpl()) {
+            server.registerServerMethodInvokerProvider((IApiMetadataService) () -> api);
             server.registerServerMethodInvokerProvider((IMasterMetadataService) () -> master);
             server.registerServerMethodInvokerProvider((IWorkerMetadataService) () -> worker);
             server.registerServerMethodInvokerProvider((IAlertMetadataService) () -> alert);
             server.start();
             ReflectionTestUtils.setField(manager, "registryClient", registry);
 
+            Server apiServer = manager.listServer(RegistryNodeType.API).get(0);
+            assertFalse(apiServer.isMetadataStale());
+            assertEquals(12345,
+                    JSONUtils.parseObject(apiServer.getHeartBeatInfo(), ApiServerHeartBeat.class).getHttpPort());
             assertFalse(manager.listServer(RegistryNodeType.MASTER).get(0).isMetadataStale());
             assertFalse(manager.listServer(RegistryNodeType.WORKER).get(0).isMetadataStale());
             assertEquals(0.75, JSONUtils.parseObject(manager.listServer(RegistryNodeType.MASTER).get(0)
                     .getHeartBeatInfo(), MasterHeartBeat.class).getCpuUsage());
+            assertTrue(JSONUtils.parseObject(manager.listServer(RegistryNodeType.MASTER).get(0).getHeartBeatInfo(),
+                    MasterHeartBeat.class).isCoordinator());
             assertEquals("analytics", JSONUtils.parseObject(manager.listServer(RegistryNodeType.WORKER).get(0)
                     .getHeartBeatInfo(), WorkerHeartBeat.class).getWorkerGroup());
             Server alertServer = manager.listServer(RegistryNodeType.ALERT_SERVER).get(0);

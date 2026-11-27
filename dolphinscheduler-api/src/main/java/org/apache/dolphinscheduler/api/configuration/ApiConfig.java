@@ -44,6 +44,7 @@ public class ApiConfig implements Validator {
 
     private String baseUrl;
     private String uiUrl;
+    private int rpcPort = 12346;
     private boolean auditEnable = false;
     private Duration sessionTimeout = Duration.ofHours(2);
 
@@ -60,6 +61,9 @@ public class ApiConfig implements Validator {
     public void validate(Object target, Errors errors) {
         validatePythonGateway(errors);
         validateSessionTimeout(errors);
+        if (rpcPort < 1 || rpcPort > 65535) {
+            errors.rejectValue("rpcPort", null, "must be between 1 and 65535");
+        }
         printConfig();
     }
 

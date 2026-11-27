@@ -17,13 +17,17 @@
 
 package org.apache.dolphinscheduler.common.model;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @NoArgsConstructor
 public class MasterHeartBeat extends BaseHeartBeat implements HeartBeat {
 
+    @Getter
+    @Setter
     private boolean isCoordinator;
 
 }

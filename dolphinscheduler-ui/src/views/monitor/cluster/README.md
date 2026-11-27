@@ -14,31 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# Cluster overview preview
+# Cluster monitoring
 
-This is a UI preview for [#18829](https://github.com/apache/dolphinscheduler/issues/18829), using simulated service metadata and running instances. It does not replace the production monitoring routes or call the monitoring APIs yet.
+The production page is `/monitor/cluster`. It queries `/monitor/API`, `/monitor/MASTER`, `/monitor/WORKER`, and `/monitor/ALERT_SERVER` using the standard authenticated API client. It contains no mock data or separate preview entry.
 
-From `dolphinscheduler-ui`:
+`cluster-data.ts` decodes heartbeat snapshots, converts utilization ratios to percentages, and keeps failed or malformed metadata unknown. API HTTP addresses come from `httpPort`; their registered RPC addresses remain available in node details. HA roles are never inferred from health, and missing role data stays unknown.
 
-```sh
-pnpm install --frozen-lockfile
-pnpm dev --host 127.0.0.1 --port 5190
-```
+Worker groups use the `workerGroup` reported by each Worker. Workers without group metadata are shown under the unavailable-group label rather than being assigned to `default`.
 
-Open `http://127.0.0.1:5190/cluster-preview.html`. The preview entry loads the same Vue component intended for the cluster overview; the mock data and surrounding preview shell are separate from the production application entry.
+Running instances use the existing workflow/task executor endpoints and retain administrator-only actions. The server continues enforcing its existing permissions. Instance links resolve through the application router, including its production base URL. Request failures remain distinct from empty results.
 
-The preview includes:
-
-- API → Master → Worker topology with shared connections and expandable Worker groups.
-- CPU and memory utilization, unavailable metadata, and independent Alert Server Active/Standby roles.
-- Running workflow and task lists for Masters, task lists for Workers, and links to workflow instance detail paths. These links describe production routes; this standalone preview does not provide workflow detail pages.
-- Light and dark themes and layouts for narrow windows.
-
-`ClusterOverview` takes service snapshots and a running-instance query callback. Its executor actions require `canQueryExecutors`; production integration must derive that value from the user's permissions and retain the existing server-side authorization checks. Query failures are displayed explicitly rather than as empty lists.
-
-Before this becomes a production feature:
-
-- Implement API server discovery and connect real service metadata, including metadata freshness and HA roles.
-- Connect the existing `/monitor/masters/workflow-executors` and `/monitor/workers/task-executors` queries. The existing Master page also supports querying tasks on a Master.
-- Add the cluster route and menu, replace the Master/Worker entries, remove the DB entry, and define redirects for existing links.
-- Add English and Chinese translations and production integration coverage.
+API metadata RPC listens on `api.rpc-port` (default `12346`), using the existing RPC authentication settings. See the [monitoring guide](../../../../../docs/docs/en/guide/monitor.md) for deployment requirements.

@@ -86,3 +86,5 @@ This document records the incompatible updates between each version. You need to
 
 * SQL task-result alert content is size-limited: by default at most 30 rows are kept, string field values longer than 100 characters are truncated with an ellipsis, and the serialized content is bounded to 60000 UTF-8 bytes (below the 65535-byte capacity of the MySQL TEXT column); rows beyond the budget are represented by an omission marker. These defaults are tunable via `sql.task.alert.max.rows`, `sql.task.alert.max.row.value.length` and `sql.task.alert.max.content.bytes` in `common.properties` (worker restart required). ([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
 
+* API now registers its identity and serves metadata RPC on `api.rpc-port` (default `12346`). Open this internal port between API instances and override it if the port is already in use. The API HTTP port is unchanged. Master/Worker/DB monitoring URLs redirect to the new cluster overview; the DB menu entry is removed.
+

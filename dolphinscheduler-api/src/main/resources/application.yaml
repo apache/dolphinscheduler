@@ -138,6 +138,8 @@ registry:
     digest: ~
 
 api:
+  # Internal RPC port for querying API server metadata from other API instances.
+  rpc-port: 12346
   # The base URL for the API server, used for constructing callback URLs for features like OIDC.
   # This should be the public-facing URL of the DolphinScheduler API.
   base-url: http://127.0.0.1:12345/dolphinscheduler

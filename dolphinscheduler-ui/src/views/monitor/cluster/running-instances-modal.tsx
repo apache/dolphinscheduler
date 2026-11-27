@@ -22,13 +22,15 @@ import {
   watch,
   type PropType
 } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { NAlert, NButton, NDataTable, NModal, NSpin } from 'naive-ui'
 import type { DataTableColumns } from 'naive-ui'
 import type {
   TaskExecutor,
   WorkflowExecutor
 } from '@/service/modules/monitor/types'
-import type { ClusterNodeInfo } from './index'
+import type { ClusterNodeInfo } from './cluster-overview'
 
 export interface RuntimeTarget {
   node: ClusterNodeInfo
@@ -51,6 +53,30 @@ export default defineComponent({
   },
   emits: ['close'],
   setup(props, { emit }) {
+    const { t } = useI18n()
+    const router = useRouter()
+    const instanceLink = (projectCode: number, id: number, name: string) => {
+      const path = `/projects/${projectCode}/workflow/instances/${id}`
+      return (
+        <a
+          href={router.resolve(path).href}
+          onClick={(event: MouseEvent) => {
+            if (
+              !event.ctrlKey &&
+              !event.metaKey &&
+              !event.shiftKey &&
+              !event.altKey &&
+              event.button === 0
+            ) {
+              event.preventDefault()
+              router.push(path)
+            }
+          }}
+        >
+          {name}
+        </a>
+      )
+    }
     const rows = ref<RuntimeInstance[]>([])
     const loading = ref(false)
     const failed = ref(false)
@@ -86,39 +112,39 @@ export default defineComponent({
       const columns: DataTableColumns<RuntimeInstance> = workflows
         ? [
             {
-              title: '工作流实例',
+              title: t('monitor.cluster.workflow_name'),
               key: 'name',
-              render: (row) => (
-                <a
-                  href={`/projects/${row.projectCode}/workflow/instances/${row.id}`}
-                >
-                  {row.name}
-                </a>
-              )
+              render: (row) => instanceLink(row.projectCode, row.id, row.name)
             },
-            { title: '状态', key: 'state' },
-            { title: '开始时间', key: 'startTime' },
-            { title: '运行次数', key: 'runTimes', width: 90 }
+            { title: t('monitor.cluster.workflow_state'), key: 'state' },
+            { title: t('monitor.cluster.start_time'), key: 'startTime' },
+            {
+              title: t('monitor.cluster.run_times'),
+              key: 'runTimes',
+              width: 90
+            }
           ]
         : [
-            { title: '任务名称', key: 'name' },
-            { title: '任务类型', key: 'taskType', width: 90 },
+            { title: t('monitor.cluster.task_name'), key: 'name' },
             {
-              title: '工作流实例',
+              title: t('monitor.cluster.task_type'),
+              key: 'taskType',
+              width: 90
+            },
+            {
+              title: t('monitor.cluster.workflow_name'),
               key: 'workflowInstanceName',
               render: (row) => {
                 const task = row as TaskExecutor
-                return (
-                  <a
-                    href={`/projects/${task.projectCode}/workflow/instances/${task.workflowInstanceId}`}
-                  >
-                    {task.workflowInstanceName || task.workflowInstanceId}
-                  </a>
+                return instanceLink(
+                  task.projectCode,
+                  task.workflowInstanceId,
+                  task.workflowInstanceName || String(task.workflowInstanceId)
                 )
               }
             },
             {
-              title: '开始时间',
+              title: t('monitor.cluster.start_time'),
               key: 'startTime',
               render: (row) => {
                 const startTime = (row as TaskExecutor).startTime
@@ -130,19 +156,21 @@ export default defineComponent({
         <NModal
           show={target !== null}
           preset='card'
-          title={`${target?.node.id || ''} · ${
-            workflows ? '运行中的工作流' : '运行中的任务'
-          }`}
+          title={`${target?.node.name || ''} · ${t(
+            workflows
+              ? 'monitor.cluster.running_workflows'
+              : 'monitor.cluster.running_tasks'
+          )}`}
           style={{ width: 'min(960px, calc(100vw - 32px))' }}
           onUpdateShow={(show) => {
             if (!show) emit('close')
           }}
         >
           {failed.value ? (
-            <NAlert type='error' title='运行实例查询失败'>
-              无法获取该节点的运行实例，请重试。
+            <NAlert type='error' title={t('monitor.cluster.query_failed')}>
+              {t('monitor.cluster.query_failed_description')}
               <NButton text type='primary' onClick={load}>
-                重新加载
+                {t('monitor.cluster.retry')}
               </NButton>
             </NAlert>
           ) : (

@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMetrics;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
 import org.apache.dolphinscheduler.extract.alert.IAlertMetadataService;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.common.IApiMetadataService;
 import org.apache.dolphinscheduler.extract.master.IMasterMetadataService;
 import org.apache.dolphinscheduler.extract.master.IWorkflowExecutorQueryClient;
 import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecutorDTO;
@@ -98,7 +99,8 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     @Override
     public List<Server> listServer(RegistryNodeType nodeType) {
         List<Server> servers = registryClient.getServerList(nodeType);
-        if (nodeType != RegistryNodeType.MASTER && nodeType != RegistryNodeType.WORKER
+        if (nodeType != RegistryNodeType.API && nodeType != RegistryNodeType.MASTER
+                && nodeType != RegistryNodeType.WORKER
                 && nodeType != RegistryNodeType.ALERT_SERVER) {
             return servers;
         }
@@ -178,6 +180,8 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
 
     BaseHeartBeat fetchHeartbeat(RegistryNodeType type, String address) {
         switch (type) {
+            case API:
+                return Clients.withService(IApiMetadataService.class).withHost(address).getServerMetadata();
             case MASTER:
                 return Clients.withService(IMasterMetadataService.class).withHost(address).getServerMetadata();
             case WORKER:

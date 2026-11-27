@@ -25,7 +25,7 @@ interface DatabaseRes {
   date: string
 }
 
-type ServerNodeType = 'MASTER' | 'WORKER' | 'ALERT_SERVER'
+type ServerNodeType = 'API' | 'MASTER' | 'WORKER' | 'ALERT_SERVER'
 
 interface ServerNode {
   id: number
