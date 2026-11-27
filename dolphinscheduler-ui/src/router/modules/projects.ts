@@ -134,6 +134,18 @@ export default {
       }
     },
     {
+      path: '/projects/:projectCode/workflow/definitions/:code/versions/:version',
+      name: 'workflow-definition-version-detail',
+      component: components['projects-workflow-definition-detail'],
+      meta: {
+        title: '工作流历史版本',
+        activeMenu: 'projects',
+        activeSide: '/projects/:projectCode/workflow-definition',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
       path: '/projects/:projectCode/workflow/timings',
       name: 'workflow-timing-list',
       component: components['projects-workflow-timing'],

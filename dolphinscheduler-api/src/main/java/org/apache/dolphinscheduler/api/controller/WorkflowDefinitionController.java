@@ -276,6 +276,26 @@ public class WorkflowDefinitionController extends BaseController {
     }
 
     /**
+     * query a workflow definition version without changing the current definition
+     */
+    @Operation(summary = "queryWorkflowDefinitionByVersion", description = "QUERY_WORKFLOW_DEFINITION_BY_CODE_NOTES")
+    @Parameters({
+            @Parameter(name = "code", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "123456789")),
+            @Parameter(name = "version", description = "VERSION", required = true, schema = @Schema(implementation = int.class, example = "1"))
+    })
+    @GetMapping(value = "/{code}/versions/{version}/detail")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_DETAIL_OF_WORKFLOW_DEFINITION_ERROR)
+    public Result<DagData> queryWorkflowDefinitionByVersion(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                            @PathVariable long code,
+                                                            @PathVariable int version) {
+        DagData dagData =
+                workflowDefinitionService.queryWorkflowDefinitionByVersion(loginUser, projectCode, code, version);
+        return Result.success(SensitivePropertyUtils.mask(dagData));
+    }
+
+    /**
      * switch certain workflow definition version
      *
      * @param loginUser   login user info

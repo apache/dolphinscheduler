@@ -79,6 +79,7 @@ export default defineComponent({
 
     return (
       <Modal
+        style={{ width: '800px', maxWidth: '90vw' }}
         show={this.$props.show}
         title={t('project.workflow.version_info')}
         onCancel={this.hideModal}

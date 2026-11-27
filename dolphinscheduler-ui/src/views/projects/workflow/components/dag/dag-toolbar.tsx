@@ -66,6 +66,10 @@ const props = {
     type: Object as PropType<WorkflowDefinition>,
     default: null
   },
+  preview: {
+    type: Boolean,
+    default: false
+  },
   dependenciesData: {
     type: Object as PropType<any>,
     require: false
@@ -263,7 +267,14 @@ export default defineComponent({
                         {t('project.workflow.parameters_variables')}
                       </NText>
                     ),
-                    default: () => <VariablesView onCopy={copy} />
+                    default: () => (
+                      <VariablesView
+                        definition={
+                          props.preview ? props.definition : undefined
+                        }
+                        onCopy={copy}
+                      />
+                    )
                   }}
                 </NPopover>
               ),
@@ -272,7 +283,15 @@ export default defineComponent({
           ></NTooltip>
         )}
         <div class={Styles['toolbar-left-part']}>
-          {route.name !== 'workflow-instance-detail' &&
+          {props.preview && (
+            <NTag round size='small' type='info'>
+              {t('project.workflow.version_preview', {
+                version: props.definition?.workflowDefinition?.version
+              })}
+            </NTag>
+          )}
+          {!props.preview &&
+            route.name !== 'workflow-instance-detail' &&
             props.definition?.workflowDefinition?.releaseState === 'ONLINE' && (
               <NTag round size='small' type='info'>
                 {t('project.dag.online')}
@@ -402,28 +421,30 @@ export default defineComponent({
             ></NTooltip>
           )}
           {/* Delete */}
-          <NTooltip
-            v-slots={{
-              trigger: () => (
-                <NButton
-                  class={Styles['toolbar-right-item']}
-                  strong
-                  secondary
-                  circle
-                  type='info'
-                  onClick={() => removeCells()}
-                  v-slots={{
-                    icon: () => (
-                      <NIcon>
-                        <DeleteOutlined />
-                      </NIcon>
-                    )
-                  }}
-                />
-              ),
-              default: () => t('project.dag.delete_cell')
-            }}
-          ></NTooltip>
+          {!props.preview && (
+            <NTooltip
+              v-slots={{
+                trigger: () => (
+                  <NButton
+                    class={Styles['toolbar-right-item']}
+                    strong
+                    secondary
+                    circle
+                    type='info'
+                    onClick={() => removeCells()}
+                    v-slots={{
+                      icon: () => (
+                        <NIcon>
+                          <DeleteOutlined />
+                        </NIcon>
+                      )
+                    }}
+                  />
+                ),
+                default: () => t('project.dag.delete_cell')
+              }}
+            ></NTooltip>
+          )}
           {/* Toggle fullscreen */}
           <NTooltip
             v-slots={{
@@ -478,7 +499,7 @@ export default defineComponent({
             }}
           ></NTooltip>
           {/* Version info */}
-          {!!props.definition && (
+          {!!props.definition && !props.preview && (
             <NTooltip
               v-slots={{
                 trigger: () => (
@@ -509,6 +530,7 @@ export default defineComponent({
             secondary
             round
             disabled={
+              !props.preview &&
               props.definition?.workflowDefinition?.releaseState === 'ONLINE' &&
               !props.instance
             }
@@ -516,7 +538,7 @@ export default defineComponent({
               context.emit('saveModelToggle', true)
             }}
           >
-            {t('project.dag.save')}
+            {t(props.preview ? 'project.dag.basic_info' : 'project.dag.save')}
           </NButton>
           {/* Return to previous page */}
           <NButton secondary round onClick={onClose} class='btn-close'>

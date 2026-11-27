@@ -93,6 +93,8 @@ export default {
     tree_limit: 'Limit Size',
     batch_copy: 'Batch Copy',
     batch_delete: 'Batch Delete',
+    view_version: 'View',
+    version_preview: 'V{version} (Read-only)',
     version_info: 'Version Info',
     version: 'Version',
     file_upload: 'File Upload',

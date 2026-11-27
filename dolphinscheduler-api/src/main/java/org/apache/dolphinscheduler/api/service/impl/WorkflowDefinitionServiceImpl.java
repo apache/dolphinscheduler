@@ -610,6 +610,25 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     @Override
+    public DagData queryWorkflowDefinitionByVersion(User loginUser, long projectCode, long code, int version) {
+        Project project = projectDao.queryByCode(projectCode);
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
+
+        WorkflowDefinition currentDefinition = workflowDefinitionDao.queryByCode(code).orElse(null);
+        if (currentDefinition == null || projectCode != currentDefinition.getProjectCode()) {
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code));
+        }
+        WorkflowDefinitionLog definitionLog = workflowDefinitionLogDao.queryByDefinitionCodeAndVersion(code, version);
+        if (definitionLog == null) {
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code));
+        }
+        if (projectCode != definitionLog.getProjectCode()) {
+            throw new ServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH);
+        }
+        return processService.genDagData(definitionLog);
+    }
+
+    @Override
     public Optional<WorkflowDefinition> queryWorkflowDefinition(long workflowDefinitionCode,
                                                                 int workflowDefinitionVersion) {
         WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);

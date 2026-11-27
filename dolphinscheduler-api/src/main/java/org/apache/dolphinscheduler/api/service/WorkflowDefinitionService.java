@@ -86,6 +86,11 @@ public interface WorkflowDefinitionService {
                                           long projectCode,
                                           long code);
 
+    /**
+     * query a workflow definition version without switching the current definition
+     */
+    DagData queryWorkflowDefinitionByVersion(User loginUser, long projectCode, long code, int version);
+
     Optional<WorkflowDefinition> queryWorkflowDefinition(long workflowDefinitionCode, int workflowDefinitionVersion);
 
     WorkflowDefinition queryWorkflowDefinitionThrowExceptionIfNotFound(long workflowDefinitionCode,

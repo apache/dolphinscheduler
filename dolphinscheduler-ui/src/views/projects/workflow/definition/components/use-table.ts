@@ -23,7 +23,11 @@ import {
   queryVersions,
   switchVersion
 } from '@/service/modules/workflow-definition'
-import { DeleteOutlined, ExclamationCircleOutlined } from '@vicons/antd'
+import {
+  DeleteOutlined,
+  ExclamationCircleOutlined,
+  EyeOutlined
+} from '@vicons/antd'
 import { NSpace, NTooltip, NButton, NPopconfirm, NTag } from 'naive-ui'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
@@ -85,9 +89,38 @@ export function useTable(
       variables.columns.push({
         title: t('project.workflow.operation'),
         key: 'operation',
+        width: 136,
         render: (_row: any) => {
           return h(NSpace, null, {
             default: () => [
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        tag: 'a',
+                        href: router.resolve({
+                          name: 'workflow-definition-version-detail',
+                          params: {
+                            projectCode: variables.projectCode,
+                            code: variables.row.code,
+                            version: _row.version
+                          }
+                        }).href,
+                        target: '_blank',
+                        rel: 'noopener noreferrer',
+                        circle: true,
+                        type: 'info',
+                        size: 'small'
+                      },
+                      { icon: () => h(EyeOutlined) }
+                    ),
+                  default: () => t('project.workflow.view_version')
+                }
+              ),
               h(
                 NPopconfirm,
                 {

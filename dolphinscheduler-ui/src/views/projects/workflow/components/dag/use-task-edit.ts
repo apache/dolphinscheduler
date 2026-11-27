@@ -30,6 +30,7 @@ import type {
 } from './types'
 
 interface Options {
+  readonly: Ref<boolean>
   graph: Ref<Graph | undefined>
   definition: Ref<WorkflowDefinition | undefined>
 }
@@ -40,7 +41,7 @@ interface Options {
  * @returns
  */
 export function useTaskEdit(options: Options) {
-  const { graph, definition } = options
+  const { graph, definition, readonly } = options
   const {
     addNode,
     removeNode,
@@ -151,8 +152,10 @@ export function useTaskEdit(options: Options) {
     if (definition) {
       currTask.value = definition
     }
-    updatePreTasks(getSources(String(code)), code)
-    updatePostTasks(code)
+    if (!readonly.value) {
+      updatePreTasks(getSources(String(code)), code)
+      updatePostTasks(code)
+    }
     taskModalVisible.value = true
   }
 
