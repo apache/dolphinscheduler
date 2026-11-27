@@ -126,19 +126,23 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
     @Override
     public boolean exists(String fullName) {
         String absKey = transformAbsolutePathToAbsKey(fullName);
-        if (isObjectExists(absKey)) {
+        if (isLiteralObjectExists(absKey)) {
             return true;
         }
         if (!absKey.endsWith(FOLDER_SEPARATOR)) {
             return false;
         }
-        return isObjectExists(transformAbsKeyToAbsolutePath(absKey))
+        return isLiteralObjectExists(transformAbsKeyToAbsolutePath(absKey))
                 || blobContainerClient.listBlobs(new ListBlobsOptions().setPrefix(absKey).setMaxResultsPerPage(1), null)
                         .iterator().hasNext();
     }
 
     protected boolean isObjectExists(String objectName) {
         return blobContainerClient.getBlobClient(objectName).exists();
+    }
+
+    private boolean isLiteralObjectExists(String blobName) {
+        return getLiteralBlobClient(blobName).exists();
     }
 
     @SneakyThrows

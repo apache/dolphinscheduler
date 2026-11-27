@@ -102,6 +102,16 @@ class DeleteResourceDtoValidatorTest {
     }
 
     @Test
+    void testValidate_percentNamedBlobIsAcceptedWhenOnlyItExists() {
+        // The SDK url-decodes blob names, so the literal name has to be encoded for the existence check
+        mockBlobExists(DIRECTORY + "/report%2520final.csv", true);
+        mockBlobExists(DIRECTORY + "/report%20final.csv", false);
+
+        assertDoesNotThrow(
+                () -> deleteResourceDtoValidator.validate(newDeleteResourceDto(DIRECTORY + "/report%20final.csv")));
+    }
+
+    @Test
     void testValidate_missingDirectoryIsRejected() {
         mockBlobExists(DIRECTORY, false);
         mockBlobExists(DIRECTORY + "/", false);

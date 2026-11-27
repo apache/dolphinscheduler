@@ -322,6 +322,20 @@ class AbsStorageOperatorTest {
     }
 
     @Test
+    void existsKeepsTheBlobNameLiteral() {
+        // BlobContainerClient#getBlobClient url-decodes its argument, "report%20final.csv" has to be encoded
+        // or the check would look at the other blob "report final.csv"
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        mockBlobExists(containerClient, "dolphinscheduler/default/resources/report%2520final.csv", true);
+        mockBlobExists(containerClient, "dolphinscheduler/default/resources/report%20final.csv", false);
+        mockBlobExists(containerClient, "dolphinscheduler/default/resources/report final.csv", false);
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        assertTrue(storageOperator.exists("dolphinscheduler/default/resources/report%20final.csv"));
+        assertFalse(storageOperator.exists("dolphinscheduler/default/resources/report final.csv"));
+    }
+
+    @Test
     void existsOfAFileChecksTheFileOnly() {
         BlobContainerClient containerClient = mock(BlobContainerClient.class);
         mockBlobExists(containerClient, "dolphinscheduler/default/resources/a.sh", true);
