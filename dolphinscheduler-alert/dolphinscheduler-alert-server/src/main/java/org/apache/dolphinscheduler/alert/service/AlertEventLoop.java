@@ -32,8 +32,9 @@ public class AlertEventLoop extends AbstractEventLoop<Alert> {
 
     public AlertEventLoop(AlertEventPendingQueue alertEventPendingQueue,
                           AlertSenderThreadPoolFactory alertSenderThreadPoolFactory,
-                          AlertSender alertSender) {
-        super("AlertEventLoop", alertSenderThreadPoolFactory.getThreadPool(), alertEventPendingQueue);
+                          AlertSender alertSender,
+                          AlertHAServer alertHAServer) {
+        super("AlertEventLoop", alertHAServer, alertSenderThreadPoolFactory.getThreadPool(), alertEventPendingQueue);
         this.alertSender = alertSender;
         AlertServerMetrics.registerPendingAlertGauge(this::getHandlingEventCount);
     }

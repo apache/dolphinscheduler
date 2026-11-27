@@ -111,9 +111,9 @@ class AlertServerTest {
         fetcher = new AlertEventFetcher(haServer, alertDao, queue);
         AlertSenderThreadPoolFactory threadPoolFactory = new AlertSenderThreadPoolFactory(config);
         senderExecutor = threadPoolFactory.getThreadPool();
-        eventLoop = new AlertEventLoop(queue, threadPoolFactory, sender);
+        eventLoop = new AlertEventLoop(queue, threadPoolFactory, sender, haServer);
         AlertBootstrapService bootstrap = new AlertBootstrapService(rpcServer, registryClient, haServer, fetcher,
-                eventLoop);
+                eventLoop, queue);
         when(alertDao.listPendingAlerts(anyInt())).thenAnswer(invocation -> {
             Alert alert = pendingAlert.get();
             return alert != null && alert.getId() > (int) invocation.getArgument(0)

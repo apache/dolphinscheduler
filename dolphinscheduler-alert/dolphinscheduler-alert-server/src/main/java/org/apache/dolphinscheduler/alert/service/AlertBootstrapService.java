@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.alert.service;
 
 import org.apache.dolphinscheduler.alert.registry.AlertRegistryClient;
 import org.apache.dolphinscheduler.alert.rpc.AlertRpcServer;
+import org.apache.dolphinscheduler.registry.api.ha.AbstractServerStatusChangeListener;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,13 +36,29 @@ public final class AlertBootstrapService implements AutoCloseable {
 
     private final AlertEventLoop alertEventLoop;
 
+    private final AlertEventPendingQueue alertEventPendingQueue;
+
     public AlertBootstrapService(AlertRpcServer alertRpcServer,
                                  AlertRegistryClient alertRegistryClient,
                                  AlertHAServer alertHAServer,
                                  AlertEventFetcher alertEventFetcher,
-                                 AlertEventLoop alertEventLoop) {
+                                 AlertEventLoop alertEventLoop,
+                                 AlertEventPendingQueue alertEventPendingQueue) {
         this.alertEventFetcher = alertEventFetcher;
         this.alertEventLoop = alertEventLoop;
+        this.alertEventPendingQueue = alertEventPendingQueue;
+        alertHAServer.addServerStatusChangeListener(new AbstractServerStatusChangeListener() {
+
+            @Override
+            public void changeToActive() {
+                alertEventPendingQueue.activate();
+            }
+
+            @Override
+            public void changeToStandBy() {
+                alertEventPendingQueue.deactivate();
+            }
+        });
     }
 
     public void start() {
@@ -54,6 +71,7 @@ public final class AlertBootstrapService implements AutoCloseable {
     @Override
     public void close() {
         log.info("AlertBootstrapService stopping...");
+        alertEventPendingQueue.deactivate();
         alertEventFetcher.shutdown();
         alertEventLoop.shutdown();
         log.info("AlertBootstrapService stopped...");

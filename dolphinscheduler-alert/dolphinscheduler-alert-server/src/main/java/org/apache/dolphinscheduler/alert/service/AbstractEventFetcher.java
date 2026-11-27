@@ -35,19 +35,16 @@ public abstract class AbstractEventFetcher<T> extends BaseDaemonThread implement
 
     protected final AlertHAServer alertHAServer;
 
-    private final EventPendingQueue<T> eventPendingQueue;
+    private final AbstractEventPendingQueue<T> eventPendingQueue;
 
     private final AtomicBoolean runningFlag = new AtomicBoolean(false);
 
-    private Integer eventOffset;
-
     protected AbstractEventFetcher(String fetcherName,
                                    AlertHAServer alertHAServer,
-                                   EventPendingQueue<T> eventPendingQueue) {
+                                   AbstractEventPendingQueue<T> eventPendingQueue) {
         super(fetcherName);
         this.alertHAServer = alertHAServer;
         this.eventPendingQueue = eventPendingQueue;
-        this.eventOffset = -1;
     }
 
     @Override
@@ -64,21 +61,34 @@ public abstract class AbstractEventFetcher<T> extends BaseDaemonThread implement
     public void run() {
         while (runningFlag.get()) {
             try {
-                if (!alertHAServer.isActive()) {
+                AbstractEventPendingQueue.EventRun<T> run = eventPendingQueue.getActiveRun();
+                if (!alertHAServer.isActive() || run == null) {
                     log.debug("The current node is not active, will not loop Alert");
                     Thread.sleep(FETCH_INTERVAL);
                     continue;
                 }
-                List<T> pendingEvents = fetchPendingEvent(eventOffset);
+                if (!run.initialized) {
+                    // Let sends admitted by an earlier activation finish before reloading pending rows.
+                    if (eventPendingQueue.getHandlingEventCount() != 0) {
+                        Thread.sleep(FETCH_INTERVAL);
+                        continue;
+                    }
+                    run.initialized = true;
+                }
+                List<T> pendingEvents = fetchPendingEvent(run.eventOffset);
                 if (CollectionUtils.isEmpty(pendingEvents)) {
                     log.debug("No pending events found");
                     Thread.sleep(FETCH_INTERVAL);
                     continue;
                 }
                 for (T alert : pendingEvents) {
-                    eventPendingQueue.put(alert);
+                    if (!runningFlag.get() || !alertHAServer.isActive() || !eventPendingQueue.isActiveRun(run)) {
+                        break;
+                    }
+                    // A delayed query or blocked put can only write to the queue of its own activation.
+                    run.pendingEvents.put(alert);
                 }
-                eventOffset = Math.max(eventOffset,
+                run.eventOffset = Math.max(run.eventOffset,
                         pendingEvents.stream().map(this::getEventOffset).max(Integer::compareTo).get());
             } catch (InterruptedException interruptedException) {
                 Thread.currentThread().interrupt();

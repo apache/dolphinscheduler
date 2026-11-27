@@ -18,31 +18,36 @@
 package org.apache.dolphinscheduler.alert.service;
 
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractEventPendingQueue<T> implements EventPendingQueue<T> {
 
-    private final LinkedBlockingQueue<T> pendingAlertQueue;
+    private volatile EventRun<T> eventRun;
+
+    private final AtomicInteger handlingEventCount = new AtomicInteger();
+
+    private boolean active;
 
     private final int capacity;
 
     protected AbstractEventPendingQueue(int capacity) {
         this.capacity = capacity;
-        this.pendingAlertQueue = new LinkedBlockingQueue<>(capacity);
+        this.eventRun = new EventRun<>(capacity);
     }
 
     @Override
     public void put(T alert) throws InterruptedException {
-        pendingAlertQueue.put(alert);
+        eventRun.pendingEvents.put(alert);
     }
 
     @Override
     public T take() throws InterruptedException {
-        return pendingAlertQueue.take();
+        return eventRun.pendingEvents.take();
     }
 
     @Override
     public int size() {
-        return pendingAlertQueue.size();
+        return eventRun.pendingEvents.size();
     }
 
     @Override
@@ -50,4 +55,50 @@ public abstract class AbstractEventPendingQueue<T> implements EventPendingQueue<
         return capacity;
     }
 
+    synchronized void activate() {
+        eventRun = new EventRun<>(capacity);
+        active = true;
+    }
+
+    synchronized void deactivate() {
+        active = false;
+        eventRun.pendingEvents.clear();
+    }
+
+    synchronized EventRun<T> getActiveRun() {
+        return active ? eventRun : null;
+    }
+
+    synchronized boolean isActiveRun(EventRun<T> run) {
+        return active && eventRun == run;
+    }
+
+    synchronized boolean reserveDispatch(EventRun<T> run) {
+        if (!isActiveRun(run)) {
+            return false;
+        }
+        handlingEventCount.incrementAndGet();
+        return true;
+    }
+
+    void releaseDispatch() {
+        handlingEventCount.decrementAndGet();
+    }
+
+    int getHandlingEventCount() {
+        return handlingEventCount.get();
+    }
+
+    static final class EventRun<T> {
+
+        final LinkedBlockingQueue<T> pendingEvents;
+
+        int eventOffset = -1;
+
+        boolean initialized;
+
+        EventRun(int capacity) {
+            pendingEvents = new LinkedBlockingQueue<>(capacity);
+        }
+    }
 }
