@@ -67,4 +67,20 @@ public class TaskGroupDaoImpl extends BaseDao<TaskGroup, TaskGroupMapper> implem
         }
         return mybatisMapper.releaseTaskGroupSlot(taskGroupId) > 0;
     }
+
+    @Override
+    public TaskGroup queryByIdForUpdate(Integer taskGroupId) {
+        if (taskGroupId == null) {
+            throw new IllegalArgumentException("taskGroupId cannot be null");
+        }
+        return mybatisMapper.queryByIdForUpdate(taskGroupId);
+    }
+
+    @Override
+    public boolean amendTaskGroupUseSize(Integer taskGroupId, int useSize) {
+        if (taskGroupId == null) {
+            throw new IllegalArgumentException("taskGroupId cannot be null");
+        }
+        return mybatisMapper.amendTaskGroupUseSize(taskGroupId, useSize) > 0;
+    }
 }

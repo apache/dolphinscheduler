@@ -106,6 +106,20 @@
         and use_size &lt; group_size
     </update>
 
+    <select id="queryByIdForUpdate" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_group
+        where id = #{id}
+        for update
+    </select>
+
+    <update id="amendTaskGroupUseSize">
+        update t_ds_task_group
+        set use_size = #{useSize}
+        where id = #{id}
+    </update>
+
     <update id="releaseTaskGroupSlot">
         update t_ds_task_group
         set use_size = use_size - 1

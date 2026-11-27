@@ -59,4 +59,23 @@ public interface TaskGroupDao extends IDao<TaskGroup> {
      * @return true if release successfully, false otherwise.
      */
     boolean releaseTaskGroupSlot(Integer taskGroupId);
+
+    /**
+     * Query the TaskGroup and lock its row until the current transaction ends, so that it serializes with
+     * {@link #acquireTaskGroupSlot} and {@link #releaseTaskGroupSlot}. Must be called inside a transaction.
+     *
+     * @param taskGroupId taskGroupId which shouldn't be null
+     * @return the TaskGroup, null if it doesn't exist.
+     */
+    TaskGroup queryByIdForUpdate(Integer taskGroupId);
+
+    /**
+     * Overwrite only the useSize of the TaskGroup, unlike updateById which writes back every column of a possibly
+     * stale entity.
+     *
+     * @param taskGroupId taskGroupId which shouldn't be null
+     * @param useSize     the new useSize
+     * @return true if the TaskGroup exists, false otherwise.
+     */
+    boolean amendTaskGroupUseSize(Integer taskGroupId, int useSize);
 }

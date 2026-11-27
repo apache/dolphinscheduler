@@ -132,7 +132,8 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     /**
      * Make sure the TaskGroup useSize is equal to the TaskGroupQueue which status is {@link TaskGroupQueueStatus#ACQUIRE_SUCCESS} and forceStart is {@link org.apache.dolphinscheduler.common.enums.Flag#NO}.
      */
-    private void amendTaskGroupUseSize() {
+    @VisibleForTesting
+    void amendTaskGroupUseSize() {
         // The TaskGroup useSize should equal to the TaskGroupQueue which inQueue is YES and forceStart is NO
         List<TaskGroup> taskGroups = taskGroupDao.queryAllTaskGroups();
         if (CollectionUtils.isEmpty(taskGroups)) {
@@ -141,15 +142,22 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         StopWatch taskGroupCoordinatorRoundTimeCost = StopWatch.createStarted();
 
         for (TaskGroup taskGroup : taskGroups) {
-            int actualUseSize = taskGroupQueueDao.countUsingTaskGroupQueueByGroupId(taskGroup.getId());
-            if (taskGroup.getUseSize() == actualUseSize) {
-                continue;
-            }
-            log.warn("The TaskGroup: {} useSize is {}, but the actual use size is {}, will amend it",
-                    taskGroup.getName(),
-                    taskGroup.getUseSize(), actualUseSize);
-            taskGroup.setUseSize(actualUseSize);
-            taskGroupDao.updateById(taskGroup);
+            // Recount under the TaskGroup row lock: slot allocation takes the same lock in its transaction, so the
+            // count cannot be overtaken by an allocation before the write below.
+            transactionTemplate.execute(transactionStatus -> {
+                final TaskGroup lockedTaskGroup = taskGroupDao.queryByIdForUpdate(taskGroup.getId());
+                if (lockedTaskGroup == null) {
+                    return null;
+                }
+                int actualUseSize = taskGroupQueueDao.countUsingTaskGroupQueueByGroupId(lockedTaskGroup.getId());
+                if (lockedTaskGroup.getUseSize() == actualUseSize) {
+                    return null;
+                }
+                log.warn("The TaskGroup: {} useSize is {}, but the actual use size is {}, will amend it",
+                        lockedTaskGroup.getName(), lockedTaskGroup.getUseSize(), actualUseSize);
+                taskGroupDao.amendTaskGroupUseSize(lockedTaskGroup.getId(), actualUseSize);
+                return null;
+            });
         }
         log.info("Success amend TaskGroup useSize cost: {}/ms", taskGroupCoordinatorRoundTimeCost.getTime());
     }

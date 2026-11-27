@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.repository.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -99,6 +100,38 @@ class TaskGroupDaoImplTest extends BaseDaoTest {
 
         taskGroup = taskGroupDao.queryById(taskGroup.getId());
         assertEquals(0, taskGroup.getUseSize());
+    }
+
+    @Test
+    void queryByIdForUpdate() {
+        TaskGroup taskGroup = createTaskGroup("testLock", 1, 3);
+        taskGroupDao.insert(taskGroup);
+
+        TaskGroup locked = taskGroupDao.queryByIdForUpdate(taskGroup.getId());
+        assertEquals("testLock", locked.getName());
+        assertEquals(1, locked.getUseSize());
+        assertEquals(3, locked.getGroupSize());
+        assertNull(taskGroupDao.queryByIdForUpdate(taskGroup.getId() + 1000));
+    }
+
+    @Test
+    void amendTaskGroupUseSize() {
+        TaskGroup taskGroup = createTaskGroup("testAmend", 2, 2);
+        taskGroupDao.insert(taskGroup);
+
+        // A group_size edit committed after a stale snapshot was read must survive the use_size amend.
+        TaskGroup edited = taskGroupDao.queryById(taskGroup.getId());
+        edited.setGroupSize(5);
+        taskGroupDao.updateById(edited);
+
+        assertTrue(taskGroupDao.amendTaskGroupUseSize(taskGroup.getId(), 1));
+
+        TaskGroup amended = taskGroupDao.queryById(taskGroup.getId());
+        assertEquals(1, amended.getUseSize());
+        assertEquals(5, amended.getGroupSize());
+        assertEquals("testAmend", amended.getName());
+
+        assertFalse(taskGroupDao.amendTaskGroupUseSize(taskGroup.getId() + 1000, 1));
     }
 
     private TaskGroup createTaskGroup(String name, int useSize, int groupSize) {
