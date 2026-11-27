@@ -176,4 +176,59 @@ public class SparkParametersTest {
         sparkParameters.setArchives(Arrays.asList(archive));
         Assertions.assertFalse(sparkParameters.checkParameters());
     }
+
+    @Test
+    public void testCheckParametersNullEntryInPyFiles() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        sparkParameters.setPyFiles(Arrays.asList((ResourceInfo) null));
+        Assertions.assertFalse(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersEmptyArchiveEntry() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        sparkParameters.setArchives(Arrays.asList(new ResourceInfo()));
+        Assertions.assertFalse(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersEmptyKeytabWithoutPrincipal() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        sparkParameters.setKeytab(new ResourceInfo());
+        Assertions.assertFalse(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersEmptyKeytabWithPrincipal() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        sparkParameters.setPrincipal("user@REALM");
+        sparkParameters.setKeytab(new ResourceInfo());
+        Assertions.assertFalse(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersOptionalFieldsOmitted() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        Assertions.assertTrue(sparkParameters.checkParameters());
+    }
 }

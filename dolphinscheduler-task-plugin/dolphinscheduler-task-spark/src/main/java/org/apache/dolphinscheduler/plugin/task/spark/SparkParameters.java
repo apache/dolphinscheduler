@@ -143,20 +143,26 @@ public class SparkParameters extends AbstractParameters {
          * Kerberos principal and keytab must be configured together: either both empty or both set.
          * A spaces-only principal is treated as absent to stay consistent with command generation,
          * otherwise the shell would drop the blank value and Spark would consume the next argument.
+         * A keytab object without a resource name is an invalid reference, not an absent keytab.
          */
         boolean hasPrincipal = StringUtils.isNotBlank(principal);
         boolean hasKeytab = keytab != null && StringUtils.isNotBlank(keytab.getResourceName());
-        boolean kerberosValid = hasPrincipal == hasKeytab;
+        boolean keytabValid = keytab == null || StringUtils.isNotBlank(keytab.getResourceName());
+        boolean kerberosValid = keytabValid && hasPrincipal == hasKeytab;
         /**
          * Spark splits --py-files/--archives on commas without an escape syntax, so resource
-         * names containing commas cannot be preserved through the list parsing.
+         * names containing commas cannot be preserved through the list parsing. Every supplied
+         * entry must also carry a resource name: a null entry or an empty object would
+         * otherwise fail later at download or command generation.
          */
         boolean pyFilesValid = pyFiles == null
-                || pyFiles.stream()
-                        .allMatch(pyFile -> pyFile == null || !StringUtils.contains(pyFile.getResourceName(), ","));
+                || pyFiles.stream().allMatch(pyFile -> pyFile != null
+                        && StringUtils.isNotBlank(pyFile.getResourceName())
+                        && !StringUtils.contains(pyFile.getResourceName(), ","));
         boolean archivesValid = archives == null
-                || archives.stream()
-                        .allMatch(archive -> archive == null || !StringUtils.contains(archive.getResourceName(), ","));
+                || archives.stream().allMatch(archive -> archive != null
+                        && StringUtils.isNotBlank(archive.getResourceName())
+                        && !StringUtils.contains(archive.getResourceName(), ","));
         return baseValid && kerberosValid && pyFilesValid && archivesValid;
     }
 

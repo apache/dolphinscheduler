@@ -24,15 +24,18 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -181,9 +184,61 @@ public class SparkTaskTest {
                         "--conf spark.executor.cores=2 " +
                         "--conf spark.executor.memory=1G " +
                         "--name spark " +
-                        "--py-files '/python libs/r&d.py','/b'\\''c.zip' " +
+                        "--py-files " + quotedFileUris("/python libs/r&d.py", "/b'c.zip") + " " +
                         "/main.py",
                 sparkTask.getScript());
+    }
+
+    @Test
+    public void testBuildCommandWithHashInPyFiles() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setLocalParams(Collections.emptyList());
+        sparkParameters.setProgramType(ProgramType.PYTHON);
+        sparkParameters.setDeployMode("client");
+        sparkParameters.setAppName("spark");
+        sparkParameters.setOthers("");
+        sparkParameters.setDriverCores(1);
+        sparkParameters.setDriverMemory("512M");
+        sparkParameters.setNumExecutors(2);
+        sparkParameters.setExecutorMemory("1G");
+        sparkParameters.setExecutorCores(2);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("/main.py");
+        sparkParameters.setMainJar(mainJar);
+        ResourceInfo pyFile = new ResourceInfo();
+        pyFile.setResourceName("/spark files/config#prod.zip");
+        sparkParameters.setPyFiles(new ArrayList<>(Arrays.asList(pyFile)));
+        String parameters = JSONUtils.toJsonString(sparkParameters);
+
+        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        ResourceContext resourceContext = new ResourceContext();
+        addResourceItem(resourceContext, "/main.py");
+        addResourceItem(resourceContext, "/spark files/config#prod.zip");
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
+        Mockito.when(taskExecutionContext.getResourceContext()).thenReturn(resourceContext);
+        SparkTask sparkTask = Mockito.spy(new SparkTask(taskExecutionContext));
+        sparkTask.init();
+        String script = sparkTask.getScript();
+        Assertions.assertEquals(
+                "${SPARK_HOME}/bin/spark-submit " +
+                        "--master yarn " +
+                        "--deploy-mode client " +
+                        "--conf spark.driver.cores=1 " +
+                        "--conf spark.driver.memory=512M " +
+                        "--conf spark.executor.instances=2 " +
+                        "--conf spark.executor.cores=2 " +
+                        "--conf spark.executor.memory=1G " +
+                        "--name spark " +
+                        "--py-files " + quotedFileUris("/spark files/config#prod.zip") + " " +
+                        "/main.py",
+                script);
+        // replicate Spark's URI resolution of the list entry: the '#' must stay inside the
+        // encoded path instead of being read as a fragment, so Spark resolves the original file
+        String pyFilesValue = script.substring(script.indexOf("--py-files ") + "--py-files ".length()).split(" ")[0];
+        URI pyFileUri = URI.create(pyFilesValue.substring(1, pyFilesValue.length() - 1));
+        Assertions.assertEquals("file", pyFileUri.getScheme());
+        Assertions.assertNull(pyFileUri.getFragment());
+        Assertions.assertTrue(pyFileUri.getPath().endsWith("config#prod.zip"));
     }
 
     @Test
@@ -227,9 +282,64 @@ public class SparkTaskTest {
                         "--conf spark.executor.cores=2 " +
                         "--conf spark.executor.memory=1G " +
                         "--name spark " +
-                        "--archives '/opt archives/c&t.gz' " +
+                        "--archives " + quotedFileUris("/opt archives/c&t.gz") + " " +
                         "/lib/dolphinscheduler-task-spark.jar",
                 sparkTask.getScript());
+    }
+
+    @Test
+    public void testBuildCommandWithHashInArchives() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setLocalParams(Collections.emptyList());
+        sparkParameters.setProgramType(ProgramType.SCALA);
+        sparkParameters.setMainClass("org.apache.dolphinscheduler.plugin.task.spark.SparkTaskTest");
+        sparkParameters.setDeployMode("client");
+        sparkParameters.setAppName("spark");
+        sparkParameters.setOthers("");
+        sparkParameters.setDriverCores(1);
+        sparkParameters.setDriverMemory("512M");
+        sparkParameters.setNumExecutors(2);
+        sparkParameters.setExecutorMemory("1G");
+        sparkParameters.setExecutorCores(2);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("/lib/dolphinscheduler-task-spark.jar");
+        sparkParameters.setMainJar(mainJar);
+        ResourceInfo archive = new ResourceInfo();
+        archive.setResourceName("/opt archives/c#prod.tar.gz");
+        sparkParameters.setArchives(new ArrayList<>(Arrays.asList(archive)));
+        String parameters = JSONUtils.toJsonString(sparkParameters);
+
+        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        ResourceContext resourceContext = new ResourceContext();
+        addResourceItem(resourceContext, "/lib/dolphinscheduler-task-spark.jar");
+        addResourceItem(resourceContext, "/opt archives/c#prod.tar.gz");
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
+        Mockito.when(taskExecutionContext.getResourceContext()).thenReturn(resourceContext);
+        SparkTask sparkTask = Mockito.spy(new SparkTask(taskExecutionContext));
+        sparkTask.init();
+        String script = sparkTask.getScript();
+        Assertions.assertEquals(
+                "${SPARK_HOME}/bin/spark-submit " +
+                        "--master yarn " +
+                        "--deploy-mode client " +
+                        "--class org.apache.dolphinscheduler.plugin.task.spark.SparkTaskTest " +
+                        "--conf spark.driver.cores=1 " +
+                        "--conf spark.driver.memory=512M " +
+                        "--conf spark.executor.instances=2 " +
+                        "--conf spark.executor.cores=2 " +
+                        "--conf spark.executor.memory=1G " +
+                        "--name spark " +
+                        "--archives " + quotedFileUris("/opt archives/c#prod.tar.gz") + " " +
+                        "/lib/dolphinscheduler-task-spark.jar",
+                script);
+        // replicate Spark's URI resolution of the list entry: the '#' must stay inside the
+        // encoded path instead of being read as a fragment, so Spark resolves the original file
+        String archivesValue =
+                script.substring(script.indexOf("--archives ") + "--archives ".length()).split(" ")[0];
+        URI archiveUri = URI.create(archivesValue.substring(1, archivesValue.length() - 1));
+        Assertions.assertEquals("file", archiveUri.getScheme());
+        Assertions.assertNull(archiveUri.getFragment());
+        Assertions.assertTrue(archiveUri.getPath().endsWith("c#prod.tar.gz"));
     }
 
     @Test
@@ -339,6 +449,13 @@ public class SparkTaskTest {
         // a blank principal paired with a keytab is invalid and must be rejected at init()
         SparkTask sparkTask = Mockito.spy(new SparkTask(taskExecutionContext));
         Assertions.assertThrows(RuntimeException.class, sparkTask::init);
+    }
+
+    private String quotedFileUris(String... localPaths) {
+        // mirror the command generation: encode each local path as a file: URI, then shell-quote
+        return Arrays.stream(localPaths)
+                .map(path -> ArgsUtils.wrapperSingleQuotes(new File(path).toURI().toString()))
+                .collect(Collectors.joining(","));
     }
 
     private void addResourceItem(ResourceContext resourceContext, String path) {
