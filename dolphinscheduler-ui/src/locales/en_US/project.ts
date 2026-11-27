@@ -406,6 +406,7 @@ export default {
     minute: 'Minute',
     second: 'Second',
     delay_execution_time: 'Delay execution time',
+    task_execute_type: 'Task execution type',
     namespace_cluster: 'Namespace(Cluster)',
     min_cpu: 'Min cpu',
     min_memory: 'Min memory',
