@@ -26,6 +26,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 
 public interface TenantDao extends IDao<Tenant> {
 
+    List<Tenant> queryByProject(long projectCode);
+
     Optional<Tenant> queryByCode(String tenantCode);
 
     Tenant queryDetailById(int tenantId);

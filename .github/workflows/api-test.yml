@@ -87,6 +87,17 @@ jobs:
           -Pdocker,staging \
           -Ddocker.tag=ci \
           -Danalyze.skip=true
+      - name: Export Project Maven Artifacts
+        run: |
+          tar --exclude='*-sources.jar' --exclude='*-shade.jar' \
+            -czf /tmp/api-test-maven-artifacts.tar.gz \
+            -C "$HOME/.m2/repository" org/apache/dolphinscheduler
+      - uses: actions/upload-artifact@v6
+        name: Upload Project Maven Artifacts
+        with:
+          name: api-test-maven-artifacts
+          path: /tmp/api-test-maven-artifacts.tar.gz
+          retention-days: 1
       - name: Export Docker Images
         run: |
           docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
@@ -154,6 +165,15 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-api-test
           restore-keys: ${{ runner.os }}-maven-
       - uses: actions/download-artifact@v8
+        name: Download Project Maven Artifacts
+        with:
+          name: api-test-maven-artifacts
+          path: /tmp
+      - name: Restore Project Maven Artifacts
+        run: |
+          mkdir -p "$HOME/.m2/repository"
+          tar -xzf /tmp/api-test-maven-artifacts.tar.gz -C "$HOME/.m2/repository"
+      - uses: actions/download-artifact@v8
         name: Download Docker Images
         with:
           name: standalone-image-api-test
@@ -165,7 +185,7 @@ jobs:
         run: df -h
       - name: Run Test
         run: |
-          ./mvnw -B -f dolphinscheduler-api-test/pom.xml -am \
+          ./mvnw -B -nsu -f dolphinscheduler-api-test/pom.xml -am \
             -DfailIfNoTests=false \
             -Dspotless.skip=true \
             -Dtest=${{ matrix.case.class }} test

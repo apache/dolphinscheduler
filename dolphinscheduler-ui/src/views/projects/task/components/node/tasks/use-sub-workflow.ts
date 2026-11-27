@@ -57,7 +57,7 @@ export function useSubWorkflow({
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(projectCode),
-      Fields.useEnvironmentName(model, !data?.id),
+      Fields.useEnvironmentName(model, !data?.id, projectCode),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useTimeoutAlarm(model),
       Fields.useChildNode({

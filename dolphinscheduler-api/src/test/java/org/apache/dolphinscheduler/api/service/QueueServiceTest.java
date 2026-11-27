@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.QueueDao;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -71,6 +72,9 @@ public class QueueServiceTest {
 
     @InjectMocks
     private QueueServiceImpl queueService;
+
+    @Mock
+    private TenantDao tenantDao;
 
     @Mock
     private QueueDao queueDao;
@@ -146,6 +150,22 @@ public class QueueServiceTest {
     }
 
     @Test
+    public void deleteQueuePreservesLegacyManagement() throws Exception {
+        User user = getLoginUser();
+        user.setUserType(UserType.ADMIN_USER);
+        when(resourcePermissionCheckService.operationPermissionCheck(Mockito.any(), Mockito.anyInt(),
+                Mockito.anyString(), Mockito.any())).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(Mockito.any(), Mockito.any(),
+                Mockito.anyInt(), Mockito.any())).thenReturn(true);
+        when(queueDao.queryById(1)).thenReturn(getQUEUE());
+        when(queueDao.deleteById(1)).thenReturn(true);
+
+        queueService.deleteQueueById(user, 1);
+
+        Mockito.verify(queueDao).deleteById(1);
+    }
+
+    @Test
     public void testUpdateQueue() {
         when(queueDao.queryById(1)).thenReturn(getQUEUE());
         when(queueDao.existQueue(EXISTS, null)).thenReturn(true);
@@ -199,29 +219,33 @@ public class QueueServiceTest {
     public void testVerifyQueue() {
         // queue null
         Throwable exception =
-                Assertions.assertThrows(ServiceException.class, () -> queueService.verifyQueue(null, QUEUE_NAME));
+                Assertions.assertThrows(ServiceException.class,
+                        () -> queueService.verifyQueue(getLoginUser(), null, QUEUE_NAME));
         String formatter = MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), Constants.QUEUE);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // queueName null
-        exception = Assertions.assertThrows(ServiceException.class, () -> queueService.verifyQueue(QUEUE_NAME, null));
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> queueService.verifyQueue(getLoginUser(), QUEUE_NAME, null));
         formatter = MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), Constants.QUEUE_NAME);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // exist queueName
         when(queueDao.existQueue(EXISTS, null)).thenReturn(true);
-        exception = Assertions.assertThrows(ServiceException.class, () -> queueService.verifyQueue(EXISTS, QUEUE_NAME));
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> queueService.verifyQueue(getLoginUser(), EXISTS, QUEUE_NAME));
         formatter = MessageFormat.format(Status.QUEUE_VALUE_EXIST.getMsg(), EXISTS);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // exist queue
         when(queueDao.existQueue(null, EXISTS)).thenReturn(true);
-        exception = Assertions.assertThrows(ServiceException.class, () -> queueService.verifyQueue(QUEUE, EXISTS));
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> queueService.verifyQueue(getLoginUser(), QUEUE, EXISTS));
         formatter = MessageFormat.format(Status.QUEUE_NAME_EXIST.getMsg(), EXISTS);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // success
-        AssertionsHelper.assertDoesNotThrow(() -> queueService.verifyQueue(NOT_EXISTS, NOT_EXISTS));
+        AssertionsHelper.assertDoesNotThrow(() -> queueService.verifyQueue(getLoginUser(), NOT_EXISTS, NOT_EXISTS));
     }
 
     @Test

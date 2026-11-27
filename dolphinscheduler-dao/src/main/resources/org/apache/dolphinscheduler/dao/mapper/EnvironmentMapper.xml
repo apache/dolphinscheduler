@@ -69,4 +69,17 @@
     <delete id="deleteByCode">
         delete from t_ds_environment where code = #{code}
     </delete>
+    <select id="queryByProject" resultType="org.apache.dolphinscheduler.dao.entity.Environment">
+        select resource.id, resource.code, resource.name, resource.description,
+            resource.operator, resource.create_time, resource.update_time
+        from t_ds_environment resource
+        where exists (
+            select 1 from t_ds_project_resource_authorization grant_auth
+            where grant_auth.project_code = #{projectCode}
+                and grant_auth.resource_type = 'ENVIRONMENT'
+                and grant_auth.resource_key = concat('', resource.id)
+        )
+        order by resource.id
+    </select>
+
 </mapper>

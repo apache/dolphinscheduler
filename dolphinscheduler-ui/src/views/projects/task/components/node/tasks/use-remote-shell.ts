@@ -56,13 +56,13 @@ export function useRemoteShell({
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(projectCode),
-      Fields.useEnvironmentName(model, !data?.id),
+      Fields.useEnvironmentName(model, !data?.id, projectCode),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
       ...Fields.useResourceLimit(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useDatasource(model, {
+      ...Fields.useDatasource(model, projectCode, {
         supportedDatasourceType: ['SSH']
       }),
       ...Fields.useRemoteShell(model),

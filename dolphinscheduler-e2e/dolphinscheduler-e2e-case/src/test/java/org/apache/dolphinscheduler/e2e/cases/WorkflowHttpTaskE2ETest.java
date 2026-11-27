@@ -80,7 +80,8 @@ public class WorkflowHttpTaskE2ETest {
 
         userPage.update(user, user, email, phone, tenant)
                 .goToNav(ProjectPage.class)
-                .create(project);
+                .createProjectUntilSuccess(project)
+                .assignResource(project, "Tenant", tenant);
     }
 
     @AfterAll
@@ -145,6 +146,7 @@ public class WorkflowHttpTaskE2ETest {
         projectPage
                 .goToTab(WorkflowDefinitionTab.class)
                 .run(workflow)
+                .tenant(tenant)
                 .submit();
 
         Awaitility.await().untilAsserted(() -> {

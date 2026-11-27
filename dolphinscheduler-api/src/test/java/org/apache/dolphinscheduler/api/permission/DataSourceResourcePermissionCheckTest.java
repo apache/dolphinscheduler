@@ -23,11 +23,8 @@ import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -52,7 +49,7 @@ public class DataSourceResourcePermissionCheckTest {
     @Test
     public void testPermissionCheck() {
         User user = getLoginUser();
-        Assertions.assertTrue(dataSourceResourcePermissionCheck.permissionCheck(user.getId(), null, logger));
+        Assertions.assertFalse(dataSourceResourcePermissionCheck.permissionCheck(user.getId(), null, logger));
     }
 
     @Test
@@ -63,15 +60,13 @@ public class DataSourceResourcePermissionCheckTest {
 
     @Test
     public void testListAuthorizedResourceIds() {
-        User user = getLoginUser();
-        DataSource dataSource = new DataSource();
-        Set<Integer> ids = new HashSet();
-        ids.add(dataSource.getId());
-        List<DataSource> dataSources = Arrays.asList(dataSource);
-
-        Mockito.when(dataSourceDao.listAuthorizedDataSource(user.getId(), null)).thenReturn(dataSources);
-
-        Assertions.assertEquals(ids, dataSourceResourcePermissionCheck.listAuthorizedResourceIds(user.getId(), logger));
+        Assertions.assertTrue(dataSourceResourcePermissionCheck.listAuthorizedResourceIds(1, logger).isEmpty());
+        Mockito.verifyNoInteractions(dataSourceDao);
+        DataSource resource = new DataSource();
+        resource.setId(1);
+        Mockito.when(dataSourceDao.queryAll()).thenReturn(Collections.singletonList(resource));
+        Assertions.assertEquals(Collections.singleton(1),
+                dataSourceResourcePermissionCheck.listAuthorizedResourceIds(0, logger));
     }
 
     private User getLoginUser() {

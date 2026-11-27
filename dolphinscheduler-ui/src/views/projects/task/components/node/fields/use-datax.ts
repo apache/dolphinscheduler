@@ -20,7 +20,10 @@ import { useCustomParams, useDatasource, useResources } from '.'
 import type { IJsonItem } from '../types'
 import utils from '@/utils'
 
-export function useDataX(model: { [field: string]: any }): IJsonItem[] {
+export function useDataX(
+  model: { [field: string]: any },
+  projectCode: number
+): IJsonItem[] {
   const { t } = useI18n()
   const jobSpeedByteOptions: any[] = [
     {
@@ -173,7 +176,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       field: 'customConfig',
       name: t('project.node.datax_custom_template')
     },
-    ...useDatasource(model, {
+    ...useDatasource(model, projectCode, {
       typeField: 'dsType',
       sourceField: 'dataSource',
       span: datasourceSpan,
@@ -242,7 +245,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     useResources(useResourcesSpan),
-    ...useDatasource(model, {
+    ...useDatasource(model, projectCode, {
       typeField: 'dtType',
       sourceField: 'dataTarget',
       span: destinationDatasourceSpan,

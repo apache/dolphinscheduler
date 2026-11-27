@@ -34,4 +34,6 @@ public interface WorkflowInstanceMapDao extends IDao<WorkflowInstanceRelation> {
     List<Integer> querySubWorkflowInstanceIds(int workflowInstanceId);
 
     void deleteByParentId(int workflowInstanceId);
+
+    void deleteByWorkflowInstanceId(int workflowInstanceId);
 }

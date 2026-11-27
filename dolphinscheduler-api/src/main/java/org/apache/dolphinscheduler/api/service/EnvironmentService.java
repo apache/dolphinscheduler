@@ -49,7 +49,7 @@ public interface EnvironmentService {
      *
      * @param code environment code
      */
-    EnvironmentDto queryEnvironmentByCode(Long code);
+    EnvironmentDto queryEnvironmentByCode(User loginUser, Long code, Long projectCode);
 
     /**
      * delete environment
@@ -89,11 +89,13 @@ public interface EnvironmentService {
      */
     List<EnvironmentDto> queryAllEnvironmentList(User loginUser);
 
+    List<EnvironmentDto> queryAllEnvironmentList(User loginUser, Long projectCode);
+
     /**
      * verify environment name
      *
      * @param environmentName environment name
      */
-    void verifyEnvironment(String environmentName);
+    void verifyEnvironment(User loginUser, String environmentName);
 
 }

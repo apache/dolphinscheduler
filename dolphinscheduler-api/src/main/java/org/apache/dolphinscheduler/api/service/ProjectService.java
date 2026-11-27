@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -53,13 +54,9 @@ public interface ProjectService {
      */
     Project queryByName(User loginUser, String projectName);
 
-    void checkProjectAndAuthThrowException(User loginUser, Project project, String permission) throws ServiceException;
+    void checkProjectPermission(User loginUser, Project project, ProjectPermission permission);
 
-    void checkProjectAndAuthThrowException(User loginUser, Long projectCode, String permission) throws ServiceException;
-
-    void checkHasProjectWritePermissionThrowException(User loginUser, long projectCode);
-
-    void checkHasProjectWritePermissionThrowException(User loginUser, Project project);
+    void checkProjectPermission(User loginUser, long projectCode, ProjectPermission permission);
 
     /**
      * admin can view all projects
@@ -162,10 +159,10 @@ public interface ProjectService {
     Result queryProjectCreatedAndAuthorizedByUser(User loginUser);
 
     /**
-     * the project list in dependent node's permissions should not be restricted
+     * query the projects visible to the login user for dependent nodes
      * @return project list
      */
-    Result queryAllProjectListForDependent();
+    Result queryAllProjectListForDependent(User loginUser);
 
     List<Long> getAuthorizedProjectCodes(User loginUser);
 }

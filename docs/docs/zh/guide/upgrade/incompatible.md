@@ -58,6 +58,15 @@
 
 ## 3.5.0
 
+* **数据源管理收敛为系统管理员专属操作**：普通用户不再具有数据源创建、全局列表查询、详情与敏感配置访问、修改、连接测试和删除权限，历史创建者身份及个人授权不会保留这些管理能力。普通用户仍可通过带 `projectCode` 的项目资源选择接口，凭项目 `VIEW` 查询已授权数据源，并按项目操作权限配置或执行任务。
+* 仅系统管理员或项目创建者可以修改项目信息、删除项目。修改项目信息保留原所有者，`DEVELOP` 不包含这些项目生命周期操作。
+* 项目操作权限为 `VIEW`、`DEVELOP`、`EXECUTE`、`MANAGE_MEMBERS` 四项：开发权限包含定义发布，执行权限包含定时调度管理。切换工作流版本需工作流与定时均已下线。全局资源名称校验限制为系统管理员。
+* 级联删除实例前，检查所有受影响实例（包括子实例）所属项目的 `DEVELOP` 权限。
+* 同项目及跨项目复制工作流均不再复制定时调度；需凭目标项目 `EXECUTE` 权限及所需资源授权单独配置调度。
+* 权限模型改为“用户拥有项目操作权限，项目获得资源使用授权”。升级程序新增 `t_ds_project_user_permission` 和 `t_ds_project_resource_authorization` 两张表，保留旧授权表及数据，但不自动迁移历史权限。管理员需要重新分配项目成员权限及项目资源授权，用户才能继续查询、配置、发布或人工执行项目任务。
+* 项目内的资源查询需要传入 `projectCode`，按项目 `VIEW` 权限及资源授权过滤；不带项目参数的全局资源目录仅管理员可查询。移除数据源和命名空间的个人授权接口，改为向项目授权。
+* 队列不纳入项目资源使用授权，保留旧队列管理、租户关联及原有队列数据，不进行队列数据修正。任务参数 `yarnQueue` 及 `others` 中的队列选项不校验项目授权。旧队列管理的废弃工作由 [#18784](https://github.com/apache/dolphinscheduler/issues/18784) 跟踪。
+* 保存、发布和人工启动、重跑时检查项目资源授权。撤销资源授权不重新鉴权既有运行或排队实例、后台定时触发和自动重试，也不会自动下线已有定时。
 * Python Gateway 不再提供默认的 `api.python-gateway.auth-token`，启用时必须显式配置非空白 token。API、Master、Worker、Alert 和 Standalone 不再提供默认的 Actuator 账号密码；开启 `management.security.enabled` 前，必须为 `management.security.username` 和 `management.security.password` 配置非空白值。缺少必需凭据或凭据仅含空白字符时，服务启动失败；未启用的功能无需配置凭据。([#18812](https://github.com/apache/dolphinscheduler/issues/18812))
 * 移除工作流移动接口 `POST /projects/{projectCode}/workflow-definition/batch-move`。更新、实例同步及版本切换不再允许改变已有工作流或任务的项目归属；历史归属不一致的数据会被拒绝，不执行自动迁移。可通过跨项目复制创建新定义，但复制不保留原工作流标识或执行历史。 ([#18806](https://github.com/apache/dolphinscheduler/issues/18806))
   * 被已有实例引用的历史工作流版本不再允许删除，包括已结束的实例。编辑实例时，其记录的工作流定义版本必须存在且属于同一项目，`syncDefine=false` 也不例外。如果该版本在升级前已被删除，编辑会返回 `WORKFLOW_DEFINITION_NOT_EXIST`，提交完整 DAG 也不会重建缺失版本。需要继续执行时，请从同一项目内的有效工作流定义启动新实例。
@@ -84,4 +93,14 @@
 * `AlertSender#getAlertData` 对 null `alertType` 增加了显式拒绝（抛 `IllegalArgumentException` 并记录错误日志），而非直接抛 `NullPointerException`。滚动升级时**必须先升级 Alert Server，再升级 Master/Worker**，否则旧 Alert Server 无法识别新增的 `alert_type` 枚举值（如 `TASK_RESULT`），会导致告警投递失败。详见[升级文档](upgrade.md#滚动升降级顺序)。([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
 
 * SQL 任务结果告警内容有大小限制：默认最多保留 30 行，超过 100 字符的字符串字段值会被截断并以省略号标记；序列化后内容总大小限制在 60000 UTF-8 字节以内（兼容 MySQL TEXT 列 65535 字节容量），超出预算的行以省略标记对象表示。以上默认值可通过 `common.properties` 中的 `sql.task.alert.max.rows`、`sql.task.alert.max.row.value.length`、`sql.task.alert.max.content.bytes` 配置调整，修改后需重启 Worker 生效。 ([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
+
+### 项目权限模型
+
+完整的操作权限、项目资源授权、跨项目校验及撤权生效边界见[安全中心（权限系统）](../security/security.md#授予权限)。
+
+以下架构图对比旧权限模型与 3.5.0 引入的项目权限模型。
+
+![旧权限模型](../../../../img/architecture-design/project-scoped-authorization-before.png)
+
+![项目权限模型](../../../../img/architecture-design/project-scoped-authorization.png)
 

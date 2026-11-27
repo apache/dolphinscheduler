@@ -34,10 +34,12 @@ import org.apache.dolphinscheduler.api.service.impl.AlertGroupServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -76,6 +78,9 @@ public class AlertGroupServiceTest {
     private AlertGroupServiceImpl alertGroupService;
 
     @Mock
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
+
+    @Mock
     private AlertGroupDao alertGroupDao;
 
     private String groupName = "AlertGroupServiceTest";
@@ -86,24 +91,13 @@ public class AlertGroupServiceTest {
     @Test
     public void testQueryAlertGroup() {
         User user = getLoginUser();
-
         when(alertGroupDao.queryAllGroupList()).thenReturn(getList());
-        List<AlertGroup> alertGroups = alertGroupService.queryAllAlertGroup(user);
-        Assertions.assertEquals(1, alertGroups.size());
-
+        Assertions.assertEquals(1, alertGroupService.queryAllAlertGroup(user).size());
         user.setUserType(UserType.GENERAL_USER);
-        user.setId(2);
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> alertGroupService.queryAllAlertGroup(user));
+        Mockito.verifyNoInteractions(resourcePermissionCheckService);
 
-        when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, 2,
-                alertGroupServiceLogger))
-                        .thenReturn(Collections.emptySet());
-        Assertions.assertEquals(alertGroupService.queryAllAlertGroup(user).size(), 0);
-
-        user.setId(3);
-        when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, 3,
-                alertGroupServiceLogger))
-                        .thenReturn(Collections.singleton(1));
-        assertDoesNotThrow(() -> alertGroupService.queryAllAlertGroup(user));
     }
 
     @Test
@@ -292,17 +286,18 @@ public class AlertGroupServiceTest {
                 baseServiceLogger)).thenReturn(true);
         when(alertGroupDao.queryById(4)).thenReturn(getEntity());
         assertDoesNotThrow(() -> alertGroupService.deleteAlertGroupById(user, 4));
+        Mockito.verify(resourceAuthorizationDao).revokeByResource(ProjectResourceType.ALERT_GROUP, "4");
     }
 
     @Test
     public void testVerifyGroupName() {
         // group name not exist
-        boolean result = alertGroupService.existGroupName(groupName);
+        boolean result = alertGroupService.existGroupName(getLoginUser(), groupName);
         Assertions.assertFalse(result);
         when(alertGroupDao.existGroupName(groupName)).thenReturn(true);
 
         // group name exist
-        result = alertGroupService.existGroupName(groupName);
+        result = alertGroupService.existGroupName(getLoginUser(), groupName);
         Assertions.assertTrue(result);
     }
 

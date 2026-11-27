@@ -22,7 +22,8 @@ import type { IEnvironmentNameOption, IJsonItem } from '../types'
 
 export function useEnvironmentName(
   model: { [field: string]: any },
-  isCreate: boolean
+  isCreate: boolean,
+  projectCode: number
 ): IJsonItem {
   const { t } = useI18n()
 
@@ -34,7 +35,7 @@ export function useEnvironmentName(
   const getEnvironmentList = async () => {
     if (loading.value) return
     loading.value = true
-    const res = await queryAllEnvironmentList()
+    const res = await queryAllEnvironmentList(projectCode)
     environmentList = res.map(
       (item: { code: string; name: string; workerGroups: string[] }) => ({
         label: item.name,

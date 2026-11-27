@@ -39,6 +39,11 @@ public class AlertGroupDaoImpl extends BaseDao<AlertGroup, AlertGroupMapper> imp
     }
 
     @Override
+    public List<AlertGroup> queryByProject(long projectCode) {
+        return mybatisMapper.queryByProject(projectCode);
+    }
+
+    @Override
     public IPage<AlertGroup> queryAlertGroupPage(Page<AlertGroup> page, String groupName) {
         return mybatisMapper.queryAlertGroupPage(page, groupName);
     }

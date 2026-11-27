@@ -20,7 +20,7 @@ import { onMounted, ref, VNodeChild } from 'vue'
 import { getAllNamespaces } from '@/service/modules/k8s-namespace'
 import { SelectOption } from 'naive-ui'
 
-export function useNamespace(): IJsonItem {
+export function useNamespace(projectCode: number): IJsonItem {
   const { t } = useI18n()
 
   const options = ref([])
@@ -29,7 +29,7 @@ export function useNamespace(): IJsonItem {
   const getNamespaceList = async () => {
     if (loading.value) return
     loading.value = true
-    const totalList = await getAllNamespaces()
+    const totalList = await getAllNamespaces(projectCode)
     options.value = (totalList || []).map(
       (item: { id: string; namespace: string; clusterName: string }) => ({
         label: `${item.namespace}(${item.clusterName})`,

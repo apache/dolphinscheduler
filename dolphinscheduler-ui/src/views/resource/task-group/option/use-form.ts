@@ -28,7 +28,6 @@ export function useForm() {
     formData: {
       id: 0,
       name: '',
-      projectCode: null as string | null,
       groupSize: '',
       status: 1,
       description: ''
@@ -57,17 +56,6 @@ export function useForm() {
             return new Error(
               t('resource.task_group_option.resource_pool_size') +
                 t('resource.task_group_option.positive_integer_tips')
-            )
-          }
-        }
-      },
-      projectCode: {
-        required: true,
-        trigger: ['input', 'blur'],
-        validator() {
-          if (!state.formData.projectCode) {
-            return new Error(
-              t('resource.task_group_option.please_select_project')
             )
           }
         }

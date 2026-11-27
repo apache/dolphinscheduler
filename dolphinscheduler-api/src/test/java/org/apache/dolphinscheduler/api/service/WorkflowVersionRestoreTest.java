@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -79,6 +80,8 @@ public class WorkflowVersionRestoreTest extends AbstractControllerTest {
     @Autowired
     private WorkflowDefinitionService workflowDefinitionService;
     @Autowired
+    private ProjectResourceAuthorizationService projectResourceAuthorizationService;
+    @Autowired
     private TaskDefinitionService taskDefinitionService;
     @Autowired
     private ProjectMapper projectMapper;
@@ -106,7 +109,8 @@ public class WorkflowVersionRestoreTest extends AbstractControllerTest {
 
     @BeforeEach
     public void createWorkflow() {
-        for (String table : Arrays.asList("t_ds_workflow_instance", "t_ds_workflow_task_relation",
+        for (String table : Arrays.asList("t_ds_project_resource_authorization", "t_ds_workflow_instance",
+                "t_ds_workflow_task_relation",
                 "t_ds_workflow_task_relation_log", "t_ds_workflow_definition", "t_ds_workflow_definition_log",
                 "t_ds_task_definition", "t_ds_task_definition_log")) {
             jdbcTemplate.update("DELETE FROM " + table + " WHERE project_code = ?", PROJECT_CODE);
@@ -118,6 +122,8 @@ public class WorkflowVersionRestoreTest extends AbstractControllerTest {
         project.setUserId(user.getId());
         project.setCreateTime(new Date());
         projectMapper.insert(project);
+        projectResourceAuthorizationService.grantResource(user, PROJECT_CODE, ProjectResourceType.WORKER_GROUP,
+                "default");
 
         existingTask = task(EXISTING_TASK_CODE, "existing");
         taskDefinitionLogMapper.insert(existingTask);
@@ -172,7 +178,7 @@ public class WorkflowVersionRestoreTest extends AbstractControllerTest {
                     .andExpect(jsonPath("$.data.projectCode").value(PROJECT_CODE))
                     .andExpect(jsonPath("$.data.version").value(relation.getPostTaskVersion()));
         }
-        Mockito.verify(schedulerService).offlineSchedulerByWorkflowCode(WORKFLOW_CODE);
+        Mockito.verifyNoInteractions(schedulerService);
     }
 
     @ParameterizedTest
@@ -204,7 +210,7 @@ public class WorkflowVersionRestoreTest extends AbstractControllerTest {
         Assertions.assertEquals(1, currentRelations.get(0).getWorkflowDefinitionVersion());
         Assertions.assertEquals(9, taskDefinitionService.getTaskDefinition(user, EXISTING_TASK_CODE).getVersion());
         Assertions.assertNull(taskDefinitionMapper.queryByCode(NEW_TASK_CODE));
-        Mockito.verify(schedulerService, Mockito.never()).offlineSchedulerByWorkflowCode(WORKFLOW_CODE);
+        Mockito.verifyNoInteractions(schedulerService);
     }
 
     private int saveInstanceWithNewTask() {

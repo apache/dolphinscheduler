@@ -46,6 +46,7 @@ interface ProjectList {
   description: string
   createTime: string
   updateTime: string
+  permissions: import('./authorization').ProjectPermission[]
   perm: number
   defCount: number
   instRunningCount: number

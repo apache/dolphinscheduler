@@ -77,6 +77,20 @@
     </dependencies>
 
     <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+            <testResource>
+                <directory>../dolphinscheduler-dao/src/main/resources</directory>
+                <includes>
+                    <include>sql/dolphinscheduler_mysql.sql</include>
+                    <include>sql/dolphinscheduler_postgresql.sql</include>
+                    <include>sql/upgrade/3.5.0_schema/**</include>
+                    <include>sql/soft_version</include>
+                </includes>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

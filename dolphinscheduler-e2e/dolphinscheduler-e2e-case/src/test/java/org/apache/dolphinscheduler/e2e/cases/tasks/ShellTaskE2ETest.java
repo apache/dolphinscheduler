@@ -67,7 +67,8 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
 
         tenantPage
                 .goToNav(ProjectPage.class)
-                .createProjectUntilSuccess(projectName);
+                .createProjectUntilSuccess(projectName)
+                .assignResource(projectName, "Tenant", adminUser.getTenant());
     }
 
     @Test

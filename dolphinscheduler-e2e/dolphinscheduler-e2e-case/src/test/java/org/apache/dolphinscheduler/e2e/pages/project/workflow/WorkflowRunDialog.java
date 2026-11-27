@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import lombok.Getter;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @Getter
@@ -32,6 +33,16 @@ public final class WorkflowRunDialog {
 
     public WorkflowRunDialog(WorkflowDefinitionTab parent) {
         this.parent = parent;
+    }
+
+    public WorkflowRunDialog tenant(String tenantCode) {
+        UiInteraction.click(parent.driver(), ".dialog-start-workflow .select-tenant .n-base-selection");
+        WebElement option = WebDriverWaitFactory.createWebDriverWait(parent.driver()).until(ignored -> parent.driver()
+                .findElements(By.cssSelector(".n-base-select-option")).stream()
+                .filter(WebElement::isDisplayed).filter(element -> tenantCode.equals(element.getText()))
+                .findFirst().orElse(null));
+        option.click();
+        return this;
     }
 
     public WorkflowDefinitionTab submit() {

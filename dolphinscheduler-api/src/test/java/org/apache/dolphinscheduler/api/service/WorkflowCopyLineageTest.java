@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCopyVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
@@ -73,6 +74,8 @@ public class WorkflowCopyLineageTest extends AbstractControllerTest {
     @Autowired
     private WorkflowDefinitionService workflowDefinitionService;
     @Autowired
+    private ProjectResourceAuthorizationService projectResourceAuthorizationService;
+    @Autowired
     private WorkflowLineageService workflowLineageService;
     @Autowired
     private ProjectMapper projectMapper;
@@ -100,6 +103,8 @@ public class WorkflowCopyLineageTest extends AbstractControllerTest {
             project.setUserId(user.getId());
             project.setCreateTime(new Date());
             projectMapper.insert(project);
+            projectResourceAuthorizationService.grantResource(user, projectCode, ProjectResourceType.WORKER_GROUP,
+                    "default");
         }
         TaskDefinitionLog task = dependentTask(SOURCE_TASK_CODE, SOURCE_PROJECT_CODE, "self-dependent",
                 SOURCE_PROJECT_CODE, SOURCE_WORKFLOW_CODE);

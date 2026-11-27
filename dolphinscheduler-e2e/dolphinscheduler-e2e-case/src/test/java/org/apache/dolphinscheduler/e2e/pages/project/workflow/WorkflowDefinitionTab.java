@@ -97,6 +97,17 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
         return this;
     }
 
+    public WorkflowTimingDialog timing(String workflow) {
+        workflowList().stream()
+                .filter(it -> it.findElement(By.className("workflow-name")).getText().equals(workflow))
+                .flatMap(it -> it.findElements(By.className("btn-timing")).stream())
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Can not find timing button in workflow definition"))
+                .click();
+        return new WorkflowTimingDialog(this);
+    }
+
     public WorkflowRunDialog run(String workflow) {
         workflowList()
                 .stream()
