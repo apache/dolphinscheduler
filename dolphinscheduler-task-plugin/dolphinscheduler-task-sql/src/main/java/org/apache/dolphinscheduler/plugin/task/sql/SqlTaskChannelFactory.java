@@ -34,6 +34,10 @@ public class SqlTaskChannelFactory implements TaskChannelFactory {
 
     @Override
     public TaskChannel create() {
+        // Fail fast on an invalid sql.task.query.max.rows while the SQL task plugin is
+        // loaded at startup, so a worker configured with a bad value exits before it can
+        // accept SQL tasks (see SqlTask.validateQueryMaxRows).
+        SqlTask.validateQueryMaxRows();
         return new SqlTaskChannel();
     }
 }

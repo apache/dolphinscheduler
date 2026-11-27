@@ -872,6 +872,9 @@ export default {
     send_alarm: 'Send Alarm',
     log_display: 'Log display',
     rows_of_result: 'rows of result',
+    query_max_rows: 'Max query rows',
+    query_max_rows_tips:
+      'Optional. Leave blank to use the global default in sql.task.query.max.rows',
     title: 'Title',
     title_tips: 'Please enter the title of alarm',
     alarm_group: 'Alarm group',

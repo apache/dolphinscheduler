@@ -93,6 +93,24 @@ export function useSqlType(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     {
+      type: 'input-number',
+      field: 'limit',
+      span: querySpan,
+      name: t('project.node.query_max_rows'),
+      props: {
+        placeholder: t('project.node.query_max_rows_tips'),
+        max: 2147483647
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        validator(unuse, value) {
+          if (value != null && (!Number.isInteger(value) || value < 1)) {
+            return new Error(t('project.node.integer_tips'))
+          }
+        }
+      }
+    },
+    {
       type: 'custom',
       field: 'displayRowsTips',
       span: querySpan,
