@@ -38,6 +38,7 @@ import { useZeppelin } from './use-zeppelin'
 import { useK8s } from './use-k8s'
 import { useJupyter } from './use-jupyter'
 import { useMlflow } from './use-mlflow'
+import { useDatavines } from './use-datavines'
 import { useOpenmldb } from './use-openmldb'
 import { useDvc } from './use-dvc'
 import { useJava } from './use-java'
@@ -76,6 +77,7 @@ export default {
   K8S: useK8s,
   JUPYTER: useJupyter,
   MLFLOW: useMlflow,
+  DATAVINES: useDatavines,
   OPENMLDB: useOpenmldb,
   DVC: useDvc,
   DINKY: useDinky,

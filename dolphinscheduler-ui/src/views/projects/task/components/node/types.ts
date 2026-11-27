@@ -442,6 +442,12 @@ interface ITaskParams {
   dvcLoadSaveDataPath?: string
   dvcStoreUrl?: string
   address?: string
+  datavinesAddress?: string
+  datavinesJobId?: number | null
+  datavinesToken?: string
+  datavinesInterval?: number
+  datavinesTimeout?: number
+  datavinesRetryTimes?: number
   taskId?: string
   online?: boolean
   sagemakerRequestJson?: string

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.DatavinesTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.HttpTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.JavaTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.PythonTaskForm;
@@ -73,6 +74,9 @@ public final class WorkflowForm {
         WebDriverWaitFactory.createWebDriverWait(driver)
                 .withMessage("DAG graph has not mounted before adding task " + type)
                 .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".dag-container .x6-graph-svg")));
+        if (type == TaskType.DATAVINES) {
+            expandOtherTaskCategory();
+        }
         // Task entries are populated by the asynchronous DAG menu request after navigation.
         final WebElement task = WebDriverWaitFactory.createWebDriverWait(driver)
                 .withMessage("DAG task menu has not rendered a draggable entry for " + type)
@@ -105,8 +109,23 @@ public final class WorkflowForm {
                 return (T) new JavaTaskForm(this);
             case PYTHON:
                 return (T) new PythonTaskForm(this);
+            case DATAVINES:
+                return (T) new DatavinesTaskForm(this);
         }
         throw new UnsupportedOperationException("Unknown task type");
+    }
+
+    private void expandOtherTaskCategory() {
+        List<WebElement> taskItems = driver.findElements(By.cssSelector(".task-item-DATAVINES"));
+        if (taskItems.stream().anyMatch(WebElement::isDisplayed)) {
+            return;
+        }
+        WebElement header = WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(
+                        By.cssSelector(".task-cate-other .n-collapse-item__header")));
+        header.click();
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".task-item-DATAVINES")));
     }
 
     public WebElement getTask(String taskName) {
@@ -144,6 +163,7 @@ public final class WorkflowForm {
         SWITCH,
         HTTP,
         JAVA,
-        PYTHON
+        PYTHON,
+        DATAVINES
     }
 }

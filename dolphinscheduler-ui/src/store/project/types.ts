@@ -43,6 +43,7 @@ type TaskType =
   | 'K8S'
   | 'JUPYTER'
   | 'MLFLOW'
+  | 'DATAVINES'
   | 'OPENMLDB'
   | 'DVC'
   | 'JAVA'
