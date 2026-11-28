@@ -290,6 +290,10 @@ public class FileUtils {
     }
 
     public static String concatFilePath(String... paths) {
+        return concatPathWithSeparator(File.separator, paths);
+    }
+
+    public static String concatPathWithSeparator(String separator, String... paths) {
         if (paths.length == 0) {
             throw new IllegalArgumentException("At least one path should be provided");
         }
@@ -297,7 +301,6 @@ public class FileUtils {
         if (StringUtils.isEmpty(finalPath)) {
             throw new IllegalArgumentException("The path should not be empty");
         }
-        String separator = File.separator;
         for (int i = 1; i < paths.length; i++) {
             String path = paths[i];
             if (StringUtils.isEmpty(path)) {

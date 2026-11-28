@@ -268,7 +268,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Integer pageSize = pagingResourceItemRequest.getPageSize();
 
         List<StorageEntity> storageEntities = resourceAbsolutePaths.stream()
-                .flatMap(resourceAbsolutePath -> storageOperator.listStorageEntity(resourceAbsolutePath).stream())
+                .flatMap(resourceAbsolutePath -> listStorageEntities(resourceAbsolutePath,
+                        pagingResourceItemRequest.getIsDirectory()).stream())
                 .collect(Collectors.toList());
 
         List<ResourceItemVO> result = storageEntities
@@ -288,6 +289,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 .build();
     }
 
+    private List<StorageEntity> listStorageEntities(String resourceAbsolutePath, Boolean isDirectory) {
+        return isDirectory == null ? storageOperator.listStorageEntity(resourceAbsolutePath)
+                : storageOperator.listStorageEntity(resourceAbsolutePath, isDirectory);
+    }
+
     @Override
     public List<ResourceComponent> queryResourceFiles(User loginUser, ResourceType resourceType) {
         Tenant tenant = tenantDao.queryOptionalById(loginUser.getTenantId())
@@ -304,9 +310,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         DeleteResourceDto deleteResourceDto = DeleteResourceDto.builder()
                 .loginUser(deleteResourceRequest.getLoginUser())
                 .resourceAbsolutePath(deleteResourceRequest.getResourceAbsolutePath())
+                .isDirectory(deleteResourceRequest.getIsDirectory())
                 .build();
         deleteResourceDtoValidator.validate(deleteResourceDto);
-        storageOperator.delete(deleteResourceDto.getResourceAbsolutePath(), true);
+        if (deleteResourceDto.getIsDirectory() == null) {
+            storageOperator.delete(deleteResourceDto.getResourceAbsolutePath(), true);
+        } else {
+            storageOperator.delete(deleteResourceDto.getResourceAbsolutePath(), true,
+                    deleteResourceDto.getIsDirectory());
+        }
     }
 
     @Override

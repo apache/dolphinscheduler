@@ -37,6 +37,8 @@ export function useFileState(
     const { state } = useAsyncState(
       queryResourceListPaging({
         fullName,
+        // the page lists one folder, whose name can look like a file name
+        isDirectory: true,
         tenantCode,
         type: type,
         searchVal,

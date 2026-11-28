@@ -22,6 +22,7 @@ import {
   NameReq,
   FileNameReq,
   FullNameReq,
+  IsDirectoryReq,
   TenantCodeReq,
   ContentReq,
   DescriptionReq,
@@ -33,7 +34,11 @@ import {
 } from './types'
 
 export function queryResourceListPaging(
-  params: ListReq & ResourceTypeReq & FullNameReq & TenantCodeReq
+  params: ListReq &
+    ResourceTypeReq &
+    FullNameReq &
+    IsDirectoryReq &
+    TenantCodeReq
 ): any {
   return axios({
     url: '/resources',
@@ -111,7 +116,9 @@ export function updateResource(
   })
 }
 
-export function deleteResource(params: FullNameReq & TenantCodeReq): any {
+export function deleteResource(
+  params: FullNameReq & IsDirectoryReq & TenantCodeReq
+): any {
   return axios({
     url: '/resources',
     method: 'delete',

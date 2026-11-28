@@ -84,6 +84,7 @@ export default defineComponent({
 
     const handleDeleteFile = (fullNameObj: {
       fullName: string
+      isDirectory: boolean
       tenantCode: string
     }) => {
       deleteResource(fullNameObj).then(() => emit('updateList'))
@@ -236,6 +237,8 @@ export default defineComponent({
                 onPositiveClick={() => {
                   this.handleDeleteFile({
                     fullName: this.row.fullName,
+                    // a file and a directory can share a name, tell which
+                    isDirectory: !!this.row.directory,
                     tenantCode: this.row.user_name
                   })
                 }}

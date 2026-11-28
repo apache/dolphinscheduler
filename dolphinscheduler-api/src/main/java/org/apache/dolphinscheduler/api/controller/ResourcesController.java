@@ -246,6 +246,7 @@ public class ResourcesController extends BaseController {
             @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
             @Parameter(name = "fullName", description = "RESOURCE_FULLNAME", required = true, schema = @Schema(implementation = String.class, example = "bucket_name/tenant_name/type/ds")),
             @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "isDirectory", description = "RESOURCE_IS_DIRECTORY", required = false, schema = @Schema(implementation = Boolean.class)),
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))})
     @GetMapping()
@@ -255,6 +256,7 @@ public class ResourcesController extends BaseController {
                                                                       @RequestParam(value = "fullName") String resourceAbsolutePath,
                                                                       @RequestParam(value = "type") ResourceType resourceType,
                                                                       @RequestParam(value = "searchVal", required = false) String resourceNameKeyWord,
+                                                                      @RequestParam(value = "isDirectory", required = false) Boolean isDirectory,
                                                                       @RequestParam("pageNo") Integer pageNo,
                                                                       @RequestParam("pageSize") Integer pageSize) {
         PagingResourceItemRequest pagingResourceItemRequest = PagingResourceItemRequest.builder()
@@ -262,6 +264,7 @@ public class ResourcesController extends BaseController {
                 .resourceAbsolutePath(resourceAbsolutePath)
                 .resourceType(resourceType)
                 .resourceNameKeyWord(StringUtils.trim(ParameterUtils.handleEscapes(resourceNameKeyWord)))
+                .isDirectory(isDirectory)
                 .pageNo(pageNo)
                 .pageSize(pageSize)
                 .build();
@@ -272,17 +275,20 @@ public class ResourcesController extends BaseController {
 
     @Operation(summary = "deleteResource", description = "DELETE_RESOURCE_BY_ID_NOTES")
     @Parameters({
-            @Parameter(name = "fullName", description = "RESOURCE_FULLNAME", required = true, schema = @Schema(implementation = String.class, example = "file:////tmp/dolphinscheduler/storage/default/resources/demo.sql"))
+            @Parameter(name = "fullName", description = "RESOURCE_FULLNAME", required = true, schema = @Schema(implementation = String.class, example = "file:////tmp/dolphinscheduler/storage/default/resources/demo.sql")),
+            @Parameter(name = "isDirectory", description = "RESOURCE_IS_DIRECTORY", required = false, schema = @Schema(implementation = Boolean.class))
     })
     @DeleteMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_RESOURCE_ERROR)
     @OperatorLog(auditType = AuditType.FILE_DELETE)
     public Result<Void> deleteResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                       @RequestParam(value = "fullName") String resourceAbsolutePath) {
+                                       @RequestParam(value = "fullName") String resourceAbsolutePath,
+                                       @RequestParam(value = "isDirectory", required = false) Boolean isDirectory) {
         DeleteResourceRequest deleteResourceRequest = DeleteResourceRequest.builder()
                 .loginUser(loginUser)
                 .resourceAbsolutePath(resourceAbsolutePath)
+                .isDirectory(isDirectory)
                 .build();
         resourceService.delete(deleteResourceRequest);
         return Result.success();

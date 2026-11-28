@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.validator.resource;
 
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowServiceException;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -97,6 +98,22 @@ class LeftoverOssDirectoryResourceCenterTest {
                 .loginUser(loginUser)
                 .resourceAbsolutePath(DIRECTORY)
                 .build();
+        assertDoesNotThrow(() -> resourcesService.delete(deleteRequest));
+        verify(storageOperator).delete(DIRECTORY, true);
+    }
+
+    @Test
+    void markerlessDirectory_deleteWithTheRowTypeStillSucceeds() {
+        // The UI sends the row type; a storage that does not override the typed methods behaves as before.
+        when(storageOperator.existsForRecursiveDelete(DIRECTORY)).thenReturn(true);
+        when(storageOperator.existsForRecursiveDelete(DIRECTORY, true)).thenCallRealMethod();
+        doCallRealMethod().when(storageOperator).delete(DIRECTORY, true, true);
+        DeleteResourceRequest deleteRequest = DeleteResourceRequest.builder()
+                .loginUser(loginUser)
+                .resourceAbsolutePath(DIRECTORY)
+                .isDirectory(true)
+                .build();
+
         assertDoesNotThrow(() -> resourcesService.delete(deleteRequest));
         verify(storageOperator).delete(DIRECTORY, true);
     }
