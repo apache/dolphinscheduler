@@ -83,6 +83,22 @@ public class TimePlaceholderUtilsTest {
     }
 
     @Test
+    public void timePlaceHolderForYearWeekAtWeekYearBoundary() {
+        // 2027-01-01 is a Friday, so under ISO week rules it belongs to 2026-W53; 2027 has no week 53.
+        Date firstDayOf2027 = DateUtils.parse("2027-01-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        assertEquals("2026-53",
+                TimePlaceholderUtils.formatTimeExpression("year_week(yyyy-MM-dd)", firstDayOf2027, false));
+        assertEquals("202653", TimePlaceholderUtils.formatTimeExpression("year_week(yyyyMMdd)", firstDayOf2027, false));
+
+        // 2025-12-29 is the Monday that starts ISO week 2026-W01.
+        Date lastMondayOf2025 = DateUtils.parse("2025-12-29 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        assertEquals("2026-01",
+                TimePlaceholderUtils.formatTimeExpression("year_week(yyyy-MM-dd)", lastMondayOf2025, false));
+        assertEquals("202601",
+                TimePlaceholderUtils.formatTimeExpression("year_week(yyyyMMdd)", lastMondayOf2025, false));
+    }
+
+    @Test
     public void timePlaceHolderForMonthFirstDay() {
         String monthFirstDate = "$[month_first_day(yyyy-MM-dd,-1)]";
         String monthFirstDay = "$[month_first_day(yyyyMMdd,-1)]";
