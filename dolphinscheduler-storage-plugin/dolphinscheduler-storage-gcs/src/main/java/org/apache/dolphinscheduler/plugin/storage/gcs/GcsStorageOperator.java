@@ -81,6 +81,13 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
         checkBucketNameExists(bucketName);
     }
 
+    // VisibleForTesting
+    GcsStorageOperator(String resourceUploadPath, String bucketName, Storage gcsStorage) {
+        super(resourceUploadPath);
+        this.bucketName = bucketName;
+        this.gcsStorage = gcsStorage;
+    }
+
     @Override
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
@@ -89,17 +96,17 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
                     resourceBaseAbsolutePath);
             return resourceBaseAbsolutePath.substring(1);
         }
-        return getStorageBaseDirectory();
+        return resourceBaseAbsolutePath;
     }
 
     @SneakyThrows
     @Override
     public void createStorageDir(String directoryAbsolutePath) {
-        directoryAbsolutePath = transformAbsolutePathToGcsKey(directoryAbsolutePath);
         if (exists(directoryAbsolutePath)) {
             throw new FileAlreadyExistsException("directory: " + directoryAbsolutePath + " already exists");
         }
-        BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, directoryAbsolutePath)).build();
+        String gcsKey = transformAbsolutePathToGcsKey(directoryAbsolutePath);
+        BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, gcsKey)).build();
         gcsStorage.create(blobInfo, EMPTY_STRING.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -126,12 +133,85 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
         return blob != null && blob.exists();
     }
 
+    @Override
+    public boolean existsForRecursiveDelete(String resourceAbsolutePath) {
+        String gcsKey = transformAbsolutePathToGcsKey(resourceAbsolutePath);
+        Blob blob = gcsStorage.get(BlobId.of(bucketName, gcsKey));
+        if (blob != null && blob.exists()) {
+            return true;
+        }
+        if (!getResourceMetaData(resourceAbsolutePath).isDirectory()) {
+            return false;
+        }
+        Page<Blob> blobs = gcsStorage.list(bucketName, Storage.BlobListOption.prefix(gcsKey),
+                Storage.BlobListOption.pageSize(1));
+        return blobs.iterateAll().iterator().hasNext();
+    }
+
     @SneakyThrows
     @Override
     public void delete(String filePath, boolean recursive) {
-        filePath = transformAbsolutePathToGcsKey(filePath);
-        if (exists(filePath)) {
-            gcsStorage.delete(BlobId.of(bucketName, filePath));
+        String gcsKey = transformAbsolutePathToGcsKey(filePath);
+        ResourceMetadata resourceMetaData = getResourceMetaData(filePath);
+        if (!resourceMetaData.isDirectory()) {
+            if (exists(filePath)) {
+                gcsStorage.delete(BlobId.of(bucketName, gcsKey));
+            }
+            return;
+        }
+
+        if (recursive) {
+            Page<Blob> blobs = gcsStorage.list(bucketName, Storage.BlobListOption.prefix(gcsKey),
+                    Storage.BlobListOption.pageSize(1000));
+            List<BlobId> batch = new ArrayList<>();
+            List<String> failedKeys = new ArrayList<>();
+            boolean markerFound = false;
+            for (Blob blob : blobs.iterateAll()) {
+                if (gcsKey.equals(blob.getName())) {
+                    markerFound = true;
+                    continue;
+                }
+                batch.add(BlobId.of(bucketName, blob.getName()));
+                if (batch.size() >= 100) {
+                    deleteBatchAndRecordFailures(batch, failedKeys);
+                    batch = new ArrayList<>();
+                }
+            }
+            if (!batch.isEmpty()) {
+                deleteBatchAndRecordFailures(batch, failedKeys);
+            }
+            if (!failedKeys.isEmpty()) {
+                throw new IllegalStateException("GCS failed to delete objects: " + failedKeys);
+            }
+            if (markerFound && !gcsStorage.delete(BlobId.of(bucketName, gcsKey))) {
+                throw new IllegalStateException("GCS failed to delete objects: " + Collections.singletonList(gcsKey));
+            }
+        } else {
+            if (exists(filePath)) {
+                gcsStorage.delete(BlobId.of(bucketName, gcsKey));
+            }
+        }
+    }
+
+    private void deleteBatchAndRecordFailures(List<BlobId> batch, List<String> failedKeys) {
+        List<Boolean> results = gcsStorage.delete(batch);
+        if (results == null) {
+            batch.forEach(blobId -> failedKeys.add(blobId.getName()));
+            return;
+        }
+        int checkedCount = Math.min(batch.size(), results.size());
+        for (int i = 0; i < checkedCount; i++) {
+            if (!Boolean.TRUE.equals(results.get(i))) {
+                failedKeys.add(batch.get(i).getName());
+            }
+        }
+        if (results.size() < batch.size()) {
+            for (int i = results.size(); i < batch.size(); i++) {
+                failedKeys.add(batch.get(i).getName());
+            }
+        } else if (results.size() > batch.size()) {
+            throw new IllegalStateException(
+                    "Unexpected GCS batch delete result count: expected " + batch.size() + ", got " + results.size());
         }
     }
 
@@ -157,12 +237,12 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
     @SneakyThrows
     @Override
     public void upload(String srcFile, String dstPath, boolean deleteSource, boolean overwrite) {
-        dstPath = transformAbsolutePathToGcsKey(dstPath);
         if (exists(dstPath) && !overwrite) {
             throw new FileAlreadyExistsException("file: " + dstPath + " already exists");
         }
+        String gcsKey = transformAbsolutePathToGcsKey(dstPath);
         BlobInfo blobInfo = BlobInfo.newBuilder(
-                BlobId.of(bucketName, dstPath)).build();
+                BlobId.of(bucketName, gcsKey)).build();
 
         Path srcPath = Paths.get(srcFile);
         gcsStorage.create(blobInfo, Files.readAllBytes(srcPath));
@@ -281,10 +361,11 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
 
     private String transformAbsolutePathToGcsKey(String absolutePath) {
         ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);
-        if (resourceMetaData.isDirectory()) {
-            return FileUtils.concatFilePath(absolutePath, "/");
+        String gcsKey = absolutePath.replace(File.separatorChar, '/');
+        if (resourceMetaData.isDirectory() && !gcsKey.endsWith("/")) {
+            return gcsKey + "/";
         }
-        return absolutePath;
+        return gcsKey;
     }
 
     private String transformGcsKeyToAbsolutePath(String gcsKey) {
