@@ -35,6 +35,11 @@ import org.junit.jupiter.api.Test;
 class RegistryClientTest {
 
     @Test
+    void apiDiscoveryNeedsOnlyStableRegistration() {
+        assertStableRegistration(RegistryNodeType.API);
+    }
+
+    @Test
     void masterDiscoveryNeedsOnlyStableRegistration() {
         assertStableRegistration(RegistryNodeType.MASTER);
     }

@@ -258,6 +258,8 @@ alert:
   sender-parallelism: 5
 
 api:
+  # Internal RPC port for querying API server metadata from other API instances.
+  rpc-port: 12346
   audit-enable: false
   # The lifetime of a login session, measured from the moment the user logs in.
   # Accepts a Duration, e.g. 30m, 12h, 1d. Defaults to 2h when unset.

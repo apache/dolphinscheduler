@@ -16,6 +16,7 @@
  */
 
 export default {
+  cluster_overview: 'Cluster Overview',
   home: 'Home',
   project: 'Project',
   resources: 'Resources',

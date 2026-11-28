@@ -26,30 +26,29 @@ export default {
   path: '/monitor',
   name: 'monitor',
   meta: { title: 'monitor' },
-  redirect: { name: 'servers-master' },
+  redirect: { name: 'cluster-overview' },
   component: () => import('@/layouts/content'),
   children: [
     {
-      path: '/monitor/master',
-      name: 'servers-master',
-      component: components['monitor-servers-master'],
+      path: '/monitor/cluster',
+      name: 'cluster-overview',
+      component: components['monitor-cluster'],
       meta: {
-        title: '服务管理-Master',
+        title: 'Cluster Overview',
         activeMenu: 'monitor',
         showSide: true,
         auth: []
       }
     },
     {
+      path: '/monitor/master',
+      name: 'servers-master',
+      redirect: { name: 'cluster-overview' }
+    },
+    {
       path: '/monitor/worker',
       name: 'servers-worker',
-      component: components['monitor-servers-worker'],
-      meta: {
-        title: '服务管理-Worker',
-        activeMenu: 'monitor',
-        showSide: true,
-        auth: []
-      }
+      redirect: { name: 'cluster-overview' }
     },
     {
       path: '/monitor/alert_server',
@@ -65,13 +64,7 @@ export default {
     {
       path: '/monitor/db',
       name: 'servers-db',
-      component: components['monitor-servers-db'],
-      meta: {
-        title: '服务管理-DB',
-        activeMenu: 'monitor',
-        showSide: true,
-        auth: []
-      }
+      redirect: { name: 'cluster-overview' }
     },
     {
       path: '/monitor/statistics',

@@ -36,7 +36,9 @@ public enum RegistryNodeType {
     WORKER("Worker", "/nodes/worker"),
 
     ALERT_SERVER("AlertServer", "/nodes/alert-server"),
-    ALERT_HA_LEADER("AlertHALeader", "/nodes/alert-server-ha-leader");
+    ALERT_HA_LEADER("AlertHALeader", "/nodes/alert-server-ha-leader"),
+
+    API("Api", "/nodes/api");
 
     private final String name;
 

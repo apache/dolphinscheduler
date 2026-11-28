@@ -94,3 +94,5 @@
 
 * SQL 任务结果告警内容有大小限制：默认最多保留 30 行，超过 100 字符的字符串字段值会被截断并以省略号标记；序列化后内容总大小限制在 60000 UTF-8 字节以内（兼容 MySQL TEXT 列 65535 字节容量），超出预算的行以省略标记对象表示。以上默认值可通过 `common.properties` 中的 `sql.task.alert.max.rows`、`sql.task.alert.max.row.value.length`、`sql.task.alert.max.content.bytes` 配置调整，修改后需重启 Worker 生效。 ([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
 
+* API 新增节点身份注册，并通过 `api.rpc-port`（默认 `12346`）提供元数据 RPC。需允许 API 实例之间访问该内部端口；如果端口已被占用，请修改配置。API HTTP 端口不变。原 Master、Worker、DB 监控地址跳转至集群总览，独立 DB 菜单入口移除。
+

@@ -54,6 +54,9 @@ public class RegistryClient {
 
     public RegistryClient(Registry registry) {
         this.registry = registry;
+        if (!registry.exists(RegistryNodeType.API.getRegistryPath())) {
+            registry.put(RegistryNodeType.API.getRegistryPath(), EMPTY, false);
+        }
         if (!registry.exists(RegistryNodeType.MASTER.getRegistryPath())) {
             registry.put(RegistryNodeType.MASTER.getRegistryPath(), EMPTY, false);
         }
@@ -86,6 +89,7 @@ public class RegistryClient {
             }
             Server server = new Server();
             switch (registryNodeType) {
+                case API:
                 case MASTER:
                 case WORKER:
                 case ALERT_SERVER:

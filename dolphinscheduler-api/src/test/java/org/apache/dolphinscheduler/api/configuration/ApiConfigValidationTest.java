@@ -79,4 +79,22 @@ class ApiConfigValidationTest {
                             .isEqualTo("gateway-token");
                 });
     }
+    @Test
+    void shouldRejectInvalidRpcPorts() {
+        for (String port : new String[]{"0", "65536"}) {
+            contextRunner.withPropertyValues("api.rpc-port=" + port).run(context -> {
+                assertThat(context).hasFailed();
+                assertThat(context.getStartupFailure()).hasStackTraceContaining("rpcPort");
+            });
+        }
+    }
+
+    @Test
+    void shouldAcceptConfiguredRpcPort() {
+        contextRunner.withPropertyValues("api.rpc-port=22346").run(context -> {
+            assertThat(context).hasNotFailed();
+            assertThat(context.getBean(ApiConfig.class).getRpcPort()).isEqualTo(22346);
+        });
+    }
+
 }

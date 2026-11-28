@@ -16,6 +16,7 @@
  */
 
 export default {
+  cluster_overview: '集群总览',
   home: '首页',
   project: '项目管理',
   resources: '资源中心',

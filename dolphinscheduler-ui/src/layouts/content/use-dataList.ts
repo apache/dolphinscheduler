@@ -207,20 +207,12 @@ export function useDataList() {
             icon: renderIcon(AppstoreOutlined),
             children: [
               {
-                label: t('menu.master'),
-                key: '/monitor/master'
-              },
-              {
-                label: t('menu.worker'),
-                key: '/monitor/worker'
+                label: t('menu.cluster_overview'),
+                key: '/monitor/cluster'
               },
               {
                 label: t('menu.alert_server'),
                 key: '/monitor/alert_server'
-              },
-              {
-                label: t('menu.db'),
-                key: '/monitor/db'
               }
             ]
           },
