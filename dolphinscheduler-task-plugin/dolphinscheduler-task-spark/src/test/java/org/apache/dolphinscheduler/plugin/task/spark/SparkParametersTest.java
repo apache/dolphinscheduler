@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.spark;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -54,5 +55,180 @@ public class SparkParametersTest {
         resourceFilesList = sparkParameters.getResourceFilesList();
         Assertions.assertNotNull(resourceFilesList);
         Assertions.assertEquals(3, resourceFilesList.size());
+    }
+
+    @Test
+    public void getResourceFilesListWithNewSparkSubmitOptions() {
+        SparkParameters sparkParameters = new SparkParameters();
+
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("main.py");
+        sparkParameters.setMainJar(mainJar);
+
+        ResourceInfo pyFile1 = new ResourceInfo();
+        pyFile1.setResourceName("a.py");
+        ResourceInfo pyFile2 = new ResourceInfo();
+        pyFile2.setResourceName("b.zip");
+        sparkParameters.setPyFiles(Arrays.asList(pyFile1, pyFile2));
+
+        ResourceInfo archive = new ResourceInfo();
+        archive.setResourceName("c.tar.gz");
+        sparkParameters.setArchives(Arrays.asList(archive));
+
+        ResourceInfo keytab = new ResourceInfo();
+        keytab.setResourceName("user.keytab");
+        sparkParameters.setKeytab(keytab);
+
+        List<ResourceInfo> resourceFilesList = sparkParameters.getResourceFilesList();
+        Assertions.assertEquals(5, resourceFilesList.size());
+        Assertions.assertTrue(resourceFilesList.contains(mainJar));
+        Assertions.assertTrue(resourceFilesList.contains(pyFile1));
+        Assertions.assertTrue(resourceFilesList.contains(pyFile2));
+        Assertions.assertTrue(resourceFilesList.contains(archive));
+        Assertions.assertTrue(resourceFilesList.contains(keytab));
+    }
+
+    @Test
+    public void testCheckParametersPrincipalWithoutKeytab() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        sparkParameters.setPrincipal("user@REALM");
+        Assertions.assertFalse(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersKeytabWithoutPrincipal() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        ResourceInfo keytab = new ResourceInfo();
+        keytab.setResourceName("user.keytab");
+        sparkParameters.setKeytab(keytab);
+        Assertions.assertFalse(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersPrincipalAndKeytab() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        sparkParameters.setPrincipal("user@REALM");
+        ResourceInfo keytab = new ResourceInfo();
+        keytab.setResourceName("user.keytab");
+        sparkParameters.setKeytab(keytab);
+        Assertions.assertTrue(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersBlankPrincipalWithoutKeytab() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        sparkParameters.setPrincipal("   ");
+        Assertions.assertTrue(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersBlankPrincipalWithKeytab() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        sparkParameters.setPrincipal("   ");
+        ResourceInfo keytab = new ResourceInfo();
+        keytab.setResourceName("user.keytab");
+        sparkParameters.setKeytab(keytab);
+        Assertions.assertFalse(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersCommaInPyFiles() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        ResourceInfo pyFile = new ResourceInfo();
+        pyFile.setResourceName("/dir/config,prod.zip");
+        sparkParameters.setPyFiles(Arrays.asList(pyFile));
+        Assertions.assertFalse(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersCommaInArchives() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        ResourceInfo archive = new ResourceInfo();
+        archive.setResourceName("/dir/config,prod.tar.gz");
+        sparkParameters.setArchives(Arrays.asList(archive));
+        Assertions.assertFalse(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersNullEntryInPyFiles() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        sparkParameters.setPyFiles(Arrays.asList((ResourceInfo) null));
+        Assertions.assertFalse(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersEmptyArchiveEntry() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        sparkParameters.setArchives(Arrays.asList(new ResourceInfo()));
+        Assertions.assertFalse(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersEmptyKeytabWithoutPrincipal() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        sparkParameters.setKeytab(new ResourceInfo());
+        Assertions.assertFalse(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersEmptyKeytabWithPrincipal() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        sparkParameters.setPrincipal("user@REALM");
+        sparkParameters.setKeytab(new ResourceInfo());
+        Assertions.assertFalse(sparkParameters.checkParameters());
+    }
+
+    @Test
+    public void testCheckParametersOptionalFieldsOmitted() {
+        SparkParameters sparkParameters = new SparkParameters();
+        sparkParameters.setProgramType(ProgramType.JAVA);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("test.jar");
+        sparkParameters.setMainJar(mainJar);
+        Assertions.assertTrue(sparkParameters.checkParameters());
     }
 }

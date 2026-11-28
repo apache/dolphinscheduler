@@ -454,6 +454,12 @@ export default {
     resources_limit_tips: 'Please select again, resource limit:',
     no_resources_tips: 'Please delete all non-existent resources',
     useless_resources_tips: 'Unauthorized or deleted resources',
+    resources_loading_tips:
+      'The resource list is still loading, please try again later',
+    resources_load_failed_tips:
+      'Failed to load the resource list, please try again later',
+    comma_in_resource_tips:
+      'Resources with commas in their names cannot be selected, as Spark splits this list on commas',
     custom_parameters: 'Custom Parameters',
     copy_success: 'Copy success',
     copy_failed: 'The browser does not support automatic copying',
@@ -493,6 +499,19 @@ export default {
     main_arguments_tips: 'Please enter main arguments',
     option_parameters: 'Option Parameters',
     option_parameters_tips: 'Please enter option parameters',
+    py_files: 'PyFiles',
+    py_files_tips:
+      'Please select .py/.zip/.egg files for PySpark (added to PYTHONPATH)',
+    archives: 'Archives',
+    archives_tips:
+      'Please select .tar/.zip/.tgz archives distributed to executors',
+    principal: 'Principal',
+    principal_tips: 'Kerberos principal, e.g. user@REALM',
+    keytab: 'Keytab',
+    keytab_tips:
+      'Please select Kerberos keytab file (must be paired with Principal)',
+    principal_keytab_pair_tips:
+      'Principal and Keytab must be configured together',
     positive_integer_tips: 'should be a positive integer',
     flink_version: 'Flink Version',
     job_manager_memory: 'JobManager Memory',

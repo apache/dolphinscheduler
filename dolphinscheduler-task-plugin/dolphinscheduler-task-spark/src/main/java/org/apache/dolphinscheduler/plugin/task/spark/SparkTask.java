@@ -175,6 +175,46 @@ public class SparkTask extends AbstractYarnTask {
             args.add(others);
         }
 
+        // --py-files .py/.zip/.egg files distributed to executors
+        // Spark resolves each entry of these lists as a URI, where a '#' in the file name would
+        // be read as a fragment and cut the name short; an encoded file: URI keeps the name resolvable
+        List<ResourceInfo> pyFiles = sparkParameters.getPyFiles();
+        if (pyFiles != null && !pyFiles.isEmpty()) {
+            String pyFilesPath = pyFiles.stream()
+                    .map(pyFile -> ArgsUtils.wrapperSingleQuotes(new File(taskExecutionContext.getResourceContext()
+                            .getResourceItem(pyFile.getResourceName())
+                            .getResourceAbsolutePathInLocal()).toURI().toString()))
+                    .collect(Collectors.joining(","));
+            args.add(SparkConstants.PY_FILES);
+            args.add(pyFilesPath);
+        }
+
+        // --archives archives distributed to executors, encoded as file: URIs like --py-files
+        List<ResourceInfo> archives = sparkParameters.getArchives();
+        if (archives != null && !archives.isEmpty()) {
+            String archivesPath = archives.stream()
+                    .map(archive -> ArgsUtils.wrapperSingleQuotes(new File(taskExecutionContext.getResourceContext()
+                            .getResourceItem(archive.getResourceName())
+                            .getResourceAbsolutePathInLocal()).toURI().toString()))
+                    .collect(Collectors.joining(","));
+            args.add(SparkConstants.ARCHIVES);
+            args.add(archivesPath);
+        }
+
+        // --principal / --keytab for Kerberos authentication
+        String principal = sparkParameters.getPrincipal();
+        if (StringUtils.isNotBlank(principal)) {
+            args.add(SparkConstants.PRINCIPAL);
+            args.add(principal);
+        }
+        ResourceInfo keytab = sparkParameters.getKeytab();
+        if (keytab != null && StringUtils.isNotEmpty(keytab.getResourceName())) {
+            args.add(SparkConstants.KEYTAB);
+            args.add(ArgsUtils.wrapperSingleQuotes(taskExecutionContext.getResourceContext()
+                    .getResourceItem(keytab.getResourceName())
+                    .getResourceAbsolutePathInLocal()));
+        }
+
         // add driver label for spark on native kubernetes
         if (onNativeKubernetes) {
             args.add(String.format(DRIVER_LABEL_CONF, UNIQUE_LABEL_NAME, taskExecutionContext.getTaskAppId()));

@@ -25,6 +25,104 @@ import { NButton, NIcon, NTag } from 'naive-ui'
 import { CopyOutlined } from '@vicons/antd'
 import { useClipboard } from '@vueuse/core'
 
+export interface ResourceOption {
+  name: string
+  fullName: string
+  dirctory: boolean
+  disable: boolean
+  children?: ResourceOption[]
+}
+
+export const validateResourceExist = (
+  fullName: string,
+  parentDir: string[],
+  resources: ResourceOption[]
+): boolean => {
+  const isDirectory = (res: ResourceOption): boolean => {
+    return (
+      res.dirctory &&
+      (fullName === res.fullName || fullName.startsWith(`${res.fullName}/`))
+    )
+  }
+
+  const processDirectory = (res: ResourceOption): boolean => {
+    if (!res.children) {
+      res.children = []
+    }
+    parentDir.push(res.name)
+    return validateResourceExist(
+      fullName,
+      parentDir,
+      res.children as ResourceOption[]
+    )
+  }
+
+  if (resources.length > 0) {
+    for (const res of resources) {
+      if (isDirectory(res)) {
+        return processDirectory(res)
+      }
+
+      if (res.fullName === fullName && !res.disable) {
+        return true
+      }
+    }
+  }
+  addResourceNode(fullName, parentDir, resources)
+  return false
+}
+
+const addResourceNode = (
+  fullName: string,
+  parentDir: string[],
+  resources: ResourceOption[]
+) => {
+  if (resources.some((resource) => resource.fullName === fullName)) {
+    return
+  }
+  const resourceNode = {
+    fullName: fullName,
+    name: getResourceDirAfter(fullName, parentDir),
+    dirctory: false,
+    disable: true
+  }
+  resources.push(resourceNode)
+}
+
+export const getResourceDirAfter = (
+  fullName: string,
+  parentDir: string[]
+): string => {
+  const dirctory = '/resources/' + parentDir.join('')
+  const delimiterIndex = fullName.indexOf(dirctory)
+  if (delimiterIndex !== -1) {
+    return fullName.substring(delimiterIndex + dirctory.length)
+  } else {
+    return fullName
+  }
+}
+
+export const spliceUselessResources = (
+  value: string[],
+  resources: ResourceOption[]
+): string => {
+  const errorNames: string[] = []
+  value.forEach((item) => {
+    if (!validateResourceExist(item, [], resources)) {
+      errorNames.push(item)
+    }
+  })
+  if (errorNames.length === 0) {
+    return ''
+  }
+  let errorName = ': '
+  errorNames.forEach((name) => {
+    value.splice(value.indexOf(name), 1)
+    errorName += getResourceDirAfter(name, []) + ';'
+  })
+  return errorName
+}
+
 export function useResources(
   span: number | Ref<number> = 24,
   required: boolean | Ref<boolean> = false,
@@ -32,16 +130,9 @@ export function useResources(
 ): IJsonItem {
   const { t } = useI18n()
 
-  interface ResourceOption {
-    name: string
-    fullName: string
-    dirctory: boolean
-    disable: boolean
-    children?: ResourceOption[]
-  }
-
   const resourcesOptions = ref<ResourceOption[] | IResource[]>([])
   const resourcesLoading = ref(false)
+  const resourcesLoadError = ref(false)
 
   const taskStore = useTaskNodeStore()
 
@@ -55,73 +146,17 @@ export function useResources(
     }
     if (resourcesLoading.value) return
     resourcesLoading.value = true
-    const res = await queryResourceList({ type: 'FILE', fullName: '' })
-    utils.removeUselessChildren(res)
-    resourcesOptions.value = res || []
-    resourcesLoading.value = false
-    taskStore.updateResource(res)
-  }
-
-  const validateResourceExist = (
-    fullName: string,
-    parentDir: string[],
-    resources: ResourceOption[]
-  ): boolean => {
-    const isDirectory = (res: ResourceOption): boolean => {
-      return (
-        res.dirctory &&
-        (fullName === res.fullName || fullName.startsWith(`${res.fullName}/`))
-      )
-    }
-
-    const processDirectory = (res: ResourceOption): boolean => {
-      if (!res.children) {
-        res.children = []
-      }
-      parentDir.push(res.name)
-      return validateResourceExist(
-        fullName,
-        parentDir,
-        res.children as ResourceOption[]
-      )
-    }
-
-    if (resources.length > 0) {
-      for (const res of resources) {
-        if (isDirectory(res)) {
-          return processDirectory(res)
-        }
-
-        if (res.fullName === fullName) {
-          return true
-        }
-      }
-    }
-    addResourceNode(fullName, parentDir, resources)
-    return false
-  }
-
-  const addResourceNode = (
-    fullName: string,
-    parentDir: string[],
-    resources: ResourceOption[]
-  ) => {
-    const resourceNode = {
-      fullName: fullName,
-      name: getResourceDirAfter(fullName, parentDir),
-      dirctory: false,
-      disable: true
-    }
-    resources.push(resourceNode)
-  }
-
-  const getResourceDirAfter = (fullName: string, parentDir: string[]) => {
-    const dirctory = '/resources/' + parentDir.join('')
-    const delimiterIndex = fullName.indexOf(dirctory)
-    if (delimiterIndex !== -1) {
-      return fullName.substring(delimiterIndex + dirctory.length)
-    } else {
-      return fullName
+    resourcesLoadError.value = false
+    try {
+      const res = await queryResourceList({ type: 'FILE', fullName: '' })
+      utils.removeUselessChildren(res)
+      resourcesOptions.value = res || []
+      taskStore.updateResource(res)
+    } catch (err) {
+      resourcesLoadError.value = true
+      throw err
+    } finally {
+      resourcesLoading.value = false
     }
   }
 
@@ -159,6 +194,7 @@ export function useResources(
       labelField: 'name',
       disabledField: 'disable',
       loading: resourcesLoading,
+      loadError: resourcesLoadError,
       'render-tag': ({
         option,
         handleClose
@@ -201,25 +237,18 @@ export function useResources(
       trigger: ['blur'],
       required: required,
       validator(validate: any, value: string[]) {
-        if (value) {
-          const errorNames: string[] = []
-          value.forEach((item) => {
-            if (
-              !validateResourceExist(
-                item,
-                [],
-                resourcesOptions.value as ResourceOption[]
-              )
-            ) {
-              errorNames.push(item)
-            }
-          })
-          if (errorNames.length > 0) {
-            let errorName = ': '
-            errorNames.forEach((name) => {
-              value.splice(value.indexOf(name), 1)
-              errorName += getResourceDirAfter(name, []) + ';'
-            })
+        if (value && value.length > 0) {
+          if (resourcesLoading.value) {
+            return new Error(t('project.node.resources_loading_tips'))
+          }
+          if (resourcesLoadError.value) {
+            return new Error(t('project.node.resources_load_failed_tips'))
+          }
+          const errorName = spliceUselessResources(
+            value,
+            resourcesOptions.value as ResourceOption[]
+          )
+          if (errorName) {
             return new Error(
               t('project.node.useless_resources_tips') + errorName
             )

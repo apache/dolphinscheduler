@@ -80,6 +80,20 @@ export function formatParams(data: INodeData): {
     taskParams.executorMemory = data.executorMemory
     taskParams.executorCores = data.executorCores
     taskParams.sqlExecutionType = data.sqlExecutionType
+    if (data.pyFiles?.length) {
+      taskParams.pyFiles = data.pyFiles.map((fullName: string) => ({
+        resourceName: fullName
+      }))
+    }
+    if (data.archives?.length) {
+      taskParams.archives = data.archives.map((fullName: string) => ({
+        resourceName: fullName
+      }))
+    }
+    taskParams.principal = data.principal
+    if (data.keytab) {
+      taskParams.keytab = { resourceName: data.keytab }
+    }
   }
 
   if (data.taskType === 'FLINK' || data.taskType === 'FLINK_STREAM') {
@@ -547,7 +561,14 @@ export function formatModel(data: ITaskData) {
       'timeoutNotifyStrategy',
       'taskParams'
     ]),
-    ...omit(data.taskParams, ['resourceList', 'mainJar', 'localParams']),
+    ...omit(data.taskParams, [
+      'resourceList',
+      'mainJar',
+      'pyFiles',
+      'archives',
+      'keytab',
+      'localParams'
+    ]),
     environmentCode: data.environmentCode === -1 ? null : data.environmentCode,
     timeoutFlag: data.timeoutFlag === 'OPEN',
     timeoutNotifyStrategy: data.timeoutNotifyStrategy
@@ -566,6 +587,19 @@ export function formatModel(data: ITaskData) {
   }
   if (data.taskParams?.mainJar) {
     params.mainJar = data.taskParams?.mainJar.resourceName
+  }
+  if (data.taskParams?.pyFiles) {
+    params.pyFiles = data.taskParams.pyFiles.map(
+      (item: { resourceName: string }) => `${item.resourceName}`
+    )
+  }
+  if (data.taskParams?.archives) {
+    params.archives = data.taskParams.archives.map(
+      (item: { resourceName: string }) => `${item.resourceName}`
+    )
+  }
+  if (data.taskParams?.keytab) {
+    params.keytab = data.taskParams.keytab.resourceName
   }
 
   if (data.taskParams?.method) {

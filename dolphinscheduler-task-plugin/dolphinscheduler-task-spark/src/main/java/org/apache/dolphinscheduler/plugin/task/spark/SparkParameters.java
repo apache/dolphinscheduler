@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.plugin.task.spark;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,6 +88,26 @@ public class SparkParameters extends AbstractParameters {
     private String others;
 
     /**
+     * --py-files .py/.zip/.egg files added to PYTHONPATH for the driver and executors
+     */
+    private List<ResourceInfo> pyFiles;
+
+    /**
+     * --archives archives (.tar/.zip/.tgz) distributed to executors
+     */
+    private List<ResourceInfo> archives;
+
+    /**
+     * --principal Kerberos principal, e.g. user@REALM
+     */
+    private String principal;
+
+    /**
+     * --keytab Kerberos keytab file
+     */
+    private ResourceInfo keytab;
+
+    /**
      * program type
      * 0 JAVA,1 SCALA,2 PYTHON,3 SQL
      */
@@ -116,13 +138,51 @@ public class SparkParameters extends AbstractParameters {
          * (1) When ProgramType is SQL, rawScript cannot be empty.
          * (2) When ProgramType is Java/Scala/Python, mainJar cannot be empty.
          */
-        return programType != null && (mainJar != null || rawScript != null);
+        boolean baseValid = programType != null && (mainJar != null || rawScript != null);
+        /**
+         * Kerberos principal and keytab must be configured together: either both empty or both set.
+         * A spaces-only principal is treated as absent to stay consistent with command generation,
+         * otherwise the shell would drop the blank value and Spark would consume the next argument.
+         * A keytab object without a resource name is an invalid reference, not an absent keytab.
+         */
+        boolean hasPrincipal = StringUtils.isNotBlank(principal);
+        boolean hasKeytab = keytab != null && StringUtils.isNotBlank(keytab.getResourceName());
+        boolean keytabValid = keytab == null || StringUtils.isNotBlank(keytab.getResourceName());
+        boolean kerberosValid = keytabValid && hasPrincipal == hasKeytab;
+        /**
+         * Spark splits --py-files/--archives on commas without an escape syntax, so resource
+         * names containing commas cannot be preserved through the list parsing. Every supplied
+         * entry must also carry a resource name: a null entry or an empty object would
+         * otherwise fail later at download or command generation.
+         */
+        boolean pyFilesValid = pyFiles == null
+                || pyFiles.stream().allMatch(pyFile -> pyFile != null
+                        && StringUtils.isNotBlank(pyFile.getResourceName())
+                        && !StringUtils.contains(pyFile.getResourceName(), ","));
+        boolean archivesValid = archives == null
+                || archives.stream().allMatch(archive -> archive != null
+                        && StringUtils.isNotBlank(archive.getResourceName())
+                        && !StringUtils.contains(archive.getResourceName(), ","));
+        return baseValid && kerberosValid && pyFilesValid && archivesValid;
     }
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         if (mainJar != null && !resourceList.contains(mainJar)) {
             resourceList.add(mainJar);
+        }
+        if (pyFiles != null) {
+            pyFiles.stream()
+                    .filter(pyFile -> pyFile != null && !resourceList.contains(pyFile))
+                    .forEach(resourceList::add);
+        }
+        if (archives != null) {
+            archives.stream()
+                    .filter(archive -> archive != null && !resourceList.contains(archive))
+                    .forEach(resourceList::add);
+        }
+        if (keytab != null && !resourceList.contains(keytab)) {
+            resourceList.add(keytab);
         }
         return resourceList;
     }
