@@ -367,7 +367,11 @@ public class TimePlaceholderUtils {
 
         int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
 
-        int year = calendar.get(Calendar.YEAR);
+        // WEEK_OF_YEAR may belong to the previous or the next week-year around New Year:
+        // 2027-01-01 is in 2026-W53, and 2025-12-29 starts 2026-W01. getWeekYear() returns the year
+        // that WEEK_OF_YEAR belongs to, so the pair stays consistent and no week 53 is reported for a
+        // 52-week year.
+        int year = calendar.getWeekYear();
 
         String weekYearStr = "";
         if (weekOfYear < 10 && format.contains(HYPHEN)) {
