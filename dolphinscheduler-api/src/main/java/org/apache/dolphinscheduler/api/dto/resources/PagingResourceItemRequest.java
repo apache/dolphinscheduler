@@ -42,6 +42,9 @@ public class PagingResourceItemRequest {
 
     private String resourceNameKeyWord;
 
+    // the type of the listed path, null when the caller does not know it
+    private Boolean isDirectory;
+
     Integer pageNo;
 
     Integer pageSize;

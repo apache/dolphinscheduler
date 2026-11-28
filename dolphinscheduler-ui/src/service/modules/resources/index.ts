@@ -34,7 +34,11 @@ import {
 } from './types'
 
 export function queryResourceListPaging(
-  params: ListReq & ResourceTypeReq & FullNameReq & TenantCodeReq
+  params: ListReq &
+    ResourceTypeReq &
+    FullNameReq &
+    IsDirectoryReq &
+    TenantCodeReq
 ): any {
   return axios({
     url: '/resources',

@@ -66,6 +66,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         paramsMap.add("searchVal", "test");
         paramsMap.add("pageSize", "1");
         paramsMap.add("fullName", "dolphinscheduler/resourcePath");
+        paramsMap.add("isDirectory", "true");
         paramsMap.add("tenantCode", "123");
 
         MvcResult mvcResult = mockMvc.perform(get("/resources")

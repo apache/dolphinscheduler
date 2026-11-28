@@ -268,7 +268,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Integer pageSize = pagingResourceItemRequest.getPageSize();
 
         List<StorageEntity> storageEntities = resourceAbsolutePaths.stream()
-                .flatMap(resourceAbsolutePath -> storageOperator.listStorageEntity(resourceAbsolutePath).stream())
+                .flatMap(resourceAbsolutePath -> listStorageEntities(resourceAbsolutePath,
+                        pagingResourceItemRequest.getIsDirectory()).stream())
                 .collect(Collectors.toList());
 
         List<ResourceItemVO> result = storageEntities
@@ -286,6 +287,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 .total(storageEntities.size())
                 .totalList(result)
                 .build();
+    }
+
+    private List<StorageEntity> listStorageEntities(String resourceAbsolutePath, Boolean isDirectory) {
+        return isDirectory == null ? storageOperator.listStorageEntity(resourceAbsolutePath)
+                : storageOperator.listStorageEntity(resourceAbsolutePath, isDirectory);
     }
 
     @Override

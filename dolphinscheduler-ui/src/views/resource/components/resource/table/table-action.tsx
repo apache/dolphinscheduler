@@ -237,7 +237,7 @@ export default defineComponent({
                 onPositiveClick={() => {
                   this.handleDeleteFile({
                     fullName: this.row.fullName,
-                    // a file and a directory can share the name, the type tells which one to delete
+                    // a file and a directory can share a name, tell which
                     isDirectory: !!this.row.directory,
                     tenantCode: this.row.user_name
                   })

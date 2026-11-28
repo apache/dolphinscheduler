@@ -179,6 +179,18 @@ public interface StorageOperator {
     List<StorageEntity> listStorageEntity(String resourceAbsolutePath);
 
     /**
+     * List the resource of the given type, so a file and a directory with the same name can be told apart. A storage
+     * that can hold both overrides this, the default ignores the type and calls {@link #listStorageEntity(String)}.
+     *
+     * @param resourceAbsolutePath the resource absolute path
+     * @param isDirectory          whether the resource is a directory
+     * @return the resource itself if it is a file, otherwise the entries directly under the directory
+     */
+    default List<StorageEntity> listStorageEntity(String resourceAbsolutePath, boolean isDirectory) {
+        return listStorageEntity(resourceAbsolutePath);
+    }
+
+    /**
      * Return the {@link StorageEntity} which is file under the given path
      *
      * @param resourceAbsolutePath the resource absolute path, cannot be empty

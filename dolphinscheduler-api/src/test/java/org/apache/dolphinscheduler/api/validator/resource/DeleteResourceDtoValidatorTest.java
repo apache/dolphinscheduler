@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.validator.resource;
 
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowServiceException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
@@ -28,16 +29,22 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.dto.resources.DeleteResourceDto;
 import org.apache.dolphinscheduler.api.dto.resources.DeleteResourceRequest;
+import org.apache.dolphinscheduler.api.dto.resources.PagingResourceItemRequest;
+import org.apache.dolphinscheduler.api.dto.resources.RenameDirectoryDto;
 import org.apache.dolphinscheduler.api.service.impl.ResourcesServiceImpl;
+import org.apache.dolphinscheduler.api.vo.ResourceItemVO;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.plugin.storage.abs.AbsStorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.abs.AbsStorageProperties;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,6 +62,7 @@ import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.BlobContainerItem;
 import com.azure.storage.blob.models.BlobItem;
+import com.azure.storage.blob.models.BlobItemProperties;
 import com.azure.storage.blob.models.BlobProperties;
 import com.azure.storage.blob.models.BlobStorageException;
 import com.azure.storage.blob.models.ListBlobsOptions;
@@ -124,12 +132,10 @@ class DeleteResourceDtoValidatorTest {
     }
 
     @Test
-    void deleteDirectoryPreservesSameNamedFlatBlob() {
+    void deleteWithoutTheTypeRemovesTheExactFileOfASameNamedPair() {
+        // a request without the row type keeps the behaviour from before the directory support: the exact file
         BlobClient exact = mockBlobExists(DIRECTORY, true);
-        @SuppressWarnings("unchecked")
-        Response<BlobProperties> properties = mock(Response.class);
-        when(properties.getHeaders()).thenReturn(new HttpHeaders());
-        when(exact.getPropertiesWithResponse(null, null, null)).thenReturn(properties);
+        mockPlainBlobProperties(exact);
         mockBlobExists(DIRECTORY + "/", false);
         String childName = DIRECTORY + "/summary.csv";
         BlobClient child = mockBlobExists(childName, true);
@@ -137,9 +143,30 @@ class DeleteResourceDtoValidatorTest {
 
         deleteThroughResourceCenter();
 
+        verify(exact).deleteIfExists();
+        verify(child, never()).deleteIfExists();
+    }
+
+    @Test
+    void childOnlyPrefixCanBeDeletedButNotRenamed() {
+        BlobClient exact = mockBlobExists(DIRECTORY, false);
+        BlobStorageException missing = mock(BlobStorageException.class);
+        when(missing.getStatusCode()).thenReturn(404);
+        when(exact.getPropertiesWithResponse(null, null, null)).thenThrow(missing);
+        mockBlobExists(DIRECTORY + "/", false);
+        String childName = DIRECTORY + "/summary.csv";
+        BlobClient child = mockBlobExists(childName, true);
+        mockChildren(DIRECTORY, childName);
+
+        // rename copies the exact source blob, which is not there, so it has to fail in the validation
+        assertThrowServiceException(
+                "Internal Server Error: Thr resource is not exists: " + DIRECTORY,
+                () -> new RenameDirectoryDtoValidator(storageOperator, mock(TenantDao.class)).validate(
+                        RenameDirectoryDto.builder().loginUser(adminUser).originDirectoryAbsolutePath(DIRECTORY)
+                                .targetDirectoryAbsolutePath(DIRECTORY + "2").build()));
+        deleteThroughResourceCenter();
+
         verify(child).deleteIfExists();
-        verify(exact, never()).deleteIfExists();
-        verify(exact, never()).deleteIfExistsWithResponse(isNull(), Mockito.any(), isNull(), isNull());
     }
 
     @Test
@@ -218,6 +245,50 @@ class DeleteResourceDtoValidatorTest {
 
         verify(percentNamed, Mockito.times(2)).deleteIfExists();
         verify(decoded, never()).deleteIfExists();
+    }
+
+    @Test
+    void browseTheDirectoryRowOfASameNamedPairListsOnlyItsChildren() {
+        // the blob "reports.v1" and the directory "reports.v1/" share the name, and the extension looks like a file
+        String path = DIRECTORY + "/reports.v1";
+        BlobItem child = new BlobItem().setName(path + "/child.csv").setIsPrefix(false)
+                .setProperties(new BlobItemProperties().setContentLength(10L));
+        BlobItem sameNamedBlob = new BlobItem().setName(path).setIsPrefix(false)
+                .setProperties(new BlobItemProperties().setContentLength(10L));
+        mockHierarchy(path + "/", child);
+        mockHierarchy(path, sameNamedBlob, new BlobItem().setName(path + "/").setIsPrefix(true));
+
+        assertEquals(Collections.singletonList(path + "/child.csv"), browse(path, true));
+        // without the row type the name is read by its extension, as before
+        assertEquals(Collections.singletonList(path), browse(path, null));
+    }
+
+    private void mockHierarchy(String prefix, BlobItem... items) {
+        @SuppressWarnings("unchecked")
+        PagedIterable<BlobItem> blobItems = mock(PagedIterable.class);
+        when(blobItems.iterator()).thenAnswer(invocation -> Arrays.asList(items).iterator());
+        when(containerClient.listBlobsByHierarchy(Mockito.eq("/"),
+                argThat((ListBlobsOptions options) -> options != null && prefix.equals(options.getPrefix())),
+                isNull())).thenReturn(blobItems);
+    }
+
+    private List<String> browse(String path, Boolean isDirectory) {
+        ResourcesServiceImpl service = new ResourcesServiceImpl();
+        TenantDao tenantDao = mock(TenantDao.class);
+        ReflectionTestUtils.setField(service, "storageOperator", storageOperator);
+        ReflectionTestUtils.setField(service, "createDirectoryDtoValidator",
+                new CreateDirectoryDtoValidator(storageOperator, tenantDao));
+        ReflectionTestUtils.setField(service, "pagingResourceItemRequestTransformer",
+                new PagingResourceItemRequestTransformer(storageOperator, tenantDao));
+        return service.pagingResourceItem(PagingResourceItemRequest.builder()
+                .loginUser(adminUser)
+                .resourceAbsolutePath(path)
+                .resourceType(ResourceType.FILE)
+                .resourceNameKeyWord("")
+                .isDirectory(isDirectory)
+                .pageNo(1)
+                .pageSize(20)
+                .build()).getTotalList().stream().map(ResourceItemVO::getFullName).collect(Collectors.toList());
     }
 
     private void mockPlainBlobProperties(BlobClient blobClient) {

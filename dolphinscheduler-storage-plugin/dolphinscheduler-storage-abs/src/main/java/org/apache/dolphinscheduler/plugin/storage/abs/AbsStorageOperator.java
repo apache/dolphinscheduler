@@ -134,7 +134,17 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
         if (!absKey.endsWith(FOLDER_SEPARATOR)) {
             return false;
         }
-        return isObjectExists(transformAbsKeyToAbsolutePath(absKey)) || hasBlobUnder(absKey);
+        return isObjectExists(transformAbsKeyToAbsolutePath(absKey));
+    }
+
+    @Override
+    public boolean existsForRecursiveDelete(String resourceAbsolutePath) {
+        // A prefix that only has children can be deleted, but it is not a blob that rename or copy could read
+        if (exists(resourceAbsolutePath)) {
+            return true;
+        }
+        String absKey = transformAbsolutePathToAbsKey(resourceAbsolutePath);
+        return absKey.endsWith(FOLDER_SEPARATOR) && hasBlobUnder(absKey);
     }
 
     @Override
@@ -166,6 +176,14 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
         String absKey = transformAbsolutePathToAbsKey(filePath);
         if (!absKey.endsWith(FOLDER_SEPARATOR)) {
             getLiteralBlobClient(absKey).deleteIfExists();
+            return;
+        }
+        // Without the row type the exact blob wins, a file named like a directory is still deleted as a file,
+        // unless the caller wrote the trailing separator, which says it is a directory
+        String exactName = transformAbsKeyToAbsolutePath(absKey);
+        if (!filePath.endsWith(FOLDER_SEPARATOR) && isObjectExists(exactName)
+                && getHierarchicalDirectoryProperties(exactName) == null) {
+            getLiteralBlobClient(exactName).deleteIfExists();
             return;
         }
         deleteDirectory(absKey, recursive);
@@ -300,8 +318,13 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
 
     @Override
     public List<StorageEntity> listStorageEntity(String resourceAbsolutePath) {
-        final boolean isDirectory = getResourceMetaData(resourceAbsolutePath).isDirectory();
-        final String absResourceAbsolutePath = transformAbsolutePathToAbsKey(resourceAbsolutePath);
+        return listStorageEntity(resourceAbsolutePath, getResourceMetaData(resourceAbsolutePath).isDirectory());
+    }
+
+    @Override
+    public List<StorageEntity> listStorageEntity(String resourceAbsolutePath, boolean isDirectory) {
+        final String absResourceAbsolutePath = isDirectory ? toDirectoryKey(resourceAbsolutePath)
+                : transformAbsKeyToAbsolutePath(resourceAbsolutePath);
         ListBlobsOptions options = new ListBlobsOptions().setPrefix(absResourceAbsolutePath)
                 .setDetails(new BlobListDetails().setRetrieveMetadata(true));
         List<StorageEntity> storageEntities = new ArrayList<>();
@@ -350,7 +373,8 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
         while (!foldersToFetch.isEmpty()) {
             String pathToExplore = foldersToFetch.pop();
             visited.add(pathToExplore);
-            List<StorageEntity> tempList = listStorageEntity(pathToExplore);
+            // Every queued path is a directory row, a dotted name must not be read as a file
+            List<StorageEntity> tempList = listStorageEntity(pathToExplore, true);
             for (StorageEntity temp : tempList) {
                 if (temp.isDirectory()) {
                     if (visited.contains(temp.getFullName())) {
