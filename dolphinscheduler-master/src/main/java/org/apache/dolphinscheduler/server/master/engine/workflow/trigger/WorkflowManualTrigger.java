@@ -84,25 +84,27 @@ public class WorkflowManualTrigger
                 EnvironmentUtils.getEnvironmentCodeOrDefault(workflowManualTriggerRequest.getEnvironmentCode()));
         workflowInstance.setTimeout(workflowDefinition.getTimeout());
         workflowInstance.setDryRun(workflowManualTriggerRequest.getDryRun().getCode());
-        return ImmutablePair.of(workflowDefinition, workflowInstance);
-    }
-
-    @Override
-    protected Command constructTriggerCommand(final WorkflowManualTriggerRequest workflowManualTriggerRequest,
-                                              final WorkflowInstance workflowInstance) {
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                 .commandParams(workflowManualTriggerRequest.getStartParamList())
                 .startNodes(workflowManualTriggerRequest.getStartNodes())
                 .timeZone(
                         StringUtils.defaultIfBlank(workflowManualTriggerRequest.getTimeZone(), DateUtils.getTimezone()))
                 .build();
+        workflowInstance.setCommandParam(JSONUtils.toJsonString(runWorkflowCommandParam));
+        workflowInstance
+                .setGlobalParams(mergeCommandParamsWithWorkflowParams(runWorkflowCommandParam, workflowDefinition));
+        return ImmutablePair.of(workflowDefinition, workflowInstance);
+    }
+
+    @Override
+    protected Command constructTriggerCommand(final WorkflowManualTriggerRequest workflowManualTriggerRequest,
+                                              final WorkflowInstance workflowInstance) {
         return Command.builder()
                 .commandType(CommandType.START_PROCESS)
                 .workflowDefinitionCode(workflowManualTriggerRequest.getWorkflowDefinitionCode())
                 .workflowDefinitionVersion(workflowManualTriggerRequest.getWorkflowDefinitionVersion())
                 .workflowInstanceId(workflowInstance.getId())
                 .workflowInstancePriority(workflowInstance.getWorkflowInstancePriority())
-                .commandParam(JSONUtils.toJsonString(runWorkflowCommandParam))
                 .build();
     }
 

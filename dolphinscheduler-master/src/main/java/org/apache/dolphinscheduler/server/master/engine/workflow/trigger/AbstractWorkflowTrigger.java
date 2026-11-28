@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.engine.workflow.trigger;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -30,8 +31,17 @@ import org.apache.dolphinscheduler.dao.repository.SerialCommandDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
+import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -95,6 +105,28 @@ public abstract class AbstractWorkflowTrigger<TriggerRequest, TriggerResponse>
                     "Workflow definition not found: " + workflowCode + " version " + workflowVersion);
         }
         return workflow;
+    }
+
+    /**
+     * Merge the command params with the workflow params.
+     * <p> If there are duplicate keys, the command params will override the workflow params.
+     */
+    protected String mergeCommandParamsWithWorkflowParams(final ICommandParam workflowCommandParam,
+                                                          final WorkflowDefinition workflowDefinition) {
+        final List<Property> commandParams =
+                Optional.ofNullable(workflowCommandParam)
+                        .map(ICommandParam::getCommandParams)
+                        .orElse(null);
+        final List<Property> globalParamsList =
+                GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams());
+        Map<String, Property> finalParams = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(globalParamsList)) {
+            globalParamsList.forEach(globalParam -> finalParams.put(globalParam.getProp(), globalParam));
+        }
+        if (CollectionUtils.isNotEmpty(commandParams)) {
+            commandParams.forEach(commandParam -> finalParams.put(commandParam.getProp(), commandParam));
+        }
+        return JSONUtils.toJsonString(finalParams.values());
     }
 
     protected User getExecutorUser(final Integer userId) {

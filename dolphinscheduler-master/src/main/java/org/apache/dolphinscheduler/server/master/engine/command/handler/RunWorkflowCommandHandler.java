@@ -19,15 +19,10 @@ package org.apache.dolphinscheduler.server.master.engine.command.handler;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
-import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
@@ -36,12 +31,6 @@ import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecu
 import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecutionBuilder;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
 
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
@@ -70,13 +59,10 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
      */
     @Override
     protected void assembleWorkflowInstance(final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
-        final WorkflowDefinition workflowDefinition = workflowExecuteContextBuilder.getWorkflowDefinition();
         final Command command = workflowExecuteContextBuilder.getCommand();
         final WorkflowInstance workflowInstance = workflowInstanceDao.queryById(command.getWorkflowInstanceId());
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, command.getCommandType().name());
         workflowInstance.setHost(masterConfig.getMasterAddress());
-        workflowInstance.setCommandParam(command.getCommandParam());
-        workflowInstance.setGlobalParams(mergeCommandParamsWithWorkflowParams(command, workflowDefinition));
         workflowInstanceDao.upsertWorkflowInstance(workflowInstance);
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);
     }
@@ -112,28 +98,6 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
         workflowExecutionGraph.removeUnReachableEdge();
 
         workflowExecuteContextBuilder.setWorkflowExecutionGraph(workflowExecutionGraph);
-    }
-
-    /**
-     * Merge the command params with the workflow params.
-     * <p> If there are duplicate keys, the command params will override the workflow params.
-     */
-    private String mergeCommandParamsWithWorkflowParams(final Command command,
-                                                        final WorkflowDefinition workflowDefinition) {
-        final List<Property> commandParams =
-                Optional.ofNullable(JSONUtils.parseObject(command.getCommandParam(), ICommandParam.class))
-                        .map(ICommandParam::getCommandParams)
-                        .orElse(null);
-        final List<Property> globalParamsList =
-                GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams());
-        Map<String, Property> finalParams = new HashMap<>();
-        if (CollectionUtils.isNotEmpty(globalParamsList)) {
-            globalParamsList.forEach(globalParam -> finalParams.put(globalParam.getProp(), globalParam));
-        }
-        if (CollectionUtils.isNotEmpty(commandParams)) {
-            commandParams.forEach(commandParam -> finalParams.put(commandParam.getProp(), commandParam));
-        }
-        return JSONUtils.toJsonString(finalParams.values());
     }
 
     @Override

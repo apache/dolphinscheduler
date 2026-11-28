@@ -47,11 +47,17 @@ This document records the incompatible updates between each version. You need to
 ## 3.4.3
 
 * HTTP tasks now preserve the real response body for non-200 statuses, including 4xx/5xx, instead of a synthetic error string. `BODY_CONTAINS` and `BODY_NOT_CONTAINS` evaluate this real body without checking the status code, so existing body checks may produce different task results. Use status-code validation when error statuses must fail the task. Missing bodies are returned as empty strings; both body checks reject empty bodies. ([#18688](https://github.com/apache/dolphinscheduler/pull/18688))
+
 * Add the `missed_fire_policy` column to `t_ds_schedules`. Existing schedules default to `FIRE_ALL_MISSED` to preserve the previous Quartz `IgnoreMisfires` behavior. ([#18464](https://github.com/apache/dolphinscheduler/pull/18464))
+
 * Remove the obsolete Dynamic Task query API. ([#18556](https://github.com/apache/dolphinscheduler/issues/18556))
+
 * Remove the obsolete task update-with-upstream API `PUT /projects/{projectCode}/task-definition/{code}/with-upstream`. ([#18568](https://github.com/apache/dolphinscheduler/issues/18568))
+
 * Remove the obsolete cluster query API `GET /cluster/query-by-code`.
+
 * The workflow instance list APIs (`GET /projects/{projectCode}/workflow-instances`, `GET /projects/{projectCode}/workflow-instances/top-n`, `GET /projects/{projectCode}/workflow-instances/trigger`) no longer return the following properties in the response body:
+
   * **Removed heavy fields**: `commandParam`, `globalParams`, `historyCmd`, `varPool`, `stateHistory`
   * **Removed transient fields**: `stateDescList`, `workflowDefinition`, `dagData`, `queue`, `locations`, `dependenceScheduleTimes`
   * **Removed derived properties**: `cmdTypeIfComplement`, `complementData` (related to complement-data executions; use the detail API to obtain them)
@@ -59,8 +65,12 @@ This document records the incompatible updates between each version. You need to
 
 ## 3.5.0
 
+* Workflow startup parameters (`commandParam` and merged `globalParams`) are now persisted when creating the workflow instance, and start commands no longer carry these parameters. Before upgrading to 3.5.0, stop new triggers and let the old Master drain pending start commands from both the regular queue (`t_ds_command`) and the serial queue (`t_ds_serial_command`, including `SERIAL_WAIT` instances). Upgrade all Masters together; mixed-version Master execution is not supported for this change. Parameters already lost by pausing a never-started instance cannot be reconstructed automatically. ([#18801](https://github.com/apache/dolphinscheduler/issues/18801))
+
 * Python Gateway no longer provides a default `api.python-gateway.auth-token`. Set a non-blank token when enabling the gateway. API, Master, Worker, Alert and Standalone no longer provide default Actuator credentials; set both `management.security.username` and `management.security.password` to non-blank values before enabling `management.security.enabled`. Missing or blank required credentials cause startup to fail. Disabled features do not require credentials. ([#18812](https://github.com/apache/dolphinscheduler/issues/18812))
+
 * Remove the workflow move API `POST /projects/{projectCode}/workflow-definition/batch-move`. Existing workflow/task project ownership can no longer be changed by updates, instance synchronization, or version switching. Inconsistent historical ownership is rejected; no automatic migration is performed. Use cross-project copying to create new definitions; copying does not preserve workflow identity or execution history. ([#18806](https://github.com/apache/dolphinscheduler/issues/18806))
+
   * Historical workflow versions referenced by existing instances, including finished instances, can no longer be deleted. Editing an instance requires its recorded workflow definition version to exist and belong to the same project, even with `syncDefine=false`. If that version was deleted before upgrading, editing is rejected with `WORKFLOW_DEFINITION_NOT_EXIST`; submitting a complete DAG does not reconstruct the missing version. To continue execution, start a new instance from a valid workflow definition in the same project.
 * Internal RPC authentication is disabled by default. Upgrade all services before coordinating `rpc.authentication.enabled=true` with the same `rpc.authentication.secret` in each service's `common.properties`; authenticated and unauthenticated services cannot communicate. Credentials are cached for the process lifetime, so enablement and rotation require restarting services. See [RPC authentication](../security/authentication-type.md#inter-service-rpc-authentication).
 * Master, Worker and Alert Server now generate heartbeat snapshots on RPC requests and share a thread-safe system-metrics cache with a one-second refresh interval. `BaseHeartBeatTask` and the Master/Worker/Alert heartbeat task subclasses have been removed; custom integrations that extend them must manage scheduling explicitly. Alert Server no longer schedules registry heartbeat writes. It registers stable process identity at startup and restores registration on reconnect. `alert.max-heartbeat-interval` is removed; API queries Alert heartbeat data directly over RPC when requested.
